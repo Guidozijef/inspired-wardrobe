@@ -1,0 +1,18 @@
+page {
+  background-color: #F2F2F7;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', sans-serif;
+  color: #333333;
+  box-sizing: border-box;
+}
+
+view, text, scroll-view, image, button {
+  box-sizing: border-box;
+}
+
+/* Hide scrollbar */
+::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+  color: transparent;
+}

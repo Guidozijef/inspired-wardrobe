@@ -1,0 +1,88 @@
+<view class="container">
+  <view class="nav-header" style="padding-top: {{statusBarHeight}}px; height: {{statusBarHeight + navBarHeight}}px;">
+    <view class="nav-btn" bindtap="goBack">
+      <text class="back-icon">‹</text> 取消
+    </view>
+    <view class="nav-title" style="top: {{statusBarHeight}}px; height: {{navBarHeight}}px; line-height: {{navBarHeight}}px;">编辑单品</view>
+  </view>
+
+  <view class="content">
+    <!-- AI Cutout Result -->
+    <view class="cutout-box">
+      <text class="emoji-large">🧥</text>
+      <view class="success-tag">
+        <image class="tag-icon" src="https://img.icons8.com/ios-glyphs/30/8A2BE2/magic-wand.png"></image>
+        <text>AI 抠图成功</text>
+      </view>
+    </view>
+    <view class="reupload-btn" bindtap="reupload">
+      <image class="reupload-icon" src="https://img.icons8.com/ios-glyphs/30/007AFF/refresh.png"></image>
+      <text>重新上传</text>
+    </view>
+
+    <!-- Form -->
+    <view class="form-group">
+      <view class="form-row" bindtap="selectCategory">
+        <text class="label">分类</text>
+        <view class="value-group">
+          <text class="value">{{category}}</text>
+          <text class="arrow">›</text>
+        </view>
+      </view>
+
+      <view class="form-card">
+        <view class="card-header">
+          <text class="label">主色调</text>
+          <text class="sub-label">(已自动提取)</text>
+        </view>
+        <view class="color-list">
+          <view 
+            wx:for="{{colors}}" 
+            wx:key="index"
+            class="color-item" 
+            style="background-color: {{item.hex}}; border: {{activeColor === index ? '2px solid #8A2BE2' : '1px solid #EEEEEE'}};"
+            bindtap="switchColor"
+            data-index="{{index}}"
+          ></view>
+          <view class="color-item add-color" bindtap="addColor">
+            <text>+</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="form-card">
+        <view class="card-header">
+          <text class="label">适合季节</text>
+        </view>
+        <view class="tag-list">
+          <view 
+            wx:for="{{seasons}}" 
+            wx:key="index"
+            class="tag-btn {{item.active ? 'active' : ''}}"
+            bindtap="toggleSeason"
+            data-index="{{index}}"
+          >{{item.name}}</view>
+        </view>
+      </view>
+
+      <view class="form-card">
+        <view class="card-header">
+          <text class="label">穿着场合 (多选)</text>
+        </view>
+        <view class="tag-list">
+          <view 
+            wx:for="{{occasions}}" 
+            wx:key="index"
+            class="tag-btn {{item.active ? 'active' : ''}}"
+            bindtap="toggleOccasion"
+            data-index="{{index}}"
+          >{{item.name}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-bar">
+    <button class="action-btn primary-btn" bindtap="saveItem">保存单品</button>
+  </view>
+</view>

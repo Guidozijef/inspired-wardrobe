@@ -1,0 +1,21 @@
+{
+  "pages": [
+    "pages/wardrobe/wardrobe",
+    "pages/edit/edit",
+    "pages/canvas/canvas",
+    "pages/looks/looks",
+    "pages/profile/profile",
+    "pages/look_detail/look_detail",
+    "pages/detail/detail",
+    "pages/search/search",
+    "pages/capsule/capsule"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#F2F2F7",
+    "navigationBarTitleText": "OOTD 电子衣橱",
+    "navigationBarTextStyle": "black"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

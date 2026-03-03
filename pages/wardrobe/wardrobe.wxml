@@ -1,0 +1,75 @@
+<view class="container">
+  <!-- Header -->
+  <view class="header" style="padding-top: {{statusBarHeight}}px; padding-bottom: 10px;">
+    <text class="title">我的衣橱</text>
+    <view class="search-btn" bindtap="goToSearch">
+      <image class="icon" src="https://img.icons8.com/ios-glyphs/30/666666/search--v1.png"></image>
+    </view>
+  </view>
+
+  <!-- Categories -->
+  <scroll-view class="categories" scroll-x="true">
+    <view 
+      wx:for="{{categories}}" 
+      wx:key="index"
+      class="category-item {{activeCategory === index ? 'active' : ''}}"
+      bindtap="switchCategory"
+      data-index="{{index}}"
+    >{{item}}</view>
+  </scroll-view>
+
+  <!-- Grid -->
+  <view class="grid">
+    <view class="grid-item" wx:for="{{items}}" wx:key="index" bindtap="goToEdit" data-item="{{item}}">
+      <view class="item-img-bg">
+        <text class="emoji">{{item.emoji}}</text>
+        <view class="tag" wx:if="{{item.tag}}"><text class="tag-icon">✓</text> {{item.tag}}</view>
+      </view>
+      <view class="item-title">{{item.title}}</view>
+      <view class="item-desc">{{item.desc}}</view>
+    </view>
+  </view>
+
+  <!-- Floating Add Button -->
+  <view class="add-btn" bindtap="showActionSheet">
+    <text class="add-icon">+</text>
+  </view>
+
+  <!-- Action Sheet Overlay -->
+  <view class="overlay {{showAction ? 'active' : ''}}" bindtap="hideActionSheet">
+    <view class="action-sheet {{showAction ? 'active' : ''}}" catchtap="stopProp">
+      <view class="action-menu">
+        <view class="action-header">添加新单品，AI 将自动去除背景</view>
+        <view class="action-item border-b" bindtap="goToEdit">
+          <image class="action-icon" src="https://img.icons8.com/ios-glyphs/30/007AFF/camera.png"></image>
+          <text>拍照</text>
+        </view>
+        <view class="action-item" bindtap="goToEdit">
+          <image class="action-icon" src="https://img.icons8.com/ios-glyphs/30/007AFF/image.png"></image>
+          <text>从相册选择</text>
+        </view>
+      </view>
+      <view class="action-cancel" bindtap="hideActionSheet">取消</view>
+    </view>
+  </view>
+
+  <!-- Custom Tab Bar -->
+  <view class="tab-bar glass">
+    <view class="tab-item active">
+      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/8A2BE2/shirt.png"></image>
+      <text class="tab-text">衣橱</text>
+    </view>
+    <view class="tab-item" bindtap="switchTab" data-path="/pages/canvas/canvas">
+      <image class="tab-icon" src="https://img.icons8.com/glyph-neue/50/999999/fantasy--v1.png"></image>
+      <text class="tab-text">画布</text>
+    </view>
+    <view class="tab-item" bindtap="switchTab" data-path="/pages/looks/looks">
+      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/999999/hanger.png"></image>
+      <text class="tab-text">穿搭</text>
+    </view>
+    <view class="tab-item" bindtap="switchTab" data-path="/pages/profile/profile">
+      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/999999/user.png"></image>
+      <text class="tab-text">我的</text>
+    </view>
+  </view>
+</view>

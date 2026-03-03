@@ -1,0 +1,159 @@
+<view class="container">
+  <view class="header" style="padding-top: {{statusBarHeight + 10}}px; padding-bottom: 10px;">
+    <view class="user-info">
+      <image class="avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop" mode="aspectFill"></image>
+      <view class="user-details">
+        <text class="user-name">OOTD 达人</text>
+        <text class="user-desc">已记录 32 套穿搭</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="content-scroll">
+    <view class="section-header">
+      <text class="section-title">穿搭日历</text>
+    </view>
+    <view class="calendar-card">
+      <view class="calendar-header">
+        <text class="month-title">2026年 2月</text>
+        <view class="nav-arrows">
+          <text class="arrow">‹</text>
+          <text class="arrow">›</text>
+        </view>
+      </view>
+      <view class="week-days">
+        <text>日</text><text>一</text><text>二</text><text>三</text><text>四</text><text>五</text><text>六</text>
+      </view>
+      <view class="days-grid">
+        <view 
+          wx:for="{{days}}" 
+          wx:key="index"
+          class="day {{item.prev ? 'prev-month' : ''}} {{item.hasRecord ? 'has-dot' : ''}} {{activeDate === item.date && !item.prev ? 'active' : ''}}"
+          bindtap="selectDate"
+          data-date="{{item.date}}"
+          data-prev="{{item.prev}}"
+        >
+          <view class="{{activeDate === item.date && !item.prev ? 'active-bg' : ''}}">{{item.date}}</view>
+          <view class="dot" wx:if="{{item.hasRecord && activeDate !== item.date}}"></view>
+        </view>
+      </view>
+
+      <!-- Daily Look Section -->
+      <view class="daily-look" wx:if="{{currentDailyLook}}">
+        <view class="daily-look-img" style="background-color: {{currentDailyLook.bg}}">
+          <text class="daily-emoji">{{currentDailyLook.emoji}}</text>
+        </view>
+        <view class="daily-look-info">
+          <text class="daily-look-title">{{currentDailyLook.title}}</text>
+          <text class="daily-look-desc">点击查看详情</text>
+        </view>
+        <view class="daily-look-arrow">›</view>
+      </view>
+      <view class="daily-look-empty" wx:else>
+        <text>今天还没有记录穿搭哦</text>
+        <button class="add-record-btn" bindtap="switchTab" data-path="/pages/canvas/canvas">去记录</button>
+      </view>
+    </view>
+
+    <!-- Scene Capsules -->
+    <view class="section-header">
+      <text class="section-title">场景胶囊</text>
+      <text class="section-btn" bindtap="goToCapsule">新建</text>
+    </view>
+    <scroll-view class="capsules-scroll" scroll-x="true">
+      <view class="capsule-card" wx:for="{{capsules}}" wx:key="id" bindtap="goToCapsule">
+        <view class="capsule-img-wrapper">
+          <image class="capsule-img" src="{{item.img}}" mode="aspectFill"></image>
+        </view>
+        <view class="capsule-title">{{item.title}}</view>
+        <view class="capsule-desc">{{item.count}}件单品</view>
+      </view>
+    </scroll-view>
+
+    <!-- Random Outfit Generator -->
+    <view class="section-header">
+      <text class="section-title">灵感扭蛋机</text>
+      <text class="section-desc">不知道穿什么？来抽一套吧！</text>
+    </view>
+    <view class="random-card">
+      <view class="slot-machine">
+        <view class="slot-window">
+          <view class="slot-reel {{isGenerating ? 'spinning-1' : 'transitioning'}}" style="transform: translateY(-{{isGenerating ? 0 : slot1Index * 80}}px)">
+            <view class="slot-item" wx:for="{{slot1Items}}" wx:key="index">{{item}}</view>
+          </view>
+        </view>
+        <view class="slot-window">
+          <view class="slot-reel {{isGenerating ? 'spinning-2' : 'transitioning'}}" style="transform: translateY(-{{isGenerating ? 0 : slot2Index * 80}}px)">
+            <view class="slot-item" wx:for="{{slot2Items}}" wx:key="index">{{item}}</view>
+          </view>
+        </view>
+        <view class="slot-window">
+          <view class="slot-reel {{isGenerating ? 'spinning-3' : 'transitioning'}}" style="transform: translateY(-{{isGenerating ? 0 : slot3Index * 80}}px)">
+            <view class="slot-item" wx:for="{{slot3Items}}" wx:key="index">{{item}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="random-info" wx:if="{{randomLook}}">
+        <text class="random-title">{{randomLook.title}}</text>
+      </view>
+      <view class="random-actions">
+        <button class="random-btn primary-btn" bindtap="generateRandomLook">
+          {{isGenerating ? '生成中...' : (randomLook ? '✨ 完美搭配！再次生成' : '✨ 随机生成穿搭')}}
+        </button>
+      </view>
+      <view class="random-actions" style="margin-top: 10px;">
+        <button class="share-btn random-btn" bindtap="shareWeiXin"><image style="height: 20px;width:20px;margin-right:10px" class="icon" src="https://img.icons8.com/fluency-systems-filled/48/ffffff/weixing.png"></image>发送给微信好友</button>
+      </view>
+    </view>
+
+    <!-- <view class="section-header">
+      <text class="section-title">发现灵感</text>
+    </view>
+    <view class="waterfall">
+      <view class="waterfall-col">
+        <view class="card" wx:for="{{inspirations}}" wx:key="id" wx:if="{{index % 2 === 0}}">
+          <image class="card-img" src="{{item.img}}" mode="widthFix"></image>
+          <view class="card-info">
+            <text class="card-title">{{item.title}}</text>
+            <view class="card-meta">
+              <text class="author">{{item.author}}</text>
+              <view class="likes"><text class="heart">♥</text> {{item.likes}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="waterfall-col">
+        <view class="card" wx:for="{{inspirations}}" wx:key="id" wx:if="{{index % 2 !== 0}}">
+          <image class="card-img" src="{{item.img}}" mode="widthFix"></image>
+          <view class="card-info">
+            <text class="card-title">{{item.title}}</text>
+            <view class="card-meta">
+              <text class="author">{{item.author}}</text>
+              <view class="likes"><text class="heart">♥</text> {{item.likes}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view> -->
+  </view>
+
+  <!-- Custom Tab Bar -->
+  <view class="tab-bar glass">
+    <view class="tab-item" bindtap="switchTab" data-path="/pages/wardrobe/wardrobe">
+      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/999999/shirt.png"></image>
+      <text class="tab-text">衣橱</text>
+    </view>
+    <view class="tab-item" bindtap="switchTab" data-path="/pages/canvas/canvas">
+      <image class="tab-icon" src="https://img.icons8.com/glyph-neue/50/999999/fantasy--v1.png"></image>
+      <text class="tab-text">画布</text>
+    </view>
+    <view class="tab-item" bindtap="switchTab" data-path="/pages/looks/looks">
+      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/999999/hanger.png"></image>
+      <text class="tab-text">穿搭</text>
+    </view>
+    <view class="tab-item active">
+      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/8A2BE2/user.png"></image>
+      <text class="tab-text">我的</text>
+    </view>
+  </view>
+</view>

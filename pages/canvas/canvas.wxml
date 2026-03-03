@@ -1,0 +1,79 @@
+<view class="container">
+  <view class="nav-header glass" style="padding-top: {{statusBarHeight}}px; height: {{statusBarHeight + navBarHeight}}px;">
+    <view class="nav-left-actions" style="position: relative; z-index: 12;">
+      <view class="nav-btn" bindtap="clearCanvas">清空</view>
+      <view class="nav-btn primary" bindtap="saveCanvas">保存</view>
+    </view>
+    <view class="nav-title" style="top: {{statusBarHeight}}px; height: {{navBarHeight}}px; line-height: {{navBarHeight}}px;">搭配画布</view>
+  </view>
+
+  <!-- Movable Area for Drag and Drop -->
+  <movable-area class="canvas-area">
+    <view class="watermark">VOGUE</view>
+    
+    <movable-view 
+      wx:for="{{canvasItems}}" 
+      wx:key="id"
+      class="canvas-item {{item.active ? '' : 'no-border'}}" 
+      x="{{item.x}}" 
+      y="{{item.y}}" 
+      direction="all" 
+      scale="true"
+      bindtap="activateItem"
+      bindchange="onItemChange"
+      data-id="{{item.id}}"
+    >
+      <text class="emoji-huge">{{item.emoji}}</text>
+      <view class="rotate-btn" wx:if="{{item.active}}" catchtap="removeItem" data-id="{{item.id}}">
+        <text style="color: white; font-size: 12px;">×</text>
+      </view>
+    </movable-view>
+  </movable-area>
+
+  <view class="bottom-drawer">
+    <view class="drawer-handle"></view>
+    <view class="drawer-tabs">
+      <view 
+        wx:for="{{tabs}}" 
+        wx:key="index"
+        class="drawer-tab {{activeTab === index ? 'active' : ''}}"
+        bindtap="switchDrawerTab"
+        data-index="{{index}}"
+      >{{item}}</view>
+    </view>
+    
+    <scroll-view class="item-scroll" scroll-x="true" wx:if="{{activeTab === 0}}">
+      <view class="scroll-item" wx:for="{{libraryItems}}" wx:key="index" bindtap="addToCanvas" data-emoji="{{item}}">
+        <text>{{item}}</text>
+      </view>
+    </scroll-view>
+    
+    <view class="empty-state" wx:if="{{activeTab !== 0}}">
+      <text>功能开发中...</text>
+    </view>
+
+    <view class="drag-hint" wx:if="{{activeTab === 0}}">
+      <text class="arrow-up">↑</text> 点击单品放入画布
+    </view>
+  </view>
+
+  <!-- Custom Tab Bar -->
+  <view class="tab-bar glass">
+    <view class="tab-item" bindtap="switchTab" data-path="/pages/wardrobe/wardrobe">
+      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/999999/shirt.png"></image>
+      <text class="tab-text">衣橱</text>
+    </view>
+    <view class="tab-item active">
+      <image class="tab-icon" src="https://img.icons8.com/glyph-neue/50/8A2BE2/fantasy--v1.png"></image>
+      <text class="tab-text">画布</text>
+    </view>
+    <view class="tab-item" bindtap="switchTab" data-path="/pages/looks/looks">
+      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/999999/hanger.png"></image>
+      <text class="tab-text">穿搭</text>
+    </view>
+    <view class="tab-item" bindtap="switchTab" data-path="/pages/profile/profile">
+      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/999999/user.png"></image>
+      <text class="tab-text">我的</text>
+    </view>
+  </view>
+</view>

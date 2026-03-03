@@ -1,0 +1,39 @@
+<view class="container">
+  <!-- <view class="nav-header glass" style="padding-top: {{statusBarHeight}}px; height: {{statusBarHeight + navBarHeight}}px;">
+    <view class="nav-title" style="height: {{navBarHeight}}px; line-height: {{navBarHeight}}px;">我的穿搭</view>
+  </view> -->
+
+  <view class="content">
+    <view class="looks-grid">
+      <view class="look-card" wx:for="{{looks}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
+        <view class="look-img-wrapper" style="background-color: {{item.bg}};">
+          <text class="emoji-huge">{{item.emoji}}</text>
+        </view>
+        <view class="look-info">
+          <text class="look-title">{{item.title}}</text>
+          <text class="look-date">{{item.date}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Custom Tab Bar -->
+  <view class="tab-bar glass">
+    <view class="tab-item" bindtap="switchTab" data-path="/pages/wardrobe/wardrobe">
+      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/999999/shirt.png"></image>
+      <text class="tab-text">衣橱</text>
+    </view>
+    <view class="tab-item" bindtap="switchTab" data-path="/pages/canvas/canvas">
+      <image class="tab-icon" src="https://img.icons8.com/glyph-neue/50/999999/fantasy--v1.png"></image>
+      <text class="tab-text">画布</text>
+    </view>
+    <view class="tab-item active">
+      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/8A2BE2/hanger.png"></image>
+      <text class="tab-text">穿搭</text>
+    </view>
+    <view class="tab-item" bindtap="switchTab" data-path="/pages/profile/profile">
+      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/999999/user.png"></image>
+      <text class="tab-text">我的</text>
+    </view>
+  </view>
+</view>

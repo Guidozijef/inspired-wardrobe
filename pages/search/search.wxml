@@ -1,0 +1,34 @@
+<view class="container">
+  <view class="search-header glass" style="padding-top: 10px">
+    <view class="search-bar">
+      <image class="search-icon" src="https://img.icons8.com/ios-glyphs/30/999999/search--v1.png"></image>
+      <input class="search-input" placeholder="搜索单品、颜色、场景" auto-focus="true" />
+    </view>
+  </view>
+
+  <view class="search-content">
+    <view class="section">
+      <view class="section-title">
+        <text>历史搜索</text>
+        <image class="delete-icon" src="https://img.icons8.com/ios-glyphs/30/999999/trash.png" bindtap="clearHistory"></image>
+      </view>
+      <view class="tags">
+        <view class="tag">白衬衫</view>
+        <view class="tag">牛仔裤</view>
+        <view class="tag">职场</view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">
+        <text>热门标签</text>
+      </view>
+      <view class="tags">
+        <view class="tag hot">🌸 春季</view>
+        <view class="tag hot">✈️ 旅行度假</view>
+        <view class="tag hot">连衣裙</view>
+        <view class="tag hot">黑色</view>
+      </view>
+    </view>
+  </view>
+</view>

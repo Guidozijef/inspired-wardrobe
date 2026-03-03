@@ -1,0 +1,46 @@
+<view class="container">
+  <view class="nav-header glass" style="padding-top: {{statusBarHeight}}px; height: {{statusBarHeight + navBarHeight}}px;">
+    <view class="nav-btn" bindtap="goBack">
+      <text class="back-icon">‹</text> 返回
+    </view>
+    <view class="nav-title" style="top: {{statusBarHeight}}px; height: {{navBarHeight}}px; line-height: {{navBarHeight}}px;">单品详情</view>
+  </view>
+
+  <view class="item-display">
+    <view class="item-bg">
+      <text class="emoji-huge">{{emoji}}</text>
+    </view>
+  </view>
+
+  <view class="info-card">
+    <view class="title-row">
+      <text class="item-title">{{title}}</text>
+      <view class="tag-badge" wx:if="{{desc}}">{{desc}}</view>
+    </view>
+    
+    <view class="info-section">
+      <text class="section-label">主色调</text>
+      <view class="color-dot" style="background-color: #FFFFFF; border: 1px solid #EEEEEE;"></view>
+    </view>
+
+    <view class="info-section">
+      <text class="section-label">适合季节</text>
+      <view class="tags">
+        <view class="tag">🌸 春季</view>
+        <view class="tag">☀️ 夏季</view>
+      </view>
+    </view>
+
+    <view class="info-section">
+      <text class="section-label">穿着场合</text>
+      <view class="tags">
+        <view class="tag">💼 职场通勤</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-bar">
+    <button class="action-btn edit-btn" bindtap="editItem">编辑单品</button>
+    <button class="action-btn delete" bindtap="deleteItem">删除单品</button>
+  </view>
+</view>

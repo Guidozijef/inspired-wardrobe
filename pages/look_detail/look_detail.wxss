@@ -1,0 +1,27 @@
+.container { min-height: 100vh; background-color: #F8FAFC; display: flex; flex-direction: column; }
+.nav-header { display: flex; justify-content: center; align-items: center; padding: 0 20px; box-sizing: border-box; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #F1F5F9; }
+.glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); }
+.nav-left-actions { position: absolute; left: 20px; display: flex; align-items: center; z-index: 12; }
+.nav-btn { color: #333333; font-size: 16px; display: flex; align-items: center; }
+.back-icon { font-size: 24px; margin-right: 4px; line-height: 1; margin-top: -2px; }
+.nav-title { font-size: 16px; font-weight: bold; }
+
+.content { padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 20px; }
+.canvas-display { width: 100%; aspect-ratio: 3/4; border-radius: 24px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
+.emoji-huge { font-size: 120px; text-shadow: 0 10px 20px rgba(0,0,0,0.15); z-index: 2; }
+.watermark { position: absolute; bottom: 20px; right: 20px; font-size: 24px; font-family: serif; color: rgba(0,0,0,0.05); font-weight: bold; letter-spacing: 4px; pointer-events: none; z-index: 1; }
+
+.info-card { background-color: #ffffff; border-radius: 20px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+.info-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.look-title { font-size: 20px; font-weight: bold; color: #1E293B; }
+.look-date { font-size: 14px; color: #94A3B8; }
+.divider { height: 1px; background-color: #F1F5F9; margin-bottom: 16px; }
+.section-title { font-size: 14px; font-weight: bold; color: #64748B; margin-bottom: 12px; display: block; }
+.items-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.item-tag { padding: 8px 16px; background-color: #F8FAFC; color: #334155; font-size: 14px; font-weight: 500; border-radius: 20px; border: 1px solid #E2E8F0; }
+
+.bottom-bar { padding: 20px; padding-bottom: 40px; background-color: #ffffff; border-top: 1px solid #F1F5F9; margin-top: auto; display: flex; gap: 12px; }
+.action-btn { flex: 1; padding: 14px 0; font-size: 16px; font-weight: bold; border-radius: 16px; display: flex; align-items: center; justify-content: center; }
+.btn-icon { width: 20px; height: 20px; margin-right: 8px; }
+.primary-btn { background-color: #8A2BE2; color: white; box-shadow: 0 4px 12px rgba(138,43,226,0.3); }
+.edit-btn { background-color: #F1F5F9; color: #334155; }

@@ -1,0 +1,40 @@
+<view class="container">
+  <view class="nav-header glass" style="padding-top: {{statusBarHeight}}px; height: {{statusBarHeight + navBarHeight}}px;">
+    <view class="nav-btn" bindtap="goBack">
+      <text class="back-icon">‹</text> 取消
+    </view>
+    <view class="nav-title" style="top: {{statusBarHeight}}px; height: {{navBarHeight}}px; line-height: {{navBarHeight}}px;">新建场景胶囊</view>
+  </view>
+
+  <view class="content">
+    <view class="cover-section">
+      <view class="cover-placeholder" bindtap="chooseCover">
+        <image class="camera-icon" src="https://img.icons8.com/ios-glyphs/30/999999/camera.png"></image>
+        <text>添加封面图</text>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <view class="form-row">
+        <text class="label">胶囊名称</text>
+        <input class="input-field" placeholder="例如：五一去大理" placeholder-style="color: #D1D5DB;" />
+      </view>
+    </view>
+
+    <view class="items-section">
+      <view class="section-header">
+        <text class="section-title">包含单品 (0)</text>
+      </view>
+      
+      <view class="items-grid">
+        <view class="add-item-btn" bindtap="addItems">
+          <text class="plus-icon">+</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-bar">
+    <button class="action-btn primary-btn" bindtap="saveCapsule">保存胶囊</button>
+  </view>
+</view>

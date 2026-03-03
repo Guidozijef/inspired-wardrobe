@@ -1,0 +1,24 @@
+.container { min-height: 100vh; background-color: #F2F2F7; display: flex; flex-direction: column; }
+.nav-header { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; box-sizing: border-box; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #F1F5F9; }
+.glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); }
+.nav-btn { color: #007AFF; font-size: 16px; display: flex; align-items: center; position: relative; z-index: 12; }
+.nav-btn.primary { color: #8A2BE2; font-weight: bold; }
+.back-icon { font-size: 24px; margin-right: 4px; line-height: 1; margin-top: -2px; }
+.nav-title { font-size: 16px; font-weight: bold; position: absolute; left: 0; right: 0; text-align: center; z-index: 11; pointer-events: none; }
+.content { padding: 20px; flex: 1; }
+.cover-section { display: flex; justify-content: center; margin-bottom: 24px; }
+.cover-placeholder { width: 120px; height: 120px; background-color: #E5E5EA; border-radius: 60px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #999999; font-size: 12px; font-weight: 500; }
+.camera-icon { width: 24px; height: 24px; margin-bottom: 8px; }
+.form-group { margin-bottom: 24px; }
+.form-row { background-color: #ffffff; border-radius: 16px; padding: 16px; display: flex; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.label { font-weight: bold; color: #333333; font-size: 14px; width: 80px; }
+.input-field { flex: 1; font-size: 14px; color: #333333; }
+.items-section { background-color: #ffffff; border-radius: 16px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); min-height: 200px; }
+.section-header { margin-bottom: 16px; }
+.section-title { font-size: 14px; font-weight: bold; color: #333333; }
+.items-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.add-item-btn { aspect-ratio: 1; background-color: #F2F2F7; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 2px dashed #D1D5DB; }
+.plus-icon { font-size: 24px; color: #999999; font-weight: 300; }
+.bottom-bar { padding: 20px; padding-bottom: 40px; background-color: #F2F2F7; margin-top: auto; }
+.action-btn { width: 100%; padding: 14px 0; font-size: 16px; font-weight: bold; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+.primary-btn { background-color: #8A2BE2; color: white; box-shadow: 0 4px 12px rgba(138,43,226,0.3); }
