@@ -6,9 +6,11 @@ Page({
       { hex: '#FFFFFF' },
       { hex: '#1A1A1A' }
     ],
+    currImage: '',
     activeColor: 0,
     seasons: [
       { name: '🌸 春季', active: false },
+      { name: '🌞 夏季', active: false },
       { name: '🍂 秋季', active: true },
       { name: '❄️ 冬季', active: false }
     ],
@@ -17,19 +19,11 @@ Page({
       { name: '🥂 约会晚宴', active: false },
       { name: '✈️ 旅行度假', active: true }
     ],
-    statusBarHeight: 20,
-    navBarHeight: 44,
-    menuButtonWidth: 80
   },
 
-  onLoad() {
-    const sysInfo = wx.getSystemInfoSync();
-    const menuButton = wx.getMenuButtonBoundingClientRect();
-    this.setData({
-      statusBarHeight: sysInfo.statusBarHeight,
-      navBarHeight: (menuButton.top - sysInfo.statusBarHeight) * 2 + menuButton.height,
-      menuButtonWidth: sysInfo.windowWidth - menuButton.left + 10
-    });
+  onLoad(res) {
+    console.log(res)
+    this.setData({ currImage: res.path })
   },
 
   goBack() {
@@ -48,10 +42,31 @@ Page({
   },
 
   reupload() {
+    const that = this
     wx.showActionSheet({
       itemList: ['拍照', '从相册选择'],
       success: (res) => {
-        wx.showToast({ title: '模拟上传成功', icon: 'none' });
+        if (res.tapIndex === 0) {
+          wx.chooseMedia({
+            count: 1, // 仅拍摄一张
+            mediaType: ["image"],
+            sourceType: ["camera"], // 仅调用相机
+            success: (res) => {
+              const tempFilePath = res.tempFiles[0].tempFilePath;
+              that.setData({ currImage: tempFilePath})
+            },
+          });
+        } else if (res.tapIndex === 1) {
+          wx.chooseMessageFile({
+            count: 10,
+            type: "image",
+            success(res) {
+              // tempFilePath可以作为img标签的src属性显示图片
+              const [tempFilePaths] = res.tempFiles;
+              that.setData({ currImage: tempFilePaths.path})
+            },
+          });
+        }
       }
     });
   },

@@ -1,15 +1,16 @@
 <view class="container">
-  <view class="nav-header" style="padding-top: {{statusBarHeight}}px; height: {{statusBarHeight + navBarHeight}}px;">
+  <view class="nav-header" style="padding-top: 47px; height: 87px;">
     <view class="nav-btn" bindtap="goBack">
       <text class="back-icon">‹</text> 取消
     </view>
-    <view class="nav-title" style="top: {{statusBarHeight}}px; height: {{navBarHeight}}px; line-height: {{navBarHeight}}px;">编辑单品</view>
+    <view class="nav-title" style="top: 45px; height: 50px; line-height:50px;">编辑单品</view>
   </view>
 
   <view class="content">
     <!-- AI Cutout Result -->
     <view class="cutout-box">
-      <text class="emoji-large">🧥</text>
+      <!-- <text class="emoji-large">🧥</text> -->
+      <image src="{{ currImage }}" mode="aspectFill" style="height:240px;width: 100%;"/>
       <view class="success-tag">
         <image class="tag-icon" src="https://img.icons8.com/ios-glyphs/30/8A2BE2/magic-wand.png"></image>
         <text>AI 抠图成功</text>

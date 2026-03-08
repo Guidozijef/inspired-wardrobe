@@ -22,7 +22,8 @@
   <view class="grid">
     <view class="grid-item" wx:for="{{items}}" wx:key="index" bindtap="goToEdit" data-item="{{item}}">
       <view class="item-img-bg">
-        <text class="emoji">{{item.emoji}}</text>
+        <!-- <text class="emoji">{{item.emoji}}</text> -->
+        <image src="{{item.emoji}}" mode="heightFix" style="height:120px"/>
         <view class="tag" wx:if="{{item.tag}}"><text class="tag-icon">✓</text> {{item.tag}}</view>
       </view>
       <view class="item-title">{{item.title}}</view>
@@ -40,11 +41,11 @@
     <view class="action-sheet {{showAction ? 'active' : ''}}" catchtap="stopProp">
       <view class="action-menu">
         <view class="action-header">添加新单品，AI 将自动去除背景</view>
-        <view class="action-item border-b" bindtap="goToEdit">
+        <view class="action-item border-b" bindtap="goPhotograph">
           <image class="action-icon" src="https://img.icons8.com/ios-glyphs/30/007AFF/camera.png"></image>
           <text>拍照</text>
         </view>
-        <view class="action-item" bindtap="goToEdit">
+        <view class="action-item" bindtap="goPhotoalbum">
           <image class="action-icon" src="https://img.icons8.com/ios-glyphs/30/007AFF/image.png"></image>
           <text>从相册选择</text>
         </view>
