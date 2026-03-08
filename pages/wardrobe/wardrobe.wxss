@@ -1,9 +1,9 @@
 .container { padding-bottom: 100px; min-height: 100vh; position: relative; }
 .header { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
 .title { font-size: 28px; font-weight: bold; }
-.search-btn { width: 32px; height: 32px; background-color: #E5E5EA; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-right: 77px; }
+.search-btn { width: 32px; height: 32px; background-color: #E5E5EA; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-right: 0px; }
 .icon { width: 16px; height: 16px; }
-.categories { white-space: nowrap; padding: 0 20px 10px; }
+.categories { white-space: nowrap; padding: 0 20px 0px;height: 40px; }
 .category-item { display: inline-block; padding: 6px 16px; background-color: #ffffff; color: #666666; font-size: 14px; font-weight: 500; border-radius: 20px; margin-right: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 .category-item.active { background-color: #8A2BE2; color: #ffffff; }
 .grid { display: flex; flex-wrap: wrap; padding: 10px 15px; justify-content: space-between; }

@@ -1,6 +1,6 @@
 <view class="container">
   <!-- Header -->
-  <view class="header" style="padding-top: {{statusBarHeight}}px; padding-bottom: 10px;">
+  <view class="header" style="padding-top: {{statusBarHeight + 40}}px; padding-bottom: 10px;">
     <text class="title">我的衣橱</text>
     <view class="search-btn" bindtap="goToSearch">
       <image class="icon" src="https://img.icons8.com/ios-glyphs/30/666666/search--v1.png"></image>
