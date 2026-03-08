@@ -66,8 +66,12 @@ Page({
       success(res) {
         // tempFilePath可以作为img标签的src属性显示图片
         const [tempFilePaths] = res.tempFiles;
-        // that.addData(tempFilePaths.path)
-        that.goToEdit(tempFilePaths.path)
+        wx.editImage({
+          src: tempFilePaths.path, // 图片路径
+          success: (res) => {
+            that.goToEdit(res.tempFilePath)
+          }
+        })
       },
     });
   },
@@ -83,7 +87,12 @@ Page({
       success: (res) => {
         const tempFilePath = res.tempFiles[0].tempFilePath;
         // 接下来将照片上传到服务器或进行预览
-        that.goToEdit(tempFilePath)
+        wx.editImage({
+          src: tempFilePath, // 图片路径
+          success: (res) => {
+            that.goToEdit(res.tempFilePath)
+          }
+        })
       },
     });
   },

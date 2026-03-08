@@ -53,7 +53,12 @@ Page({
             sourceType: ["camera"], // 仅调用相机
             success: (res) => {
               const tempFilePath = res.tempFiles[0].tempFilePath;
-              that.setData({ currImage: tempFilePath})
+              wx.editImage({
+                src: tempFilePath, // 图片路径
+                success: (res) => {
+                  that.setData({ currImage: res.tempFilePath})
+                }
+              })
             },
           });
         } else if (res.tapIndex === 1) {
@@ -63,7 +68,12 @@ Page({
             success(res) {
               // tempFilePath可以作为img标签的src属性显示图片
               const [tempFilePaths] = res.tempFiles;
-              that.setData({ currImage: tempFilePaths.path})
+              wx.editImage({
+                src: tempFilePaths.path, // 图片路径
+                success: (res) => {
+                  that.setData({ currImage: res.tempFilePath})
+                }
+              })
             },
           });
         }
