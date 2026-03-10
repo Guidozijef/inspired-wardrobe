@@ -83,6 +83,36 @@
     </view>
   </view>
 
+  <!-- 自定义拾色器弹窗 -->
+  <view wx:if="{{colorPickerVisible}}" class="picker-mask">
+    <view class="picker-panel">
+      <view class="picker-header">
+        <text class="label">选择主色调</text>
+      </view>
+
+      <view class="picker-preview" style="background-color: {{tempColor}};"></view>
+      <view class="picker-hex">当前颜色：{{tempColor}}</view>
+
+      <view class="picker-slider-row">
+        <text class="picker-slider-label">R</text>
+        <slider min="0" max="255" step="1" value="{{tempR}}" bindchange="onColorSliderChange" data-channel="r" show-value />
+      </view>
+      <view class="picker-slider-row">
+        <text class="picker-slider-label">G</text>
+        <slider min="0" max="255" step="1" value="{{tempG}}" bindchange="onColorSliderChange" data-channel="g" show-value />
+      </view>
+      <view class="picker-slider-row">
+        <text class="picker-slider-label">B</text>
+        <slider min="0" max="255" step="1" value="{{tempB}}" bindchange="onColorSliderChange" data-channel="b" show-value />
+      </view>
+
+      <view class="picker-actions">
+        <button class="picker-btn cancel" bindtap="cancelColorPick">取消</button>
+        <button class="picker-btn confirm" bindtap="confirmColorPick">确定</button>
+      </view>
+    </view>
+  </view>
+
   <view class="bottom-bar">
     <button class="action-btn primary-btn" bindtap="saveItem">保存单品</button>
   </view>

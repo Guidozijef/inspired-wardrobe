@@ -1,6 +1,6 @@
 Page({
   data: {
-    category: '外套 / 风衣',
+    category: '上装',
     colors: [
       { hex: '#D4C4B7' },
       { hex: '#FFFFFF' },
@@ -8,6 +8,12 @@ Page({
     ],
     currImage: '',
     activeColor: 0,
+    // 自定义拾色器相关
+    colorPickerVisible: false,
+    tempColor: '#FFFFFF',
+    tempR: 255,
+    tempG: 255,
+    tempB: 255,
     seasons: [
       { name: '🌸 春季', active: false },
       { name: '🌞 夏季', active: false },
@@ -83,9 +89,9 @@ Page({
 
   selectCategory() {
     wx.showActionSheet({
-      itemList: ['外套 / 风衣', '上装 / 衬衫', '下装 / 裤子', '连衣裙'],
+      itemList: ["上装", "下装", "连衣裙", "鞋履", "配饰"],
       success: (res) => {
-        const list = ['外套 / 风衣', '上装 / 衬衫', '下装 / 裤子', '连衣裙'];
+        const list = ["上装", "下装", "连衣裙", "鞋履", "配饰"];
         this.setData({ category: list[res.tapIndex] });
       }
     });
@@ -96,7 +102,52 @@ Page({
   },
 
   addColor() {
-    wx.showToast({ title: '打开拾色器', icon: 'none' });
+    this.setData({
+      colorPickerVisible: true
+    });
+  },
+
+  // RGB 滑块变化
+  onColorSliderChange(e) {
+    const channel = e.currentTarget.dataset.channel; // 'r' | 'g' | 'b'
+    const value = Number(e.detail.value);
+    let { tempR, tempG, tempB } = this.data;
+
+    if (channel === 'r') tempR = value;
+    if (channel === 'g') tempG = value;
+    if (channel === 'b') tempB = value;
+
+    const toHex = (v) => {
+      const h = v.toString(16).toUpperCase();
+      return h.length === 1 ? '0' + h : h;
+    };
+
+    const tempColor = `#${toHex(tempR)}${toHex(tempG)}${toHex(tempB)}`;
+
+    this.setData({
+      tempR,
+      tempG,
+      tempB,
+      tempColor
+    });
+  },
+
+  // 取消拾色
+  cancelColorPick() {
+    this.setData({
+      colorPickerVisible: false
+    });
+  },
+
+  // 确认选择颜色
+  confirmColorPick() {
+    const hex = this.data.tempColor;
+    const colors = this.data.colors.concat({ hex });
+    this.setData({
+      colors,
+      activeColor: colors.length - 1,
+      colorPickerVisible: false
+    });
   },
 
   toggleSeason(e) {
