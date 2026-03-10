@@ -23,6 +23,18 @@
 
     <!-- Form -->
     <view class="form-group">
+      <view class="form-row">
+        <text class="label">单品名称</text>
+        <input 
+          class="value-input" 
+          type="text" 
+          placeholder="给这件衣服起个名字" 
+          value="{{name}}" 
+          bindinput="onNameInput"
+          placeholder-class="value-input-placeholder"
+        />
+      </view>
+
       <view class="form-row" bindtap="selectCategory">
         <text class="label">分类</text>
         <view class="value-group">
@@ -95,15 +107,15 @@
 
       <view class="picker-slider-row">
         <text class="picker-slider-label">R</text>
-        <slider min="0" max="255" step="1" value="{{tempR}}" bindchange="onColorSliderChange" data-channel="r" show-value />
+        <slider class='silder-color' min="0" max="255" step="1" value="{{tempR}}" bindchanging="onColorSliderChange" data-channel="r" show-value="true" />
       </view>
       <view class="picker-slider-row">
         <text class="picker-slider-label">G</text>
-        <slider min="0" max="255" step="1" value="{{tempG}}" bindchange="onColorSliderChange" data-channel="g" show-value />
+        <slider class='silder-color' min="0" max="255" step="1" value="{{tempG}}" bindchanging="onColorSliderChange" data-channel="g" show-value="true" />
       </view>
       <view class="picker-slider-row">
         <text class="picker-slider-label">B</text>
-        <slider min="0" max="255" step="1" value="{{tempB}}" bindchange="onColorSliderChange" data-channel="b" show-value />
+        <slider class='silder-color' min="0" max="255" step="1" value="{{tempB}}" bindchanging="onColorSliderChange" data-channel="b" show-value="true" />
       </view>
 
       <view class="picker-actions">

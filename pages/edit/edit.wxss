@@ -17,6 +17,15 @@
 .value-group { display: flex; align-items: center; color: #666666; font-size: 14px; }
 .value { font-weight: 500; margin-right: 8px; }
 .arrow { color: #999999; font-size: 18px; }
+.value-input {
+  flex: 1;
+  text-align: right;
+  font-size: 14px;
+  color: #333333;
+}
+.value-input-placeholder {
+  color: #C0C0C0;
+}
 .form-card { background-color: #ffffff; border-radius: 16px; padding: 16px; }
 .card-header { margin-bottom: 12px; display: flex; align-items: baseline; }
 .sub-label { font-size: 12px; color: #999999; margin-left: 4px; }
@@ -29,3 +38,87 @@
 .bottom-bar { padding: 20px; padding-bottom: 40px; background-color: #F2F2F7; margin-top: auto; }
 .action-btn { width: 100%; padding: 14px 0; font-size: 16px; font-weight: bold; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
 .primary-btn { background-color: #8A2BE2; color: white; box-shadow: 0 4px 12px rgba(138,43,226,0.3); }
+
+/* 拾色器弹窗样式，延续现有圆角卡片 + 毛玻璃风格 */
+.picker-mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 100;
+}
+
+.picker-panel {
+  width: 100%;
+  padding: 16px 20px 24px;
+  box-sizing: border-box;
+  background-color: #F2F2F7;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.picker-header {
+  margin-bottom: 12px;
+}
+
+.picker-preview {
+  width: 100%;
+  height: 56px;
+  border-radius: 16px;
+  border: 2px solid #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 8px;
+}
+
+.picker-hex {
+  font-size: 12px;
+  color: #666666;
+  margin-bottom: 8px;
+}
+
+.picker-slider-row {
+  display: flex;
+  align-items: center;
+  margin: 6px 0;
+}
+
+.picker-slider-label {
+  width: 18px;
+  font-size: 12px;
+  color: #999999;
+}
+
+.picker-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.picker-btn {
+  min-width: 84px;
+  padding: 8px 0;
+  border-radius: 999px;
+  font-size: 14px;
+}
+
+.picker-btn.cancel {
+  background-color: #F2F2F7;
+  color: #666666;
+}
+
+.picker-btn.confirm {
+  background-color: #8A2BE2;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(138, 43, 226, 0.35);
+}
+
+.silder-color {
+  width: 100%
+}

@@ -1,5 +1,6 @@
 Page({
   data: {
+    name: '',
     category: '上装',
     colors: [
       { hex: '#D4C4B7' },
@@ -7,6 +8,7 @@ Page({
       { hex: '#1A1A1A' }
     ],
     currImage: '',
+    currFileID: '',
     activeColor: 0,
     // 自定义拾色器相关
     colorPickerVisible: false,
@@ -17,13 +19,19 @@ Page({
     seasons: [
       { name: '🌸 春季', active: false },
       { name: '🌞 夏季', active: false },
-      { name: '🍂 秋季', active: true },
+      { name: '🍂 秋季', active: false },
       { name: '❄️ 冬季', active: false }
     ],
     occasions: [
-      { name: '💼 职场通勤', active: true },
+      { name: '💼 职场通勤', active: false },
       { name: '🥂 约会晚宴', active: false },
-      { name: '✈️ 旅行度假', active: true }
+      { name: '☕ 周末休闲', active: false },
+      { name: '📷 逛街拍照', active: false },
+      { name: '✈️ 旅行度假', active: false },
+      { name: '🏃 运动出汗', active: false },
+      { name: '🎉 聚会派对', active: false },
+      { name: '🛏 居家睡衣', active: false },
+      { name: '🏫 校园上课', active: false }
     ],
   },
 
@@ -36,15 +44,29 @@ Page({
     wx.navigateBack();
   },
 
-  saveItem() {
-    wx.showToast({
-      title: '保存成功',
-      icon: 'success',
-      duration: 1500
+  async saveItem() {
+    // 调用云函数，把 fileID 和其他属性存入数据库
+    const that = this
+    const dbRes = await wx.cloud.callFunction({
+      name: 'clothFunctions',
+      data: {
+        type: 'addCloth',
+        data: {
+          fileID: 'test',//  that.data.currFileID,
+          name: '我的新外套',
+          category: '外套',
+          tags: ['休闲', '春季'],
+          color: '卡其色'
+        }
+      }
     });
-    setTimeout(() => {
-      wx.navigateBack();
-    }, 1500);
+    if (dbRes.result.success) {
+      wx.showToast({ title: '添加成功！', icon: 'success', duration: 1500 });
+      // 这里可以跳转回列表页或者刷新数据
+      setTimeout(() => {
+        wx.navigateBack();
+      }, 1500);
+    }
   },
 
   reupload() {
@@ -94,6 +116,12 @@ Page({
         const list = ["上装", "下装", "连衣裙", "鞋履", "配饰"];
         this.setData({ category: list[res.tapIndex] });
       }
+    });
+  },
+
+  onNameInput(e) {
+    this.setData({
+      name: e.detail.value
     });
   },
 
