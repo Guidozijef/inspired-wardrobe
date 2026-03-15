@@ -1,5 +1,6 @@
 Page({
   data: {
+    editingId: '',
     name: '',
     category: '上装',
     colors: [
@@ -13,9 +14,11 @@ Page({
     // 自定义拾色器相关
     colorPickerVisible: false,
     tempColor: '#FFFFFF',
-    tempR: 255,
-    tempG: 255,
-    tempB: 255,
+    // 记录拾色画布在页面上的位置，用于触摸坐标换算
+    pickerRect: null,
+    // 当前选择点在圆形调色盘中的位置（用于小圆圈展示）
+    pickerX: 110,
+    pickerY: 80,
     seasons: [
       { name: '🌸 春季', active: false },
       { name: '🌞 夏季', active: false },
@@ -35,9 +38,62 @@ Page({
     ],
   },
 
-  onLoad(res) {
-    console.log(res)
-    this.setData({ currImage: res.path })
+  async onLoad(options) {
+    console.log('edit options', options);
+
+    // 1. 新增：从首页「添加」进来，带本地图片 path
+    if (options && options.path) {
+      this.setData({ currImage: options.path });
+    }
+
+    // 2. 编辑：从首页卡片进来，带云数据库文档 id
+    if (options && options.id) {
+      const db = wx.cloud.database();
+      try {
+        wx.showLoading({ title: '加载中...', mask: true });
+        const res = await db.collection('clothes').doc(options.id).get();
+        const item = res.data;
+
+        // 处理季节/场合多选状态
+        const seasons = this.data.seasons.map(s => ({
+          ...s,
+          active:
+            Array.isArray(item.seasons) &&
+            item.seasons.includes(s.name),
+        }));
+        const occasions = this.data.occasions.map(o => ({
+          ...o,
+          active:
+            Array.isArray(item.occasions) &&
+            item.occasions.includes(o.name),
+        }));
+
+        // 颜色：用数据库里的主色作为当前主色
+        const mainColor = item.color || '#FFFFFF';
+
+        this.setData({
+          editingId: options.id,
+          name: item.name || '',
+          category: item.category || '上装',
+          currImage: item.image_url || '',
+          currFileID: item.image_url || '',
+          colors: [{ hex: mainColor }],
+          activeColor: 0,
+          seasons,
+          occasions,
+        });
+      } catch (e) {
+        console.error('加载衣物详情失败', e);
+        wx.showToast({ title: '加载失败', icon: 'none' });
+      } finally {
+        wx.hideLoading();
+      }
+    }
+  },
+
+  onReady() {
+    // 页面初次渲染完成时，准备好拾色画布信息
+    this.initColorCanvas();
   },
 
   goBack() {
@@ -45,53 +101,60 @@ Page({
   },
 
   async saveItem() {
-    const { name, category, colors, activeColor, seasons, occasions, currImage, currFileID } = this.data;
+    const { editingId, name, category, colors, activeColor, seasons, occasions, currImage, currFileID } = this.data;
 
     if (!currImage) {
       wx.showToast({ title: '请先上传图片', icon: 'none' });
       return;
     }
 
-    wx.showLoading({ title: 'AI 抠图中...', mask: true });
+    wx.showLoading({ title: '处理图片中...', mask: true });
 
     try {
-      let originalFileID = currFileID;
+      const isEdit = !!editingId;
+      const isCloudImage = typeof currImage === 'string' && currImage.startsWith('cloud://');
+      const imageUnchanged = isEdit && isCloudImage && currImage === currFileID;
 
-      // 1. 如果是本地临时路径，则需要先上传原始图
-      const cloudPath = `temp/${Date.now()}-${Math.floor(Math.random() * 1000)}.jpg`;
-      const uploadRes = await wx.cloud.uploadFile({
-        cloudPath,
-        filePath: currImage
-      });
-      originalFileID = uploadRes.fileID;
+      let finalFileID = currFileID;
 
-      // 2. 调用抠图云函数
-      const cutoutRes = await wx.cloud.callFunction({
-        name: 'clothFunctions',
-        data: {
-          type: 'doCutout',
-          data: { fileID: originalFileID }
+      // 1. 只有在「新增」或「编辑但更换了图片」时，才重新上传 + 抠图
+      if (!imageUnchanged) {
+        const cloudPath = `temp/${Date.now()}-${Math.floor(Math.random() * 1000)}.jpg`;
+        const uploadRes = await wx.cloud.uploadFile({
+          cloudPath,
+          filePath: currImage
+        });
+        const originalFileID = uploadRes.fileID;
+
+        const cutoutRes = await wx.cloud.callFunction({
+          name: 'clothFunctions',
+          data: {
+            type: 'doCutout',
+            data: { fileID: originalFileID }
+          }
+        });
+
+        if (!cutoutRes.result.success) {
+          throw new Error(cutoutRes.result.errMsg || '抠图失败');
         }
-      });
 
-      if (!cutoutRes.result.success) {
-        throw new Error(cutoutRes.result.errMsg || '抠图失败');
+        finalFileID = cutoutRes.result.fileID;
       }
-
-      const finalFileID = cutoutRes.result.fileID;
 
       // 3. 提取选中的季节和场合
       const activeSeasons = seasons.filter(s => s.active).map(s => s.name);
       const activeOccasions = occasions.filter(o => o.active).map(o => o.name);
       const mainColor = colors[activeColor] ? colors[activeColor].hex : '';
 
-      // 4. 保存单品信息
+      // 4. 保存单品信息（新增或更新）
       wx.showLoading({ title: '保存中...', mask: true });
       const dbRes = await wx.cloud.callFunction({
         name: 'clothFunctions',
         data: {
-          type: 'addCloth',
+          type: isEdit ? 'updateCloth' : 'addCloth',
           data: {
+            // 编辑模式需要传 id，新增时后台会忽略
+            id: editingId,
             fileID: finalFileID,
             name: name || '未命名衣物',
             category,
@@ -105,7 +168,7 @@ Page({
       wx.hideLoading();
 
       if (dbRes.result.success) {
-        wx.showToast({ title: '添加成功！', icon: 'success', duration: 1500 });
+        wx.showToast({ title: isEdit ? '更新成功！' : '添加成功！', icon: 'success', duration: 1500 });
         setTimeout(() => {
           wx.navigateBack();
         }, 1500);
@@ -183,31 +246,95 @@ Page({
     this.setData({
       colorPickerVisible: true
     });
+    this.initColorCanvas();
   },
 
-  // RGB 滑块变化
-  onColorSliderChange(e) {
-    const channel = e.currentTarget.dataset.channel; // 'r' | 'g' | 'b'
-    const value = Number(e.detail.value);
-    let { tempR, tempG, tempB } = this.data;
+  // 初始化 Canvas 调色板
+  initColorCanvas() {
+    const query = wx.createSelectorQuery().in(this);
+    query
+      .select('#color-picker-canvas')
+      .boundingClientRect(rect => {
+        if (!rect) return;
 
-    if (channel === 'r') tempR = value;
-    if (channel === 'g') tempG = value;
-    if (channel === 'b') tempB = value;
+        const ctx = wx.createCanvasContext('colorPickerCanvas', this);
+        const width = rect.width;
+        const height = rect.height;
 
-    const toHex = (v) => {
-      const h = v.toString(16).toUpperCase();
-      return h.length === 1 ? '0' + h : h;
-    };
+        // 1. 色相渐变（左右）
+        const hueGrad = ctx.createLinearGradient(0, 0, width, 0);
+        hueGrad.addColorStop(0, 'red');
+        hueGrad.addColorStop(1 / 6, 'yellow');
+        hueGrad.addColorStop(2 / 6, 'lime');
+        hueGrad.addColorStop(3 / 6, 'cyan');
+        hueGrad.addColorStop(4 / 6, 'blue');
+        hueGrad.addColorStop(5 / 6, 'magenta');
+        hueGrad.addColorStop(1, 'red');
+        ctx.setFillStyle(hueGrad);
+        ctx.fillRect(0, 0, width, height);
 
-    const tempColor = `#${toHex(tempR)}${toHex(tempG)}${toHex(tempB)}`;
+        // 2. 上方白色渐变，控制亮度
+        const whiteGrad = ctx.createLinearGradient(0, 0, 0, height);
+        whiteGrad.addColorStop(0, 'rgba(255,255,255,1)');
+        whiteGrad.addColorStop(0.5, 'rgba(255,255,255,0)');
+        whiteGrad.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.setFillStyle(whiteGrad);
+        ctx.fillRect(0, 0, width, height);
 
-    this.setData({
-      tempR,
-      tempG,
-      tempB,
-      tempColor
-    });
+        // 3. 下方黑色渐变，控制暗度
+        const blackGrad = ctx.createLinearGradient(0, height, 0, 0);
+        blackGrad.addColorStop(0, 'rgba(0,0,0,1)');
+        blackGrad.addColorStop(0.5, 'rgba(0,0,0,0)');
+        blackGrad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.setFillStyle(blackGrad);
+        ctx.fillRect(0, 0, width, height);
+
+        ctx.draw(false, () => {
+          this.setData({ pickerRect: rect });
+        });
+      })
+      .exec();
+  },
+
+  // 在调色板上拖动 / 点击，实时读取像素颜色
+  onColorCanvasTouch(e) {
+    const rect = this.data.pickerRect;
+    if (!rect) return;
+
+    const touch = e.touches[0] || e.changedTouches[0];
+    if (!touch) return;
+
+    let x = touch.x - rect.left;
+    let y = touch.y - rect.top;
+
+    x = Math.max(0, Math.min(rect.width - 1, x));
+    y = Math.max(0, Math.min(rect.height - 1, y));
+
+    wx.canvasGetImageData({
+      canvasId: 'colorPickerCanvas',
+      x: Math.round(x),
+      y: Math.round(y),
+      width: 1,
+      height: 1,
+      success: (res) => {
+        const [r, g, b] = res.data;
+        const toHex = (v) => {
+          const h = v.toString(16).toUpperCase();
+          return h.length === 1 ? '0' + h : h;
+        };
+        const hex = `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+        this.setData({
+          tempColor: hex,
+          pickerX: x - 6,  // 小圆圈半径约 6px，减去让其居中
+          pickerY: y - 6
+        });
+      }
+    }, this);
+  },
+
+  // 阻止弹窗区域的触摸事件滚动到底层页面，保证纵向拖动生效
+  stopTouchMove() {
+    return false;
   },
 
   // 取消拾色

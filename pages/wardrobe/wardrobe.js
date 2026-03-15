@@ -5,12 +5,10 @@ Page({
     showAction: false,
     categories: ["全部", "上装", "下装", "连衣裙", "鞋履", "配饰"],
     activeCategory: 0,
-    items: [
-      { emoji: "👚", title: "基础白衬衫", desc: "上装 · 春夏", tag: "职场" },
-      { emoji: "👖", title: "直筒牛仔裤", desc: "下装 · 四季", tag: "" },
-      { emoji: "👗", title: "法式碎花裙", desc: "连衣裙 · 约会", tag: "" },
-      { emoji: "👠", title: "复古红高跟", desc: "鞋履 · 职场", tag: "" },
-    ],
+    // 从云数据库 clothes 拉取的完整衣服列表
+    allItems: [],
+    // 根据当前筛选展示的列表
+    items: [],
     statusBarHeight: 20,
     navBarHeight: 44,
   },
@@ -23,10 +21,92 @@ Page({
       navBarHeight:
         (menuButton.top - sysInfo.statusBarHeight) * 2 + menuButton.height,
     });
+
+    // 首次进入页面时也拉取一次
+    this.fetchClothes();
+  },
+
+  // 从编辑页返回时会触发 onShow，这里重新拉取一次云端数据
+  onShow() {
+    this.fetchClothes();
+  },
+
+  // 从云数据库 clothes 获取数据
+  fetchClothes() {
+    const db = wx.cloud.database();
+    db.collection('clothes')
+      .get()
+      .then(res => {
+        const list = (res.data || []).map(item => {
+          // 你的 clothes 文档字段结构：
+          // category: "上装"
+          // image_url: "cloud://..."
+          // name: "222"
+          // occasions: ["🥂 约会晚宴"]
+          // seasons: ["🌞 夏季", "🍂 秋季"]
+          const category = item.category || '';
+          const seasons = Array.isArray(item.seasons) ? item.seasons : [];
+          const descParts = [];
+          if (category) descParts.push(category);
+          if (seasons.length) descParts.push(seasons.join(' / '));
+
+          return {
+            // 文档 id，后续编辑时用来从数据库读取原始数据
+            id: item._id,
+            // 分类字段，用于筛选
+            category: item.category || '',
+            // 网格里用 image 展示服装图片，这里直接用 image_url 字段
+            emoji: item.image_url || '',
+            title: item.name || '未命名单品',
+            desc: descParts.join(' · '),
+            tag:
+              Array.isArray(item.occasions) && item.occasions.length
+                ? item.occasions[0]
+                : '',
+          };
+        });
+
+        // 默认按照当前选中的 tab 做一次筛选（如“全部”）
+        this.setData(
+          {
+            allItems: list,
+          },
+          () => {
+            this.applyCategoryFilter();
+          }
+        );
+      })
+      .catch(err => {
+        console.error('获取 clothes 数据失败', err);
+        wx.showToast({
+          title: '衣橱加载失败',
+          icon: 'none',
+        });
+      });
   },
 
   switchCategory(e) {
-    this.setData({ activeCategory: e.currentTarget.dataset.index });
+    const index = e.currentTarget.dataset.index;
+    this.setData(
+      { activeCategory: index },
+      () => {
+        this.applyCategoryFilter();
+      }
+    );
+  },
+
+  // 根据当前 activeCategory 对 allItems 做筛选
+  applyCategoryFilter() {
+    const { activeCategory, categories, allItems } = this.data;
+    const current = categories[activeCategory];
+
+    if (!current || current === '全部') {
+      this.setData({ items: allItems });
+      return;
+    }
+
+    const filtered = allItems.filter(item => item.category === current);
+    this.setData({ items: filtered });
   },
 
   goToSearch() {
@@ -52,10 +132,31 @@ Page({
     // Prevent event bubbling
   },
 
-  goToEdit(path) {
-    wx.navigateTo({
-      url: "/pages/edit/edit?path=" + path,
-    });
+  // 进入编辑页：
+  // 1）从首页卡片点击：传入 event，携带已有单品 id
+  // 2）从拍照/相册新增：传入图片本地 path
+  goToEdit(eOrPath) {
+    let path = '';
+    let id = '';
+
+    if (typeof eOrPath === 'string') {
+      // 新增：直接传入本地图片地址
+      path = eOrPath;
+    } else if (eOrPath && eOrPath.currentTarget) {
+      // 首页点击已有单品
+      const item = eOrPath.currentTarget.dataset.item || {};
+      id = item.id || '';
+    }
+
+    let url = '/pages/edit/edit';
+    const query = [];
+    if (path) query.push('path=' + encodeURIComponent(path));
+    if (id) query.push('id=' + id);
+    if (query.length) {
+      url += '?' + query.join('&');
+    }
+
+    wx.navigateTo({ url });
   },
 
   // 相册
