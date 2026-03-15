@@ -45,27 +45,77 @@ Page({
   },
 
   async saveItem() {
-    // 调用云函数，把 fileID 和其他属性存入数据库
-    const that = this
-    const dbRes = await wx.cloud.callFunction({
-      name: 'clothFunctions',
-      data: {
-        type: 'addCloth',
+    const { name, category, colors, activeColor, seasons, occasions, currImage, currFileID } = this.data;
+
+    if (!currImage) {
+      wx.showToast({ title: '请先上传图片', icon: 'none' });
+      return;
+    }
+
+    wx.showLoading({ title: 'AI 抠图中...', mask: true });
+
+    try {
+      let originalFileID = currFileID;
+
+      // 1. 如果是本地临时路径，则需要先上传原始图
+      const cloudPath = `temp/${Date.now()}-${Math.floor(Math.random() * 1000)}.jpg`;
+      const uploadRes = await wx.cloud.uploadFile({
+        cloudPath,
+        filePath: currImage
+      });
+      originalFileID = uploadRes.fileID;
+
+      // 2. 调用抠图云函数
+      const cutoutRes = await wx.cloud.callFunction({
+        name: 'clothFunctions',
         data: {
-          fileID: 'test',//  that.data.currFileID,
-          name: '我的新外套',
-          category: '外套',
-          tags: ['休闲', '春季'],
-          color: '卡其色'
+          type: 'doCutout',
+          data: { fileID: originalFileID }
         }
+      });
+
+      if (!cutoutRes.result.success) {
+        throw new Error(cutoutRes.result.errMsg || '抠图失败');
       }
-    });
-    if (dbRes.result.success) {
-      wx.showToast({ title: '添加成功！', icon: 'success', duration: 1500 });
-      // 这里可以跳转回列表页或者刷新数据
-      setTimeout(() => {
-        wx.navigateBack();
-      }, 1500);
+
+      const finalFileID = cutoutRes.result.fileID;
+
+      // 3. 提取选中的季节和场合
+      const activeSeasons = seasons.filter(s => s.active).map(s => s.name);
+      const activeOccasions = occasions.filter(o => o.active).map(o => o.name);
+      const mainColor = colors[activeColor] ? colors[activeColor].hex : '';
+
+      // 4. 保存单品信息
+      wx.showLoading({ title: '保存中...', mask: true });
+      const dbRes = await wx.cloud.callFunction({
+        name: 'clothFunctions',
+        data: {
+          type: 'addCloth',
+          data: {
+            fileID: finalFileID,
+            name: name || '未命名衣物',
+            category,
+            seasons: activeSeasons,
+            occasions: activeOccasions,
+            color: mainColor
+          }
+        }
+      });
+
+      wx.hideLoading();
+
+      if (dbRes.result.success) {
+        wx.showToast({ title: '添加成功！', icon: 'success', duration: 1500 });
+        setTimeout(() => {
+          wx.navigateBack();
+        }, 1500);
+      } else {
+        wx.showToast({ title: '添加失败：' + dbRes.result.errMsg, icon: 'none' });
+      }
+    } catch (err) {
+      wx.hideLoading();
+      console.error('保存单品失败:', err);
+      wx.showToast({ title: (err.message || '系统错误'), icon: 'none' });
     }
   },
 
@@ -81,12 +131,12 @@ Page({
             sourceType: ["camera"], // 仅调用相机
             success: (res) => {
               const tempFilePath = res.tempFiles[0].tempFilePath;
-              wx.editImage({
-                src: tempFilePath, // 图片路径
-                success: (res) => {
-                  that.setData({ currImage: res.tempFilePath})
-                }
-              })
+              // wx.editImage({
+              //   src: tempFilePath, // 图片路径
+              //   success: (res) => {
+                  that.setData({ currImage: tempFilePath})
+                // }
+              // })
             },
           });
         } else if (res.tapIndex === 1) {

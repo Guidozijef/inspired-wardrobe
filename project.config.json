@@ -36,5 +36,6 @@
   "projectname": "ootd-wardrobe",
   "condition": {},
   "simulatorPluginLibVersion": {},
-  "editorSetting": {}
+  "editorSetting": {},
+  "cloudfunctionTemplateRoot": "cloudfunctionTemplate/"
 }

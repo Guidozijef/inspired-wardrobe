@@ -1,3 +1,5 @@
+import { uploadPhoto } from '../utils'
+
 Page({
   data: {
     showAction: false,
@@ -57,7 +59,7 @@ Page({
   },
 
   // 相册
-  goPhotoalbum() {
+  async goPhotoalbum() {
     const that = this;
     that.hideActionSheet();
     wx.chooseMessageFile({
@@ -66,35 +68,49 @@ Page({
       success(res) {
         // tempFilePath可以作为img标签的src属性显示图片
         const [tempFilePaths] = res.tempFiles;
-        wx.editImage({
+        const df = wx.compressImage({
           src: tempFilePaths.path, // 图片路径
-          success: (res) => {
-            that.goToEdit(res.tempFilePath)
-          }
+          quality: 50 // 压缩质量
         })
+        console.log(df)
+        // wx.editImage({
+        //   src: tempFilePaths.path, // 图片路径
+        //   success: (res) => {
+        //     that.goToEdit(res.tempFilePath)
+        //   }
+        // })
       },
     });
+
+
   },
 
   // 拍照
-  goPhotograph() {
+  async goPhotograph() {
     this.hideActionSheet();
-    const that = this;
-    wx.chooseMedia({
-      count: 1, // 仅拍摄一张
-      mediaType: ["image"],
-      sourceType: ["camera"], // 仅调用相机
-      success: (res) => {
-        const tempFilePath = res.tempFiles[0].tempFilePath;
-        // 接下来将照片上传到服务器或进行预览
-        wx.editImage({
-          src: tempFilePath, // 图片路径
-          success: (res) => {
-            that.goToEdit(res.tempFilePath)
-          }
-        })
-      },
-    });
+    // wx.chooseMedia({
+    //   count: 1, // 仅拍摄一张
+    //   mediaType: ["image"],
+    //   sourceType: ["camera"], // 仅调用相机
+    //   success: (res) => {
+    //     const tempFilePath = res.tempFiles[0].tempFilePath;
+    //     // 接下来将照片上传到服务器或进行预览
+    //     const df = wx.compressImage({
+    //       src: tempFilePath, // 图片路径
+    //       quality: 50 // 压缩质量
+    //     })
+    //     df.then(res => {
+    //       // wx.editImage({
+    //       //   src: res.tempFilePath, // 图片路径
+    //       //   success: (res) => {
+    //           that.goToEdit(res.tempFilePath)
+    //         // }
+    //     // })
+    //     })
+    //   },
+    // });
+    const filePath = await uploadPhoto() 
+    this.goToEdit(filePath)
   },
 
 
