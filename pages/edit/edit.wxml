@@ -10,7 +10,7 @@
     <!-- AI Cutout Result -->
     <view class="cutout-box">
       <!-- <text class="emoji-large">🧥</text> -->
-      <image src="{{ currImage }}" mode="aspectFill" style="height:240px;width: 100%;"/>
+      <image src="{{ currImage }}" mode="aspectFit" style="height:240px;width: 100%;"/>
       <view class="success-tag">
         <image class="tag-icon" src="https://img.icons8.com/ios-glyphs/30/8A2BE2/magic-wand.png"></image>
         <text>AI 抠图成功</text>
@@ -96,7 +96,7 @@
   </view>
 
   <!-- 自定义拾色器弹窗 -->
-  <view wx:if="{{colorPickerVisible}}" class="picker-mask">
+  <view wx:if="{{colorPickerVisible}}" class="picker-mask" catchtouchmove="stopTouchMove">
     <view class="picker-panel">
       <view class="picker-header">
         <text class="label">选择主色调</text>
@@ -105,17 +105,20 @@
       <view class="picker-preview" style="background-color: {{tempColor}};"></view>
       <view class="picker-hex">当前颜色：{{tempColor}}</view>
 
-      <view class="picker-slider-row">
-        <text class="picker-slider-label">R</text>
-        <slider class='silder-color' min="0" max="255" step="1" value="{{tempR}}" bindchanging="onColorSliderChange" data-channel="r" show-value="true" />
-      </view>
-      <view class="picker-slider-row">
-        <text class="picker-slider-label">G</text>
-        <slider class='silder-color' min="0" max="255" step="1" value="{{tempG}}" bindchanging="onColorSliderChange" data-channel="g" show-value="true" />
-      </view>
-      <view class="picker-slider-row">
-        <text class="picker-slider-label">B</text>
-        <slider class='silder-color' min="0" max="255" step="1" value="{{tempB}}" bindchanging="onColorSliderChange" data-channel="b" show-value="true" />
+      <!-- Canvas 调色盘：圆形展示 + 小圆圈标记当前颜色 -->
+      <view class="color-wheel-wrapper">
+        <canvas
+          id="color-picker-canvas"
+          canvas-id="colorPickerCanvas"
+          class="color-canvas"
+          disable-scroll="true"
+          bindtouchstart="onColorCanvasTouch"
+          bindtouchmove="onColorCanvasTouch"
+        ></canvas>
+        <view
+          class="color-thumb"
+          style="left: {{pickerX}}px; top: {{pickerY}}px; background-color: {{tempColor}};"
+        ></view>
       </view>
 
       <view class="picker-actions">
