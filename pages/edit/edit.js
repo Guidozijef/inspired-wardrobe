@@ -141,7 +141,8 @@ Page({
       });
     } catch (e) {
       // console.error('AI 抠图失败', e);
-      wx.showToast({ title: e || '抠图失败，请重试', icon: 'none' });
+      const errorMsg = e.message || e.errMsg || '抠图失败，请重试';
+      wx.showToast({ title: errorMsg, icon: 'none' });
       // 失败时可以考虑回退到展示原图，由用户决定是否重试
       this.setData({
         currImage: localPath,
@@ -173,39 +174,7 @@ Page({
 
     try {
       const isEdit = !!editingId;
-      const isCloudImage = typeof currImage === 'string' && currImage.startsWith('cloud://');
-      const imageUnchanged = isEdit && isCloudImage && currImage === currFileID;
-
-      let finalFileID = currFileID;
-
-      // 1. 只有在「还没抠图」或「编辑时更换了图片」时，才重新上传 + 抠图
-      if (!hasCutout || (isEdit && !imageUnchanged)) {
-        const cloudPath = `temp/${Date.now()}-${Math.floor(Math.random() * 1000)}.jpg`;
-        const uploadRes = await wx.cloud.uploadFile({
-          cloudPath,
-          filePath: currImage
-        });
-        const originalFileID = uploadRes.fileID;
-
-        const cutoutRes = await wx.cloud.callFunction({
-          name: 'clothFunctions',
-          data: {
-            type: 'doCutout',
-            data: { fileID: originalFileID }
-          }
-        });
-
-        if (!cutoutRes.result.success) {
-          throw new Error(cutoutRes.result.errMsg || '抠图失败');
-        }
-
-        finalFileID = cutoutRes.result.fileID;
-        this.setData({
-          currFileID: finalFileID,
-          hasCutout: true,
-          currImage: finalFileID
-        });
-      }
+      const finalFileID = currFileID;
 
       // 3. 提取选中的季节和场合
       const activeSeasons = seasons.filter(s => s.active).map(s => s.name);
