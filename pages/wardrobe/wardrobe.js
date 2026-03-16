@@ -45,20 +45,22 @@ Page({
           // occasions: ["🥂 约会晚宴"]
           // seasons: ["🌞 夏季", "🍂 秋季"]
           const category = item.category || '';
-          const seasons = Array.isArray(item.seasons) ? item.seasons : [];
-          const descParts = [];
-          if (category) descParts.push(category);
-          if (seasons.length) descParts.push(seasons.join(' / '));
+          const originalSeasons = Array.isArray(item.seasons) ? item.seasons : [];
+          
+          // 提取季节图标（如 🌸, 🌞, 🍂, ❄️）
+          const seasonIcons = originalSeasons.map(s => {
+            const match = s.match(/[\uD83C-\uDBFF\uDC00-\uDFFF]+/g);
+            return match ? match[0] : '';
+          }).filter(icon => icon !== '');
 
           return {
-            // 文档 id，后续编辑时用来从数据库读取原始数据
             id: item._id,
-            // 分类字段，用于筛选
-            category: item.category || '',
-            // 网格里用 image 展示服装图片，这里直接用 image_url 字段
+            category: category,
             emoji: item.image_url || '',
             title: item.name || '未命名单品',
-            desc: descParts.join(' · '),
+            // description 只保留分类，季节通过图标展示
+            desc: category,
+            seasons: seasonIcons,
             tag:
               Array.isArray(item.occasions) && item.occasions.length
                 ? item.occasions[0]
