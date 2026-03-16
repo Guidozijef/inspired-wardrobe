@@ -2,12 +2,12 @@ Page({
   data: {
     tabs: ['👗 单品库', '🖼️ 杂志模板', '✨ 滤镜/去色'],
     activeTab: 0,
-    libraryItems: ['🎽', '👔', '👗', '🩳', '👟', '🧥', '👖', '👠'],
-    canvasItems: [
-      { id: 1, emoji: '🧥', x: 80, y: 100, active: true },
-      { id: 2, emoji: '👖', x: 100, y: 220, active: false }
-    ],
-    nextId: 3,
+    categories: ["全部", "上装", "下装", "连衣裙", "鞋履", "配饰"],
+    activeCategory: 0,
+    allItems: [], // 存储从云端获取的所有单品
+    libraryItems: [], // 存储当前分类下的单品
+    canvasItems: [],
+    nextId: 1,
     statusBarHeight: 20,
     navBarHeight: 44,
     menuButtonWidth: 80
@@ -21,6 +21,43 @@ Page({
       navBarHeight: (menuButton.top - sysInfo.statusBarHeight) * 2 + menuButton.height,
       menuButtonWidth: sysInfo.windowWidth - menuButton.left + 10
     });
+    this.fetchClothes();
+  },
+
+  onShow() {
+    this.fetchClothes();
+  },
+
+  fetchClothes() {
+    const db = wx.cloud.database();
+    db.collection('clothes').get().then(res => {
+      this.setData({
+        allItems: res.data || []
+      }, () => {
+        this.applyCategoryFilter();
+      });
+    }).catch(err => {
+      console.error('获取单品失败', err);
+    });
+  },
+
+  switchCategory(e) {
+    const index = e.currentTarget.dataset.index;
+    this.setData({ activeCategory: index }, () => {
+      this.applyCategoryFilter();
+    });
+  },
+
+  applyCategoryFilter() {
+    const { activeCategory, categories, allItems } = this.data;
+    const currentCategory = categories[activeCategory];
+    
+    if (currentCategory === '全部') {
+      this.setData({ libraryItems: allItems });
+    } else {
+      const filtered = allItems.filter(item => item.category === currentCategory);
+      this.setData({ libraryItems: filtered });
+    }
   },
 
   switchTab(e) {
@@ -59,12 +96,12 @@ Page({
   },
 
   addToCanvas(e) {
-    const emoji = e.currentTarget.dataset.emoji;
+    const item = e.currentTarget.dataset.item;
     const newItem = {
       id: this.data.nextId,
-      emoji: emoji,
-      x: 120,
-      y: 150,
+      url: item.image_url,
+      x: 100,
+      y: 100,
       active: true
     };
     

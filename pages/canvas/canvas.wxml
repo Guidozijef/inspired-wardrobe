@@ -23,7 +23,7 @@
       bindchange="onItemChange"
       data-id="{{item.id}}"
     >
-      <text class="emoji-huge">{{item.emoji}}</text>
+      <image class="canvas-img" src="{{item.url}}" mode="aspectFit" />
       <view class="rotate-btn" wx:if="{{item.active}}" catchtap="removeItem" data-id="{{item.id}}">
         <text style="color: white; font-size: 12px;">×</text>
       </view>
@@ -42,9 +42,20 @@
       >{{item}}</view>
     </view>
     
-    <scroll-view class="item-scroll" scroll-x="true" wx:if="{{activeTab === 0}}">
-      <view class="scroll-item" wx:for="{{libraryItems}}" wx:key="index" bindtap="addToCanvas" data-emoji="{{item}}">
-        <text>{{item}}</text>
+    <!-- Library Categories -->
+    <scroll-view class="library-categories" scroll-x="true" show-scrollbar="false" wx:if="{{activeTab === 0}}">
+      <view 
+        wx:for="{{categories}}" 
+        wx:key="index"
+        class="lib-cat-item {{activeCategory === index ? 'active' : ''}}"
+        bindtap="switchCategory"
+        data-index="{{index}}"
+      >{{item}}</view>
+    </scroll-view>
+    
+    <scroll-view class="item-scroll" scroll-x="true" scroll-with-animation="true" enhanced="true" show-scrollbar="false" wx:if="{{activeTab === 0}}">
+      <view class="scroll-item" wx:for="{{libraryItems}}" wx:key="index" bindtap="addToCanvas" data-item="{{item}}">
+        <image class="library-img" src="{{item.image_url}}" mode="aspectFit" />
       </view>
     </scroll-view>
     
