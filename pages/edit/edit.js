@@ -1,3 +1,5 @@
+import { uploadPhoto } from '../utils'
+
 Page({
   data: {
     editingId: '',
@@ -41,8 +43,6 @@ Page({
   },
 
   async onLoad(options) {
-    console.log('edit options', options);
-
     // 1. 新增：从首页「添加」进来，带本地图片 path
     if (options && options.path) {
       const localPath = decodeURIComponent(options.path);
@@ -220,7 +220,7 @@ Page({
         wx.showToast({ title: isEdit ? '更新成功！' : '添加成功！', icon: 'success', duration: 1500 });
         setTimeout(() => {
           wx.navigateBack();
-        }, 1500);
+        }, 1000);
       } else {
         wx.showToast({ title: '添加失败：' + dbRes.result.errMsg, icon: 'none' });
       }
@@ -231,26 +231,15 @@ Page({
     }
   },
 
+  // 重新上传
   reupload() {
     const that = this
     wx.showActionSheet({
       itemList: ['拍照', '从相册选择'],
-      success: (res) => {
+      success: async (res) => {
         if (res.tapIndex === 0) {
-          wx.chooseMedia({
-            count: 1, // 仅拍摄一张
-            mediaType: ["image"],
-            sourceType: ["camera"], // 仅调用相机
-            success: (res) => {
-              const tempFilePath = res.tempFiles[0].tempFilePath;
-              // wx.editImage({
-              //   src: tempFilePath, // 图片路径
-              //   success: (res) => {
-                  that.setData({ currImage: tempFilePath})
-                // }
-              // })
-            },
-          });
+         const tempFilePath = await uploadPhoto()
+         that.setData({ currImage: tempFilePath})
         } else if (res.tapIndex === 1) {
           wx.chooseMessageFile({
             count: 10,

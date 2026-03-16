@@ -189,27 +189,6 @@ Page({
   // 拍照
   async goPhotograph() {
     this.hideActionSheet();
-    // wx.chooseMedia({
-    //   count: 1, // 仅拍摄一张
-    //   mediaType: ["image"],
-    //   sourceType: ["camera"], // 仅调用相机
-    //   success: (res) => {
-    //     const tempFilePath = res.tempFiles[0].tempFilePath;
-    //     // 接下来将照片上传到服务器或进行预览
-    //     const df = wx.compressImage({
-    //       src: tempFilePath, // 图片路径
-    //       quality: 50 // 压缩质量
-    //     })
-    //     df.then(res => {
-    //       // wx.editImage({
-    //       //   src: res.tempFilePath, // 图片路径
-    //       //   success: (res) => {
-    //           that.goToEdit(res.tempFilePath)
-    //         // }
-    //     // })
-    //     })
-    //   },
-    // });
     const filePath = await uploadPhoto() 
     this.goToEdit(filePath)
   },
