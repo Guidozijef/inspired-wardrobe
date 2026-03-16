@@ -7,7 +7,8 @@
     <view class="looks-grid">
       <view class="look-card" wx:for="{{looks}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
         <view class="look-img-wrapper" style="background-color: {{item.bg}};">
-          <text class="emoji-huge">{{item.emoji}}</text>
+          <image wx:if="{{item.preview}}" class="look-preview" src="{{item.preview}}" mode="aspectFill" />
+          <text wx:else class="emoji-huge">{{item.emoji}}</text>
         </view>
         <view class="look-info">
           <text class="look-title">{{item.title}}</text>

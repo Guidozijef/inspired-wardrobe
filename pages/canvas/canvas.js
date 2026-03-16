@@ -13,7 +13,7 @@ Page({
     menuButtonWidth: 80
   },
 
-  onLoad() {
+  onLoad(options) {
     const sysInfo = wx.getSystemInfoSync();
     const menuButton = wx.getMenuButtonBoundingClientRect();
     this.setData({
@@ -21,7 +21,54 @@ Page({
       navBarHeight: (menuButton.top - sysInfo.statusBarHeight) * 2 + menuButton.height,
       menuButtonWidth: sysInfo.windowWidth - menuButton.left + 10
     });
-    this.fetchClothes();
+    
+    // 如果有传递 ID，则进入“重新编辑”模式，还原画布内容
+    if (options.id) {
+      this.loadOutfit(options.id);
+    } else {
+      this.fetchClothes();
+    }
+  },
+
+  loadOutfit(id) {
+    wx.showLoading({ title: '还原搭配中...', mask: true });
+    wx.cloud.callFunction({
+      name: 'outfitFunctions',
+      data: {
+        type: 'getOutfitDetail',
+        data: { id: id }
+      }
+    }).then(res => {
+      wx.hideLoading();
+      if (res.result && res.result.success) {
+        const data = res.result.data;
+        const config = JSON.parse(data.canvas_data.layout_config);
+        
+        // 此处需要注意：URL 需要从 clothes 集合中重新映射，或者保存时就存好全量信息
+        // 目前简单还原布局，假设 item.url 已经包含在保存的 context 中
+        // 为了稳健性，我们在保存时其实存了 url，但上面的序列化只存了基础配置
+        // 需要在 fetchClothes 之后进行 matching，或者更直接地在保存时存好 url
+        
+        // 方案：先 fetch 基础单品库，再匹配还原
+        this.fetchClothes().then(() => {
+          const restoredItems = config.map(conf => {
+            const original = this.data.allItems.find(i => i._id === conf.id || i.id === conf.id);
+            return {
+              ...conf,
+              url: original ? original.image_url : '',
+              active: false
+            };
+          });
+          this.setData({
+            canvasItems: restoredItems,
+            nextId: Math.max(...restoredItems.map(i => i.id)) + 1
+          });
+        });
+      }
+    }).catch(err => {
+      wx.hideLoading();
+      console.error('还原搭配失败', err);
+    });
   },
 
   onShow() {
@@ -29,15 +76,19 @@ Page({
   },
 
   fetchClothes() {
-    const db = wx.cloud.database();
-    db.collection('clothes').get().then(res => {
-      this.setData({
-        allItems: res.data || []
-      }, () => {
-        this.applyCategoryFilter();
+    return new Promise((resolve, reject) => {
+      const db = wx.cloud.database();
+      db.collection('clothes').get().then(res => {
+        this.setData({
+          allItems: res.data || []
+        }, () => {
+          this.applyCategoryFilter();
+          resolve();
+        });
+      }).catch(err => {
+        console.error('获取单品失败', err);
+        reject(err);
       });
-    }).catch(err => {
-      console.error('获取单品失败', err);
     });
   },
 
@@ -137,6 +188,7 @@ Page({
     const item = e.currentTarget.dataset.item;
     const newItem = {
       id: this.data.nextId,
+      db_id: item._id, // 记录数据库原始 ID
       url: item.image_url,
       x: 100,
       y: 100,
@@ -167,13 +219,74 @@ Page({
   },
 
   saveCanvas() {
-    wx.showToast({
-      title: '已保存到穿搭',
-      icon: 'success',
-      duration: 1500
+    const { canvasItems } = this.data;
+    if (canvasItems.length === 0) {
+      wx.showToast({ title: '画布是空的哦', icon: 'none' });
+      return;
+    }
+
+    // 先同步最后操作项的状态
+    const activeItem = canvasItems.find(i => i.active);
+    if (activeItem) {
+      // 通过一次性的全量同步来确保 x, y, scale 是最新的
+      const items = canvasItems.map(item => ({
+        ...item,
+        // 如果是活跃项，使用内存中的实时值（因为我们之前是静默修改的）
+        x: item.id === activeItem.id ? item.x : item.x,
+        y: item.id === activeItem.id ? item.y : item.y,
+        scale: item.id === activeItem.id ? item.scale : item.scale
+      }));
+      this.setData({ canvasItems: items });
+    }
+
+    wx.showLoading({ title: '保存中...', mask: true });
+
+    // 构造 outfits 数据
+    const clothes_ids = canvasItems.map(item => item.db_id || item.id); // 优先使用数据库真 ID
+    const layout_config = JSON.stringify(canvasItems.map(item => ({
+      id: item.id,
+      x: item.x,
+      y: item.y,
+      scale: item.scale,
+      zIndex: item.zIndex
+    })));
+
+    const outfitData = {
+      title: '周一元气上班装', // 演示标题，后续可支持用户输入
+      scene: '职场',
+      description: '搭配得体，干练又不失随性。',
+      preview_url: canvasItems[0].url, // 暂用第一件衣服做预览
+      clothes_ids: clothes_ids,
+      canvas_data: {
+        background_color: '#F5F5F5',
+        layout_config: layout_config
+      }
+    };
+
+    wx.cloud.callFunction({
+      name: 'outfitFunctions',
+      data: {
+        type: 'addOutfit',
+        data: outfitData
+      }
+    }).then(res => {
+      wx.hideLoading();
+      if (res.result && res.result.success) {
+        wx.showToast({
+          title: '已保存到穿搭',
+          icon: 'success',
+          duration: 1500
+        });
+        setTimeout(() => {
+          wx.redirectTo({ url: '/pages/looks/looks' });
+        }, 1500);
+      } else {
+        throw new Error(res.result.errMsg || '保存失败');
+      }
+    }).catch(err => {
+      wx.hideLoading();
+      wx.showToast({ title: '保存失败: ' + err.message, icon: 'none' });
+      console.error('保存搭配失败', err);
     });
-    setTimeout(() => {
-      wx.redirectTo({ url: '/pages/looks/looks' });
-    }, 1500);
   }
 });

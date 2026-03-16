@@ -16,6 +16,39 @@ Page({
       statusBarHeight: sysInfo.statusBarHeight,
       navBarHeight: (menuButton.top - sysInfo.statusBarHeight) * 2 + menuButton.height
     });
+    this.fetchLooks();
+  },
+  onShow() {
+    this.fetchLooks();
+  },
+  fetchLooks() {
+    wx.showLoading({ title: '加载中...', mask: true });
+    wx.cloud.callFunction({
+      name: 'outfitFunctions',
+      data: { type: 'getOutfits' }
+    }).then(res => {
+      wx.hideLoading();
+      if (res.result && res.result.success) {
+        this.setData({
+          looks: res.result.data.map(item => ({
+            id: item._id,
+            title: item.title || '我的搭配',
+            date: this.formatDate(item.create_time),
+            emoji: '🧥👖', // 暂用
+            bg: '#F3E8FF',
+            preview: item.preview_url || ''
+          }))
+        });
+      }
+    }).catch(err => {
+      wx.hideLoading();
+      console.error('获取搭配失败', err);
+    });
+  },
+  formatDate(dateStr) {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
   },
   switchTab(e) {
     const path = e.currentTarget.dataset.path;
@@ -23,6 +56,7 @@ Page({
   },
   goToDetail(e) {
     const id = e.currentTarget.dataset.id;
+    if (!id) return;
     wx.navigateTo({ url: `/pages/look_detail/look_detail?id=${id}` });
   }
 });

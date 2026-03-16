@@ -6,8 +6,9 @@
 .content { padding: 20px; flex: 1; }
 .looks-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
 .look-card { background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; }
-.look-img-wrapper { width: 100%; aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; position: relative; }
-.emoji-huge { font-size: 60px; text-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+.look-img-wrapper { width: 100%; aspect-ratio: 3/4; position: relative; overflow: hidden; background-color: #f8fafc; border-radius: 20px 20px 0 0; }
+.look-preview { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
+.emoji-huge { font-size: 60px; text-shadow: 0 10px 20px rgba(0,0,0,0.1); z-index: 1; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 .look-info { padding: 12px; display: flex; flex-direction: column; }
 .look-title { font-size: 14px; font-weight: bold; color: #1E293B; margin-bottom: 4px; }
 .look-date { font-size: 12px; color: #94A3B8; }
