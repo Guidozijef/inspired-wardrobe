@@ -17,11 +17,19 @@
       class="canvas-item {{item.active ? '' : 'no-border'}}" 
       x="{{item.x}}" 
       y="{{item.y}}" 
-      direction="all" 
+      direction="{{item.active ? 'all' : 'none'}}" 
+      damping="40"
+      friction="2"
       scale="true"
+      min-scale="0.5"
+      max-scale="4"
+      scale-value="{{item.scale || 1}}"
       bindtap="activateItem"
+      catchtouchstart="{{item.active ? '' : 'activateItem'}}"
       bindchange="onItemChange"
+      bindscale="onItemScale"
       data-id="{{item.id}}"
+      style="z-index: {{item.zIndex || 1}};"
     >
       <image class="canvas-img" src="{{item.url}}" mode="aspectFit" />
       <view class="rotate-btn" wx:if="{{item.active}}" catchtap="removeItem" data-id="{{item.id}}">

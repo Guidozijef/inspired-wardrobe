@@ -72,21 +72,59 @@ Page({
   onItemChange(e) {
     if (e.detail.source === 'touch') {
       const id = e.currentTarget.dataset.id;
-      const item = this.data.canvasItems.find(i => i.id === id);
-      if (item) {
-        item.x = e.detail.x;
-        item.y = e.detail.y;
+      const index = this.data.canvasItems.findIndex(i => i.id === id);
+      if (index !== -1) {
+        // 直接修改数据而不通过 setData，避免与组件内部状态产生死循环冲突
+        // 这样可以解决位置跳变和抖动问题
+        this.data.canvasItems[index].x = e.detail.x;
+        this.data.canvasItems[index].y = e.detail.y;
       }
+    }
+  },
+
+  onItemScale(e) {
+    const id = e.currentTarget.dataset.id;
+    const index = this.data.canvasItems.findIndex(i => i.id === id);
+    if (index !== -1) {
+      // 记录缩放比例，不使用 setData 避免缩放爆炸
+      this.data.canvasItems[index].scale = e.detail.scale;
     }
   },
 
   activateItem(e) {
     const id = e.currentTarget.dataset.id;
-    const items = this.data.canvasItems.map(item => ({
-      ...item,
-      active: item.id === id
-    }));
-    this.setData({ canvasItems: items });
+    const { canvasItems } = this.data;
+    
+    // 找出当前激活的项是否就是被点击的项
+    const currentActiveItem = canvasItems.find(i => i.active);
+    if (currentActiveItem && currentActiveItem.id === id) return;
+
+    const updates = {};
+    let maxZ = 0;
+    canvasItems.forEach(item => {
+      if (item.zIndex > maxZ) maxZ = item.zIndex;
+    });
+
+    canvasItems.forEach((item, index) => {
+      const activePath = `canvasItems[${index}].active`;
+      const zIndexPath = `canvasItems[${index}].zIndex`;
+      const xPath = `canvasItems[${index}].x`;
+      const yPath = `canvasItems[${index}].y`;
+      const scalePath = `canvasItems[${index}].scale`;
+      
+      if (item.id === id) {
+        updates[activePath] = true;
+        updates[zIndexPath] = maxZ + 1;
+      } else if (item.active) {
+        updates[activePath] = false;
+        // 在切换前，将之前静默修改的位置和缩放同步到渲染层
+        updates[xPath] = item.x;
+        updates[yPath] = item.y;
+        updates[scalePath] = item.scale;
+      }
+    });
+
+    this.setData(updates);
   },
 
   removeItem(e) {
@@ -102,7 +140,9 @@ Page({
       url: item.image_url,
       x: 100,
       y: 100,
-      active: true
+      active: true,
+      scale: 1,
+      zIndex: Math.max(...this.data.canvasItems.map(i => i.zIndex || 0), 0) + 1
     };
     
     const items = this.data.canvasItems.map(item => ({...item, active: false}));
