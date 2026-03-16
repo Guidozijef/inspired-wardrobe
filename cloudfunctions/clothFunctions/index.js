@@ -66,9 +66,10 @@ async function aiCutout(fileID) {
   try {
     const response = await axios(options)
     if (response.data && response.data.image) {
-      return response.data.image // 返回抠图后的 base64
+      return { code: 200, imageBase64: response.data.image } // 返回抠图后的 base64
     } else {
-      throw new Error(JSON.stringify(response.data))
+      return { code: response.data.error_code, message: response.data.error_msg}
+
     }
   } catch (error) {
     console.error('百度 API 调用失败:', error)
@@ -172,8 +173,11 @@ exports.main = async (event, context) => {
       return await updateCloth(event.data);
     case "doCutout":
       try {
-        const foregroundBase64 = await aiCutout(event.data.fileID)
-        const newFileID = await saveProcessedImage(foregroundBase64)
+        const {code, imageBase64, message } = await aiCutout(event.data.fileID)
+        if (code !== 200) {
+          return { success: false, errMsg: message }
+        }
+        const newFileID = await saveProcessedImage(imageBase64)
         return {
           success: true,
           fileID: newFileID

@@ -1,4 +1,4 @@
-import { uploadPhoto } from '../utils'
+import { takePhoto, chooseImage } from '../utils'
 
 Page({
   data: {
@@ -161,36 +161,24 @@ Page({
 
   // 相册
   async goPhotoalbum() {
-    const that = this;
-    that.hideActionSheet();
-    wx.chooseMessageFile({
-      count: 10,
-      type: "image",
-      success(res) {
-        // tempFilePath可以作为img标签的src属性显示图片
-        const [tempFilePaths] = res.tempFiles;
-        const df = wx.compressImage({
-          src: tempFilePaths.path, // 图片路径
-          quality: 50 // 压缩质量
-        })
-        console.log(df)
-        // wx.editImage({
-        //   src: tempFilePaths.path, // 图片路径
-        //   success: (res) => {
-        //     that.goToEdit(res.tempFilePath)
-        //   }
-        // })
-      },
-    });
-
-
+    this.hideActionSheet();
+    try {
+      const filePath = await chooseImage();
+      this.goToEdit(filePath);
+    } catch (e) {
+      console.error('从相册选择失败', e);
+    }
   },
 
   // 拍照
   async goPhotograph() {
     this.hideActionSheet();
-    const filePath = await uploadPhoto() 
-    this.goToEdit(filePath)
+    try {
+      const filePath = await takePhoto();
+      this.goToEdit(filePath);
+    } catch (e) {
+      console.error('拍照失败', e);
+    }
   },
 
 

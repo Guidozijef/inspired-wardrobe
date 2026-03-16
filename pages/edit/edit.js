@@ -1,4 +1,4 @@
-import { uploadPhoto } from '../utils'
+import { takePhoto, chooseImage } from '../utils'
 
 Page({
   data: {
@@ -102,10 +102,14 @@ Page({
     this.initColorCanvas();
   },
 
-  // 新增流程：自动上传 + 抠图，并在画布显示抠后图片
-  async autoCutoutForNew(localPath) {
+  // 自动抠图核心逻辑：上传 -> 调用云函数抠图 -> 更新界面展示
+  async processImageWithCutout(localPath) {
+    if (!localPath) return;
+
     try {
       wx.showLoading({ title: 'AI 抠图中...', mask: true });
+      
+      // 1. 上传原图到临时目录
       const cloudPath = `temp/${Date.now()}-${Math.floor(Math.random() * 1000)}.jpg`;
       const uploadRes = await wx.cloud.uploadFile({
         cloudPath,
@@ -113,6 +117,7 @@ Page({
       });
       const originalFileID = uploadRes.fileID;
 
+      // 2. 调用抠图云函数
       const cutoutRes = await wx.cloud.callFunction({
         name: 'clothFunctions',
         data: {
@@ -120,24 +125,36 @@ Page({
           data: { fileID: originalFileID }
         }
       });
+      wx.hideLoading();
 
       if (!cutoutRes.result.success) {
         throw new Error(cutoutRes.result.errMsg || '抠图失败');
       }
 
       const finalFileID = cutoutRes.result.fileID;
-      // 直接在画布上展示抠图后的云文件
+
+      // 3. 更新数据：直接展示抠图后的云文件 ID
       this.setData({
         currImage: finalFileID,
         currFileID: finalFileID,
         hasCutout: true
       });
     } catch (e) {
-      console.error('自动抠图失败', e);
-      wx.showToast({ title: '抠图失败，请重试', icon: 'none' });
+      // console.error('AI 抠图失败', e);
+      wx.showToast({ title: e || '抠图失败，请重试', icon: 'none' });
+      // 失败时可以考虑回退到展示原图，由用户决定是否重试
+      this.setData({
+        currImage: localPath,
+        hasCutout: false
+      });
     } finally {
-      wx.hideLoading();
+        wx.hideLoading();
     }
+  },
+
+  // 新增流程：从首页进来的自动处理
+  async autoCutoutForNew(localPath) {
+    await this.processImageWithCutout(localPath);
   },
 
   goBack() {
@@ -233,28 +250,22 @@ Page({
 
   // 重新上传
   reupload() {
-    const that = this
     wx.showActionSheet({
       itemList: ['拍照', '从相册选择'],
       success: async (res) => {
-        if (res.tapIndex === 0) {
-         const tempFilePath = await uploadPhoto()
-         that.setData({ currImage: tempFilePath})
-        } else if (res.tapIndex === 1) {
-          wx.chooseMessageFile({
-            count: 10,
-            type: "image",
-            success(res) {
-              // tempFilePath可以作为img标签的src属性显示图片
-              const [tempFilePaths] = res.tempFiles;
-              wx.editImage({
-                src: tempFilePaths.path, // 图片路径
-                success: (res) => {
-                  that.setData({ currImage: res.tempFilePath})
-                }
-              })
-            },
-          });
+        let tempFilePath = '';
+        try {
+          if (res.tapIndex === 0) {
+            tempFilePath = await takePhoto();
+          } else if (res.tapIndex === 1) {
+            tempFilePath = await chooseImage();
+          }
+          if (tempFilePath) {
+            // 选完图直接进入抠图流程
+            this.processImageWithCutout(tempFilePath);
+          }
+        } catch (e) {
+          console.error('选择图片失败', e);
         }
       }
     });

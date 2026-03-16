@@ -1,22 +1,52 @@
 
+// 通用图片压缩逻辑
+function compressImage(path) {
+  return new Promise((resolve, reject) => {
+    wx.compressImage({
+      src: path,
+      quality: 30,
+      success: (res) => resolve(res.tempFilePath),
+      fail: (err) => reject(err)
+    });
+  });
+}
+
 // 拍照上传
-export function uploadPhoto() {
+export function takePhoto() {
   return new Promise((resolve, reject) => {
     wx.chooseMedia({
-      count: 1, // 仅拍摄一张
+      count: 1,
       mediaType: ["image"],
-      sourceType: ["camera"], // 仅调用相机
-      success: (res) => {
-        const tempFilePath = res.tempFiles[0].tempFilePath;
-        // 压缩图片
-        const df = wx.compressImage({
-          src: tempFilePath, // 图片路径
-          quality: 50 // 压缩质量
-        })
-        df.then(res => {
-          resolve(res.tempFilePath)
-        })
+      sourceType: ["camera"],
+      success: async (res) => {
+        try {
+          const compressed = await compressImage(res.tempFiles[0].tempFilePath);
+          resolve(compressed);
+        } catch (e) {
+          reject(e);
+        }
       },
+      fail: reject
     });
-  })
-} 
+  });
+}
+
+// 从相册选择
+export function chooseImage() {
+  return new Promise((resolve, reject) => {
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ["image"],
+      sourceType: ["album"],
+      success: async (res) => {
+        try {
+          const compressed = await compressImage(res.tempFiles[0].tempFilePath);
+          resolve(compressed);
+        } catch (e) {
+          reject(e);
+        }
+      },
+      fail: reject
+    });
+  });
+}
