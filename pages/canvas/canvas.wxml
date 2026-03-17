@@ -37,6 +37,9 @@
       </view>
     </movable-view>
   </movable-area>
+  
+  <!-- Hidden Canvas for Rendering -->
+  <canvas type="2d" id="helperCanvas" style="width: {{helperCanvasWidth}}px; height: {{helperCanvasHeight}}px; position: absolute; left: -9999px;"></canvas>
 
   <view class="bottom-drawer">
     <view class="drawer-handle"></view>
@@ -93,6 +96,28 @@
     <view class="tab-item" bindtap="switchTab" data-path="/pages/profile/profile">
       <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/999999/user.png"></image>
       <text class="tab-text">我的</text>
+    </view>
+  </view>
+
+  <!-- Save Definition Modal -->
+  <view class="modal-mask {{showSaveModal ? 'show' : ''}}" bindtap="closeSaveModal">
+    <view class="modal-content glass" catchtap="stopBubble">
+      <view class="modal-header">
+        <text class="modal-title">命名你的搭配</text>
+      </view>
+      <view class="modal-body">
+        <input 
+          class="title-input" 
+          placeholder="给这套穿搭起个名字..." 
+          value="{{outfitTitle}}" 
+          bindinput="onTitleInput"
+          focus="{{showSaveModal}}"
+        />
+      </view>
+      <view class="modal-footer">
+        <view class="modal-btn cancel" bindtap="closeSaveModal">取消</view>
+        <view class="modal-btn confirm" bindtap="confirmSave">确定完成</view>
+      </view>
     </view>
   </view>
 </view>

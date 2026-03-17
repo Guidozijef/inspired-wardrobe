@@ -10,7 +10,11 @@ Page({
     nextId: 1,
     statusBarHeight: 20,
     navBarHeight: 44,
-    menuButtonWidth: 80
+    menuButtonWidth: 80,
+    showSaveModal: false,
+    outfitTitle: '',
+    helperCanvasWidth: 375,
+    helperCanvasHeight: 500
   },
 
   onLoad(options) {
@@ -225,68 +229,193 @@ Page({
       return;
     }
 
-    // 先同步最后操作项的状态
     const activeItem = canvasItems.find(i => i.active);
     if (activeItem) {
-      // 通过一次性的全量同步来确保 x, y, scale 是最新的
       const items = canvasItems.map(item => ({
         ...item,
-        // 如果是活跃项，使用内存中的实时值（因为我们之前是静默修改的）
-        x: item.id === activeItem.id ? item.x : item.x,
-        y: item.id === activeItem.id ? item.y : item.y,
-        scale: item.id === activeItem.id ? item.scale : item.scale
+        x: item.x,
+        y: item.y,
+        scale: item.scale
       }));
       this.setData({ canvasItems: items });
     }
 
-    wx.showLoading({ title: '保存中...', mask: true });
+    this.setData({
+      showSaveModal: true,
+      outfitTitle: '我的时尚搭配 ' + new Date().toLocaleDateString()
+    });
+  },
 
-    // 构造 outfits 数据
-    const clothes_ids = canvasItems.map(item => item.db_id || item.id); // 优先使用数据库真 ID
-    const layout_config = JSON.stringify(canvasItems.map(item => ({
-      id: item.id,
-      x: item.x,
-      y: item.y,
-      scale: item.scale,
-      zIndex: item.zIndex
-    })));
+  onTitleInput(e) {
+    this.setData({ outfitTitle: e.detail.value });
+  },
 
-    const outfitData = {
-      title: '周一元气上班装', // 演示标题，后续可支持用户输入
-      scene: '职场',
-      description: '搭配得体，干练又不失随性。',
-      preview_url: canvasItems[0].url, // 暂用第一件衣服做预览
-      clothes_ids: clothes_ids,
-      canvas_data: {
-        background_color: '#F5F5F5',
-        layout_config: layout_config
-      }
-    };
+  stopBubble() {
+    // 阻止冒泡到遮罩层
+  },
 
-    wx.cloud.callFunction({
-      name: 'outfitFunctions',
-      data: {
-        type: 'addOutfit',
-        data: outfitData
-      }
-    }).then(res => {
+  closeSaveModal() {
+    this.setData({ showSaveModal: false });
+  },
+
+  confirmSave() {
+    if (!this.data.outfitTitle.trim()) {
+      wx.showToast({ title: '请输入穿搭名称', icon: 'none' });
+      return;
+    }
+    this.setData({ showSaveModal: false });
+    this.processSave();
+  },
+
+  async processSave() {
+    wx.showLoading({ title: '正在渲染...', mask: true });
+    
+    try {
+      // 1. 渲染画布为图片
+      const tempFilePath = await this.generateCanvasImage();
+      
+      // 2. 上传到云存储
+      wx.showLoading({ title: '正在上传封面...', mask: true });
+      const cloudPath = `outfit_covers/${Date.now()}-${Math.floor(Math.random() * 1000)}.png`;
+      const uploadRes = await wx.cloud.uploadFile({
+        cloudPath: cloudPath,
+        filePath: tempFilePath,
+      });
+      const previewUrl = uploadRes.fileID;
+
+      // 3. 保存到数据库
+      wx.showLoading({ title: '保存搭配中...', mask: true });
+      const { canvasItems, outfitTitle } = this.data;
+      const clothes_ids = canvasItems.map(item => item.db_id || item.id);
+      const layout_config = JSON.stringify(canvasItems.map(item => ({
+        id: item.id,
+        x: item.x,
+        y: item.y,
+        scale: item.scale,
+        zIndex: item.zIndex
+      })));
+
+      const outfitData = {
+        title: outfitTitle,
+        scene: '日常',
+        description: '由画布精心搭配生成',
+        preview_url: previewUrl,
+        clothes_ids: clothes_ids,
+        canvas_data: {
+          background_color: '#F5F5F5',
+          layout_config: layout_config
+        }
+      };
+
+      const res = await wx.cloud.callFunction({
+        name: 'outfitFunctions',
+        data: {
+          type: 'addOutfit',
+          data: outfitData
+        }
+      });
+
       wx.hideLoading();
       if (res.result && res.result.success) {
-        wx.showToast({
-          title: '已保存到穿搭',
-          icon: 'success',
-          duration: 1500
-        });
+        wx.showToast({ title: '已保存到穿搭', icon: 'success' });
         setTimeout(() => {
           wx.redirectTo({ url: '/pages/looks/looks' });
         }, 1500);
       } else {
         throw new Error(res.result.errMsg || '保存失败');
       }
-    }).catch(err => {
+    } catch (err) {
       wx.hideLoading();
-      wx.showToast({ title: '保存失败: ' + err.message, icon: 'none' });
-      console.error('保存搭配失败', err);
+      wx.showToast({ title: '操作失败: ' + err.message, icon: 'none' });
+      console.error('保存流程失败', err);
+    }
+  },
+
+  generateCanvasImage() {
+    return new Promise((resolve, reject) => {
+      const areaQuery = wx.createSelectorQuery();
+      areaQuery.select('.canvas-area').boundingClientRect();
+      areaQuery.selectAll('.canvas-item').boundingClientRect();
+      
+      areaQuery.exec(async (rects) => {
+        const areaRect = rects[0];
+        const itemRects = rects[1];
+        
+        if (!areaRect) return reject(new Error('无法获取画布布局信息'));
+        
+        const width = areaRect.width;
+        const height = areaRect.height;
+        
+        // 1. 同步设置画布样式尺寸
+        this.setData({
+          helperCanvasWidth: width,
+          helperCanvasHeight: height
+        }, () => {
+          const canvasQuery = wx.createSelectorQuery();
+          canvasQuery.select('#helperCanvas').node().exec(async (res) => {
+            if (!res[0] || !res[0].node) return reject(new Error('未找到画布节点'));
+            
+            const canvas = res[0].node;
+            const ctx = canvas.getContext('2d');
+            const dpr = wx.getSystemInfoSync().pixelRatio;
+
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.scale(dpr, dpr);
+
+            // 保持透明背景
+            
+            // 2. 匹配 Rects 与数据中的 canvasItems (用于获取 url 和 zIndex)
+            // SelectorQuery 返回的顺序通常与 WXML 中的 wx:for 顺序一致
+            const itemsWithRects = this.data.canvasItems.map((item, index) => ({
+              ...item,
+              rect: itemRects[index]
+            })).sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0));
+
+            try {
+              for (const item of itemsWithRects) {
+                if (!item.rect) continue;
+
+                const info = await new Promise((resImg) => {
+                  wx.getImageInfo({
+                    src: item.url,
+                    success: resImg,
+                    fail: () => resImg(null)
+                  });
+                });
+
+                if (info && info.path) {
+                  const img = canvas.createImage();
+                  await new Promise((resLoad) => {
+                    img.onload = resLoad;
+                    img.onerror = resLoad;
+                    img.src = info.path;
+                  });
+
+                  // 3. 直接通过 Rect 计算相对位置
+                  const relativeX = item.rect.left - areaRect.left;
+                  const relativeY = item.rect.top - areaRect.top;
+                  
+                  ctx.save();
+                  // 直接使用 Rect 的渲染宽高，这样就自动包含了 Scale 效果
+                  ctx.drawImage(img, relativeX, relativeY, item.rect.width, item.rect.height);
+                  ctx.restore();
+                }
+              }
+
+              // 4. 导出
+              wx.canvasToTempFilePath({
+                canvas,
+                success: (res) => resolve(res.tempFilePath),
+                fail: (err) => reject(err)
+              });
+            } catch (err) {
+              reject(err);
+            }
+          });
+        });
+      });
     });
-  }
+  },
 });

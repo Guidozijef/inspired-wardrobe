@@ -56,7 +56,7 @@
     </view>
 
     <!-- Scene Capsules -->
-    <view class="section-header">
+    <!-- <view class="section-header">
       <text class="section-title">场景胶囊</text>
       <text class="section-btn" bindtap="goToCapsule">新建</text>
     </view>
@@ -68,7 +68,7 @@
         <view class="capsule-title">{{item.title}}</view>
         <view class="capsule-desc">{{item.count}}件单品</view>
       </view>
-    </scroll-view>
+    </scroll-view> -->
 
     <!-- Random Outfit Generator -->
     <view class="section-header">
