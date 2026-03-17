@@ -374,8 +374,15 @@ Page({
             })).sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0));
 
             try {
+              let minX = width, minY = height, maxX = 0, maxY = 0;
+              let hasItems = false;
+
+              // 清空背景
+              ctx.clearRect(0, 0, width, height);
+
               for (const item of itemsWithRects) {
                 if (!item.rect) continue;
+                hasItems = true;
 
                 const info = await new Promise((resImg) => {
                   wx.getImageInfo({
@@ -389,26 +396,73 @@ Page({
                   const img = canvas.createImage();
                   await new Promise((resLoad) => {
                     img.onload = resLoad;
-                    img.onerror = resLoad;
+                    img.onerror = (e) => {
+                      console.error('图片加载失败:', item.url, e);
+                      resLoad();
+                    };
                     img.src = info.path;
                   });
 
-                  // 3. 直接通过 Rect 计算相对位置
+                  if (img.width === 0) continue;
+
                   const relativeX = item.rect.left - areaRect.left;
                   const relativeY = item.rect.top - areaRect.top;
                   
+                  // 实现 aspectFit 渲染逻辑，防止变形
+                  const rectW = item.rect.width;
+                  const rectH = item.rect.height;
+                  const imgRatio = info.width / info.height;
+                  const rectRatio = rectW / rectH;
+                  
+                  let drawW, drawH, offsetX = 0, offsetY = 0;
+                  if (imgRatio > rectRatio) {
+                    drawW = rectW;
+                    drawH = rectW / imgRatio;
+                    offsetY = (rectH - drawH) / 2;
+                  } else {
+                    drawH = rectH;
+                    drawW = rectH * imgRatio;
+                    offsetX = (rectW - drawW) / 2;
+                  }
+
                   ctx.save();
-                  // 直接使用 Rect 的渲染宽高，这样就自动包含了 Scale 效果
-                  ctx.drawImage(img, relativeX, relativeY, item.rect.width, item.rect.height);
+                  ctx.drawImage(img, relativeX + offsetX, relativeY + offsetY, drawW, drawH);
                   ctx.restore();
+
+                  // 更新边界
+                  minX = Math.min(minX, relativeX);
+                  minY = Math.min(minY, relativeY);
+                  maxX = Math.max(maxX, relativeX + rectW);
+                  maxY = Math.max(maxY, relativeY + rectH);
                 }
               }
 
-              // 4. 导出
+              // 4. 导出 (带裁剪)
+              const padding = 20; // 留白边距
+              let exportX = 0, exportY = 0, exportWidth = width, exportHeight = height;
+
+              if (hasItems) {
+                exportX = Math.max(0, minX - padding);
+                exportY = Math.max(0, minY - padding);
+                exportWidth = Math.min(width - exportX, (maxX - minX) + padding * 2);
+                exportHeight = Math.min(height - exportY, (maxY - minY) + padding * 2);
+              }
+
+              // 在 Canvas 2D 中，x, y, width, height 对应逻辑像素 (CSS 尺寸)
+              // 而 destWidth, destHeight 对应导出分辨率 (物理像素)
               wx.canvasToTempFilePath({
                 canvas,
+                x: exportX,
+                y: exportY,
+                width: exportWidth,
+                height: exportHeight,
+                destWidth: exportWidth * dpr,
+                destHeight: exportHeight * dpr,
                 success: (res) => resolve(res.tempFilePath),
-                fail: (err) => reject(err)
+                fail: (err) => {
+                  console.error('canvasToTempFilePath 失败:', err);
+                  reject(err);
+                }
               });
             } catch (err) {
               reject(err);
