@@ -102,7 +102,7 @@ Page({
     this.initColorCanvas();
   },
 
-  // 自动抠图核心逻辑：上传 -> 调用云函数抠图 -> 更新界面展示
+  // 自动抠图核心逻辑：上传 -> 调用云函数抠图 -> [新增] 自动裁剪 -> 更新界面展示
   async processImageWithCutout(localPath) {
     if (!localPath) return;
 
@@ -125,25 +125,37 @@ Page({
           data: { fileID: originalFileID }
         }
       });
-      wx.hideLoading();
 
       if (!cutoutRes.result.success) {
         throw new Error(cutoutRes.result.errMsg || '抠图失败');
       }
 
-      const finalFileID = cutoutRes.result.fileID;
+      const cutoutFileID = cutoutRes.result.fileID;
 
-      // 3. 更新数据：直接展示抠图后的云文件 ID
+      // 3. [新增] 自动裁剪透明边界
+      wx.showLoading({ title: '正在优化裁剪...', mask: true });
+      const croppedFilePath = await this.autoCropImage(cutoutFileID);
+      
+      // 4. 上传裁剪后的图片
+      const finalCloudPath = `clothes/${Date.now()}-${Math.floor(Math.random() * 1000)}.png`;
+      const finalUploadRes = await wx.cloud.uploadFile({
+        cloudPath: finalCloudPath,
+        filePath: croppedFilePath
+      });
+      const finalFileID = finalUploadRes.fileID;
+
+      wx.hideLoading();
+
+      // 5. 更新数据
       this.setData({
         currImage: finalFileID,
         currFileID: finalFileID,
         hasCutout: true
       });
     } catch (e) {
-      // console.error('AI 抠图失败', e);
+      console.error('AI 抠图或裁剪失败', e);
       const errorMsg = e.message || e.errMsg || '抠图失败，请重试';
       wx.showToast({ title: errorMsg, icon: 'none' });
-      // 失败时可以考虑回退到展示原图，由用户决定是否重试
       this.setData({
         currImage: localPath,
         hasCutout: false
@@ -151,6 +163,81 @@ Page({
     } finally {
         wx.hideLoading();
     }
+  },
+
+  // 核心裁剪逻辑：利用 Canvas 获取非透明区域并裁剪
+  async autoCropImage(fileID) {
+    return new Promise((resolve, reject) => {
+      // 1. 下载并获取图片信息
+      wx.getImageInfo({
+        src: fileID,
+        success: (imgInfo) => {
+          const query = wx.createSelectorQuery();
+          query.select('#processCanvas').node().exec(async (res) => {
+            if (!res[0] || !res[0].node) return reject(new Error('未找到处理画布'));
+            
+            const canvas = res[0].node;
+            const ctx = canvas.getContext('2d');
+            const { width, height } = imgInfo;
+
+            // 设置画布大小为原图大小
+            canvas.width = width;
+            canvas.height = height;
+
+            const img = canvas.createImage();
+            img.onload = () => {
+              ctx.clearRect(0, 0, width, height);
+              ctx.drawImage(img, 0, 0, width, height);
+
+              // 获取像素数据
+              const imageData = ctx.getImageData(0, 0, width, height);
+              const data = imageData.data;
+
+              let minX = width, minY = height, maxX = 0, maxY = 0;
+              let found = false;
+
+              // 扫描非透明像素点
+              for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                  const alpha = data[(y * width + x) * 4 + 3];
+                  if (alpha > 10) { // 稍微给点阈值过滤杂质
+                    if (x < minX) minX = x;
+                    if (y < minY) minY = y;
+                    if (x > maxX) maxX = x;
+                    if (y > maxY) maxY = y;
+                    found = true;
+                  }
+                }
+              }
+
+              if (!found) return resolve(imgInfo.path); // 如果全透明则返回原路径
+
+              // 计算裁剪后的宽高
+              const cropW = maxX - minX + 1;
+              const cropH = maxY - minY + 1;
+
+              // 创建一个新的临时画布进行裁剪后的绘制
+              // 注意：直接复用此 canvas 即可，只需修改导出参数或重绘
+              const offCanvas = wx.createOffscreenCanvas({ type: '2d', width: cropW, height: cropH });
+              const offCtx = offCanvas.getContext('2d');
+              offCtx.drawImage(canvas, minX, minY, cropW, cropH, 0, 0, cropW, cropH);
+
+              // 导出临时路径
+              wx.canvasToTempFilePath({
+                canvas: offCanvas,
+                destWidth: cropW,
+                destHeight: cropH,
+                success: (res) => resolve(res.tempFilePath),
+                fail: (err) => reject(err)
+              });
+            };
+            img.onerror = (e) => reject(new Error('图片加载到画布失败'));
+            img.src = imgInfo.path;
+          });
+        },
+        fail: (err) => reject(new Error('获取图片信息失败'))
+      });
+    });
   },
 
   // 新增流程：从首页进来的自动处理

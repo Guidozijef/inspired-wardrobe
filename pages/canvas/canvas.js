@@ -35,7 +35,7 @@ Page({
   },
 
   loadOutfit(id) {
-    wx.showLoading({ title: '还原搭配中...', mask: true });
+    wx.showLoading({ title: '还原穿搭中...', mask: true });
     wx.cloud.callFunction({
       name: 'outfitFunctions',
       data: {
@@ -71,7 +71,7 @@ Page({
       }
     }).catch(err => {
       wx.hideLoading();
-      console.error('还原搭配失败', err);
+      console.error('还原穿搭失败', err);
     });
   },
 
@@ -242,7 +242,7 @@ Page({
 
     this.setData({
       showSaveModal: true,
-      outfitTitle: '我的时尚搭配 ' + new Date().toLocaleDateString()
+      outfitTitle: ''
     });
   },
 
@@ -284,7 +284,7 @@ Page({
       const previewUrl = uploadRes.fileID;
 
       // 3. 保存到数据库
-      wx.showLoading({ title: '保存搭配中...', mask: true });
+      wx.showLoading({ title: '保存穿搭中...', mask: true });
       const { canvasItems, outfitTitle } = this.data;
       const clothes_ids = canvasItems.map(item => item.db_id || item.id);
       const layout_config = JSON.stringify(canvasItems.map(item => ({
@@ -298,7 +298,7 @@ Page({
       const outfitData = {
         title: outfitTitle,
         scene: '日常',
-        description: '由画布精心搭配生成',
+        description: '由画布精心穿搭生成',
         preview_url: previewUrl,
         clothes_ids: clothes_ids,
         canvas_data: {
