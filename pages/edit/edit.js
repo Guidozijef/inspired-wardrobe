@@ -314,6 +314,47 @@ Page({
     }
   },
 
+  // 删除单品
+  async deleteItem() {
+    const { editingId } = this.data;
+    if (!editingId) return;
+
+    wx.showModal({
+      title: '提示',
+      content: '确定要将这件衣服从衣橱中移除吗？',
+      confirmColor: '#ff4d4f',
+      success: async (res) => {
+        if (res.confirm) {
+          try {
+            wx.showLoading({ title: '正在删除...', mask: true });
+            const dbRes = await wx.cloud.callFunction({
+              name: 'clothFunctions',
+              data: {
+                type: 'deleteCloth',
+                data: { id: editingId }
+              }
+            });
+
+            wx.hideLoading();
+
+            if (dbRes.result.success) {
+              wx.showToast({ title: '已删除', icon: 'success' });
+              setTimeout(() => {
+                wx.navigateBack();
+              }, 1000);
+            } else {
+              wx.showToast({ title: '删除失败：' + dbRes.result.errMsg, icon: 'none' });
+            }
+          } catch (err) {
+            wx.hideLoading();
+            console.error('删除单品失败:', err);
+            wx.showToast({ title: '系统错误', icon: 'none' });
+          }
+        }
+      }
+    });
+  },
+
   // 重新上传
   reupload() {
     wx.showActionSheet({

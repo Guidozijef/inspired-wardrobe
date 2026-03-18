@@ -69,6 +69,47 @@ Page({
       icon: 'success'
     });
   },
+  // 删除当前穿搭
+  async deleteLook() {
+    const id = this.data.look.id;
+    if (!id) return;
+
+    wx.showModal({
+      title: '提示',
+      content: '确定要删除这个穿搭方案吗？',
+      confirmColor: '#ff4d4f',
+      success: async (res) => {
+        if (res.confirm) {
+          try {
+            wx.showLoading({ title: '正在删除...', mask: true });
+            const dbRes = await wx.cloud.callFunction({
+              name: 'outfitFunctions',
+              data: {
+                type: 'deleteOutfit',
+                data: { id: id }
+              }
+            });
+
+            wx.hideLoading();
+
+            if (dbRes.result.success) {
+              wx.showToast({ title: '已删除', icon: 'success' });
+              setTimeout(() => {
+                wx.navigateBack();
+              }, 1000);
+            } else {
+              wx.showToast({ title: '删除失败：' + dbRes.result.errMsg, icon: 'none' });
+            }
+          } catch (err) {
+            wx.hideLoading();
+            console.error('删除穿搭失败:', err);
+            wx.showToast({ title: '系统错误', icon: 'none' });
+          }
+        }
+      }
+    });
+  },
+
   editLook() {
     // 带上 ID 跳转到画布进行重新编辑
     if (this.data.look && this.data.look.id) {

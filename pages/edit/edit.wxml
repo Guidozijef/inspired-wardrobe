@@ -132,6 +132,7 @@
   <canvas type="2d" id="processCanvas" style="width: 1000px; height: 1000px; position: absolute; left: -9999px;"></canvas>
 
   <view class="bottom-bar">
-    <button class="action-btn primary-btn" bindtap="saveItem">保存单品</button>
+    <button wx:if="{{editingId}}" class="action-btn delete-btn" bindtap="deleteItem">删除单品</button>
+    <button class="action-btn primary-btn {{editingId ? 'half-width' : ''}}" bindtap="saveItem">{{editingId ? '保存修改' : '保存单品'}}</button>
   </view>
 </view>

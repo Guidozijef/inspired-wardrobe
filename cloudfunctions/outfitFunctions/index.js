@@ -111,6 +111,47 @@ const getOutfitDetail = async (id) => {
   }
 };
 
+// 删除搭配
+const deleteOutfit = async (id) => {
+  const { OPENID } = cloud.getWXContext();
+
+  try {
+    // 1. 先查出预览图 fileID
+    const res = await db.collection('outfits').doc(id).get();
+    const outfit = res.data;
+
+    // 校验所有权
+    if (outfit._openid !== OPENID) {
+      return {
+        success: false,
+        errMsg: '无权删除该数据'
+      };
+    }
+
+    const { preview_url } = outfit;
+
+    // 2. 从数据库删除记录
+    await db.collection('outfits').doc(id).remove();
+
+    // 3. 从云存储删除预览图
+    if (preview_url) {
+      await cloud.deleteFile({
+        fileList: [preview_url],
+      });
+    }
+
+    return {
+      success: true,
+      message: '搭配已删除'
+    };
+  } catch (err) {
+    return {
+      success: false,
+      errMsg: err.message || err
+    };
+  }
+};
+
 exports.main = async (event, context) => {
   switch (event.type) {
     case "addOutfit":
@@ -119,6 +160,8 @@ exports.main = async (event, context) => {
       return await getOutfits();
     case "getOutfitDetail":
       return await getOutfitDetail(event.data.id);
+    case "deleteOutfit":
+      return await deleteOutfit(event.data.id);
     default:
       return {
         success: false,

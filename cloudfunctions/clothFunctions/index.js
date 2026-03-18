@@ -225,6 +225,47 @@ const getClothDetail = async (id) => {
   }
 }
 
+// 删除单品衣服
+const deleteCloth = async (id) => {
+  const { OPENID } = cloud.getWXContext()
+
+  try {
+    // 1. 先查出图片 fileID，用于后续从云存储删除
+    const res = await db.collection('clothes').doc(id).get()
+    const cloth = res.data
+    
+    // 校验所有权
+    if (cloth._openid !== OPENID) {
+      return {
+        success: false,
+        errMsg: '无权删除该数据'
+      }
+    }
+
+    const { image_url } = cloth
+
+    // 2. 从数据库删除记录
+    await db.collection('clothes').doc(id).remove()
+
+    // 3. 从云存储删除图片文件
+    if (image_url) {
+      await cloud.deleteFile({
+        fileList: [image_url],
+      })
+    }
+
+    return {
+      success: true,
+      message: '衣服已从衣橱移除'
+    }
+  } catch (err) {
+    return {
+      success: false,
+      errMsg: err.message || err
+    }
+  }
+}
+
 
 // 云函数入口函数
 exports.main = async (event, context) => {
@@ -238,6 +279,8 @@ exports.main = async (event, context) => {
       return await getClothes();
     case "getClothDetail":
       return await getClothDetail(event.data.id);
+    case "deleteCloth":
+      return await deleteCloth(event.data.id);
     case "doCutout":
       try {
         const {code, imageBase64, message } = await aiCutout(event.data.fileID)

@@ -21,8 +21,10 @@
 .items-list { display: flex; flex-wrap: wrap; gap: 8px; }
 .item-tag { padding: 8px 16px; background-color: #F8FAFC; color: #334155; font-size: 14px; font-weight: 500; border-radius: 20px; border: 1px solid #E2E8F0; }
 
-.bottom-bar { padding: 20px; padding-bottom: 40px; background-color: #ffffff; border-top: 1px solid #F1F5F9; margin-top: auto; display: flex; gap: 12px; }
-.action-btn { flex: 1; padding: 14px 0; font-size: 16px; font-weight: bold; border-radius: 16px; display: flex; align-items: center; justify-content: center; }
-.btn-icon { width: 20px; height: 20px; margin-right: 8px; }
-.primary-btn { background-color: #8A2BE2; color: white; box-shadow: 0 4px 12px rgba(138,43,226,0.3); }
-.edit-btn { background-color: #F1F5F9; color: #334155; }
+.bottom-bar { padding: 20px; padding-bottom: 40px; background-color: #ffffff; border-top: 1px solid #F1F5F9; margin-top: auto; display: flex; align-items: center; gap: 12px; }
+.delete-icon-btn { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background-color: #F8FAFC; border-radius: 12px; border: 1px solid #F1F5F9; flex-shrink: 0; }
+.btn-icon-only { width: 20px; height: 20px; }
+.action-btn { flex: 1; height: 44px; padding: 0; font-size: 15px; font-weight: bold; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+.btn-icon { width: 18px; height: 18px; margin-right: 6px; }
+.primary-btn { background-color: #8A2BE2; color: white; box-shadow: 0 4px 12px rgba(138,43,226,0.3); flex: 2; }
+.share-btn { background-color: #F3E8FF; color: #8A2BE2; border: 1px solid rgba(138,43,226,0.1); }

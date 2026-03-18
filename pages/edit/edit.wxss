@@ -35,9 +35,11 @@
 .tag-list { display: flex; flex-wrap: wrap; gap: 8px; }
 .tag-btn { padding: 5px 9px; background-color: #F2F2F7; color: #666666; font-size: 14px; font-weight: 500; border-radius: 20px; }
 .tag-btn.active { background-color: #F3E8FF; color: #8A2BE2; border: 1px solid rgba(138,43,226,0.3); font-weight: bold; }
-.bottom-bar { padding: 20px; padding-bottom: 40px; background-color: #F2F2F7; margin-top: auto; }
-.action-btn { width: 100%; padding: 14px 0; font-size: 16px; font-weight: bold; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+.bottom-bar { padding: 20px; padding-bottom: 40px; background-color: #F2F2F7; margin-top: auto; display: flex; gap: 12px; }
+.action-btn { flex: 1; padding: 14px 0; font-size: 16px; font-weight: bold; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
 .primary-btn { background-color: #8A2BE2; color: white; box-shadow: 0 4px 12px rgba(138,43,226,0.3); }
+.delete-btn { background-color: #ffeef0; color: #ff4d4f; border: 1px solid #ffd8d6; }
+.half-width { flex: 1.5; }
 
 /* 拾色器弹窗样式，延续现有圆角卡片 + 毛玻璃风格 */
 .picker-mask {
