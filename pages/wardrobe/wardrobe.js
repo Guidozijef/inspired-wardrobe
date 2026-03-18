@@ -3,7 +3,7 @@ import { takePhoto, chooseImage } from '../utils'
 Page({
   data: {
     showAction: false,
-    categories: ["全部", "上装", "下装", "连衣裙", "鞋履", "配饰"],
+    categories: ["全部", "上装", "下装", "连衣裙", "包包", "鞋履", "配饰"],
     activeCategory: 0,
     // 从云数据库 clothes 拉取的完整衣服列表
     allItems: [],

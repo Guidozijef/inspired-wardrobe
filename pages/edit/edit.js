@@ -329,9 +329,9 @@ Page({
 
   selectCategory() {
     wx.showActionSheet({
-      itemList: ["上装", "下装", "连衣裙", "鞋履", "配饰"],
+      itemList: ["上装", "下装", "连衣裙", "包包", "鞋履", "配饰"],
       success: (res) => {
-        const list = ["上装", "下装", "连衣裙", "鞋履", "配饰"];
+        const list = ["上装", "下装", "连衣裙", "包包", "鞋履", "配饰"];
         this.setData({ category: list[res.tapIndex] });
       }
     });
