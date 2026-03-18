@@ -33,6 +33,7 @@ Page({
 
   // 从云端获取数据
   fetchClothes() {
+    wx.showLoading({ title: '加载中...', mask: true });
     wx.cloud.callFunction({
       name: 'clothFunctions',
       data: {
@@ -40,6 +41,7 @@ Page({
       }
     })
       .then(res => {
+        wx.hideLoading()
         const list = (res.result.data || []).map(item => {
           // 你的 clothes 文档字段结构：
           // category: "上装"

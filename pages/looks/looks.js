@@ -7,7 +7,8 @@ Page({
       { id: 2, title: '约会晚宴', date: '2026-02-25', emoji: '👗👠', bg: '#FFE4E6' },
       { id: 3, title: '周末运动', date: '2026-02-20', emoji: '🎽👟', bg: '#E0F2FE' },
       { id: 4, title: '休闲日常', date: '2026-02-18', emoji: '👕🩳', bg: '#DCFCE7' }
-    ]
+    ],
+    colors: ['#F3E8FF', '#FFE4E6','#E0F2FE', '#DCFCE7']
   },
   onLoad() {
     const sysInfo = wx.getSystemInfoSync();
@@ -20,6 +21,9 @@ Page({
   },
   onShow() {
     this.fetchLooks();
+  },
+  getRandomNumber(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   },
   fetchLooks() {
     wx.showLoading({ title: '加载中...', mask: true });
@@ -35,7 +39,7 @@ Page({
             title: item.title || '我的搭配',
             date: this.formatDate(item.create_time),
             emoji: '🧥👖', // 暂用
-            bg: '#F3E8FF',
+            bg: this.data.colors[this.getRandomNumber(0,3)],
             preview: item.preview_url || ''
           }))
         });
