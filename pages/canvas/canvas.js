@@ -81,10 +81,14 @@ Page({
 
   fetchClothes() {
     return new Promise((resolve, reject) => {
-      const db = wx.cloud.database();
-      db.collection('clothes').get().then(res => {
+      wx.cloud.callFunction({
+        name: 'clothFunctions',
+        data: {
+          type: 'getClothes'
+        }
+      }).then(res => {
         this.setData({
-          allItems: res.data || []
+          allItems: res.result.data || []
         }, () => {
           this.applyCategoryFilter();
           resolve();

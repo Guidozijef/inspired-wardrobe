@@ -31,13 +31,16 @@ Page({
     this.fetchClothes();
   },
 
-  // 从云数据库 clothes 获取数据
+  // 从云端获取数据
   fetchClothes() {
-    const db = wx.cloud.database();
-    db.collection('clothes')
-      .get()
+    wx.cloud.callFunction({
+      name: 'clothFunctions',
+      data: {
+        type: 'getClothes'
+      }
+    })
       .then(res => {
-        const list = (res.data || []).map(item => {
+        const list = (res.result.data || []).map(item => {
           // 你的 clothes 文档字段结构：
           // category: "上装"
           // image_url: "cloud://..."

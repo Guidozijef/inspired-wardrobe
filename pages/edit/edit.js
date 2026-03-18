@@ -53,11 +53,21 @@ Page({
 
     // 2. 编辑：从首页卡片进来，带云数据库文档 id
     if (options && options.id) {
-      const db = wx.cloud.database();
       try {
         wx.showLoading({ title: '加载中...', mask: true });
-        const res = await db.collection('clothes').doc(options.id).get();
-        const item = res.data;
+        const res = await wx.cloud.callFunction({
+          name: 'clothFunctions',
+          data: {
+            type: 'getClothDetail',
+            data: { id: options.id }
+          }
+        });
+
+        if (!res.result || !res.result.success) {
+          throw new Error(res.result ? res.result.errMsg : '加载数据失败');
+        }
+
+        const item = res.result.data;
 
         // 处理季节/场合多选状态
         const seasons = this.data.seasons.map(s => ({

@@ -126,10 +126,10 @@ const addCloth = async (data) => {
     }
   }
 }
-
 // 更新单品衣服
 const updateCloth = async (data) => {
   const { id, name, category, seasons, occasions, color, fileID } = data
+  const { OPENID } = cloud.getWXContext()
   
   try {
     const updateData = {
@@ -146,9 +146,20 @@ const updateCloth = async (data) => {
       updateData.image_url = fileID
     }
 
-    await db.collection('clothes').doc(id).update({
+    // 只能更新属于自己的数据
+    const res = await db.collection('clothes').where({
+      _id: id,
+      _openid: OPENID
+    }).update({
       data: updateData
     })
+
+    if (res.stats.updated === 0) {
+      return {
+        success: false,
+        errMsg: '无权修改该数据或数据不存在'
+      }
+    }
 
     return {
       success: true,
@@ -157,7 +168,59 @@ const updateCloth = async (data) => {
   } catch (err) {
     return {
       success: false,
-      errMsg: err
+      errMsg: err.message || err
+    }
+  }
+}
+
+// 获取衣物列表
+const getClothes = async () => {
+  const { OPENID } = cloud.getWXContext()
+
+  try {
+    const res = await db.collection('clothes')
+      .where({
+        _openid: OPENID
+      })
+      .orderBy('create_time', 'desc')
+      .get()
+
+    return {
+      success: true,
+      data: res.data
+    }
+  } catch (err) {
+    return {
+      success: false,
+      errMsg: err.message || err
+    }
+  }
+}
+
+// 获取单件衣物详情
+const getClothDetail = async (id) => {
+  const { OPENID } = cloud.getWXContext()
+
+  try {
+    const res = await db.collection('clothes').doc(id).get()
+    const cloth = res.data
+
+    // 校验所有权
+    if (cloth._openid !== OPENID) {
+      return {
+        success: false,
+        errMsg: '无权访问该数据'
+      }
+    }
+
+    return {
+      success: true,
+      data: cloth
+    }
+  } catch (err) {
+    return {
+      success: false,
+      errMsg: err.message || err
     }
   }
 }
@@ -171,6 +234,10 @@ exports.main = async (event, context) => {
       return await addCloth(event.data);
     case "updateCloth":
       return await updateCloth(event.data);
+    case "getClothes":
+      return await getClothes();
+    case "getClothDetail":
+      return await getClothDetail(event.data.id);
     case "doCutout":
       try {
         const {code, imageBase64, message } = await aiCutout(event.data.fileID)

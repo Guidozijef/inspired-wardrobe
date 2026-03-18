@@ -72,16 +72,26 @@ const getOutfits = async () => {
 
 // 获取单个搭配详情（包含关联单品信息）
 const getOutfitDetail = async (id) => {
+  const { OPENID } = cloud.getWXContext();
   try {
     const res = await db.collection('outfits').doc(id).get();
     const outfit = res.data;
     
+    // 校验所有权
+    if (outfit._openid !== OPENID) {
+      return {
+        success: false,
+        errMsg: '无权访问该数据'
+      };
+    }
+
     // 如果有 clothes_ids，则联表查询单品详情
     if (outfit.clothes_ids && outfit.clothes_ids.length > 0) {
       const _ = db.command;
       const clothesRes = await db.collection('clothes')
         .where({
-          _id: _.in(outfit.clothes_ids)
+          _id: _.in(outfit.clothes_ids),
+          _openid: OPENID // 额外验证关联单品的所有权
         })
         .get();
       outfit.clothes_info = clothesRes.data;
