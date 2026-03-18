@@ -54,7 +54,8 @@ Page({
           
           // 提取季节图标（如 🌸, 🌞, 🍂, ❄️）
           const seasonIcons = originalSeasons.map(s => {
-            const match = s.match(/[\uD83C-\uDBFF\uDC00-\uDFFF]+/g);
+            // 改进正则以包含变体选择器 (\uFE0F)，确保像 ❄️ 这样的图标能以彩色 Emoji 形式渲染
+            const match = s.match(/[\uD83C-\uDBFF\uDC00-\uDFFF\u2600-\u27BF\uFE00-\uFE0F]+/g);
             return match ? match[0] : '';
           }).filter(icon => icon !== '');
 
