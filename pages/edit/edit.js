@@ -1,10 +1,11 @@
 import { takePhoto, chooseImage } from '../utils'
+import { CATEGORIES } from '../constants'
 
 Page({
   data: {
     editingId: '',
     name: '',
-    category: '上装',
+    category: CATEGORIES[0],
     colors: [
       { hex: '#D4C4B7' },
       { hex: '#FFFFFF' },
@@ -380,10 +381,9 @@ Page({
 
   selectCategory() {
     wx.showActionSheet({
-      itemList: ["上装", "下装", "连衣裙", "包包", "鞋履", "配饰"],
+      itemList: CATEGORIES,
       success: (res) => {
-        const list = ["上装", "下装", "连衣裙", "包包", "鞋履", "配饰"];
-        this.setData({ category: list[res.tapIndex] });
+        this.setData({ category: CATEGORIES[res.tapIndex] });
       }
     });
   },

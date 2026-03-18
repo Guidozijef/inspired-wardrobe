@@ -1,8 +1,10 @@
+import { CATEGORIES, WARDROBE_CATEGORIES } from '../constants'
+
 Page({
   data: {
     tabs: ['👗 单品库', '🖼️ 杂志模板', '✨ 滤镜/去色'],
     activeTab: 0,
-    categories: ["全部", "上装", "下装", "连衣裙", "鞋履", "配饰"],
+    categories: WARDROBE_CATEGORIES,
     activeCategory: 0,
     allItems: [], // 存储从云端获取的所有单品
     libraryItems: [], // 存储当前分类下的单品
