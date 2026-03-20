@@ -64,10 +64,11 @@ Page({
     wx.navigateBack();
   },
   shareImage() {
-    wx.showToast({
-      title: '已生成分享图',
-      icon: 'success'
-    });
+    if (this.data.look && this.data.look.id) {
+      wx.navigateTo({ url: `/pages/share/share?id=${this.data.look.id}` });
+    } else {
+      wx.showToast({ title: '无法分享该穿搭', icon: 'none' });
+    }
   },
   // 删除当前穿搭
   async deleteLook() {

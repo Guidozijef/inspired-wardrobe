@@ -8,7 +8,8 @@
     "pages/look_detail/look_detail",
     "pages/detail/detail",
     "pages/search/search",
-    "pages/capsule/capsule"
+    "pages/capsule/capsule",
+    "pages/share/share"
   ],
   "window": {
     "backgroundTextStyle": "light",

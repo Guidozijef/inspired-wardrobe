@@ -1,0 +1,86 @@
+<view class="container" bindtap="deselectText">
+  <view class="main-content">
+    <view class="canvas-wrapper">
+      <!-- 预览区：可以将其看作一个画板 -->
+      <view class="canvas-area" style="background: {{selectedBg.css}};" id="previewArea" catchtap="deselectText">
+        <image class="outfit-image" wx:if="{{look.preview_url}}" src="{{look.preview_url}}" mode="aspectFit"></image>
+        
+        <!-- 文本元素列表 -->
+        <block wx:for="{{textItems}}" wx:key="id">
+          <view class="text-item {{item.active ? 'active' : ''}}"
+                style="left: {{item.x}}px; top: {{item.y}}px; font-size: {{item.size}}px; color: {{item.color}};"
+                catchtouchstart="onTextTouchStart"
+                catchtouchmove="onTextTouchMove"
+                catchtap="activateText"
+                data-id="{{item.id}}">
+            {{item.content}}
+            <!-- 删除按钮 (只在激活时显示)，使用 catchtouchstart 阻止事件冒泡且立即响应 -->
+            <view wx:if="{{item.active}}" class="delete-btn" catchtouchstart="deleteText" data-id="{{item.id}}">×</view>
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <!-- 操作面板 -->
+    <view class="tools-panel glass" catchtap="true">
+      <block wx:if="{{!activeTextId}}">
+        <!-- 背景颜色选择卡片 -->
+        <view class="section-title">背景颜色</view>
+        <scroll-view class="color-scroll" scroll-x="true" show-scrollbar="false">
+          <view class="color-list">
+            <view wx:for="{{backgrounds}}" wx:key="id"
+                  class="color-card {{selectedBg.id === item.id ? 'selected' : ''}}"
+                  style="background: {{item.css}};"
+                  catchtap="selectBg"
+                  data-bg="{{item}}"></view>
+          </view>
+        </scroll-view>
+
+        <view class="divider"></view>
+
+        <!-- 添加文本功能 -->
+        <view class="text-tool">
+          <input class="text-input" placeholder="输入要添加的文字..." value="{{inputText}}" bindinput="onTextInput" />
+          <button class="add-text-btn" catchtap="addText">添加文字</button>
+        </view>
+      </block>
+      
+      <block wx:else>
+        <view class="section-title">文字设置</view>
+        
+        <!-- 字体大小 -->
+        <view class="tool-row">
+          <text class="tool-label">大小</text>
+          <slider class="tool-slider" min="12" max="64" value="{{textItems[activeTextId - 1] ? textItems[activeTextId - 1].size : 24}}" activeColor="#8A2BE2" block-size="20" bindchange="changeTextSize" bindchanging="changeTextSize" />
+        </view>
+        
+        <!-- 字体颜色 -->
+        <view class="tool-row">
+          <text class="tool-label">颜色</text>
+          <scroll-view class="color-scroll" scroll-x="true" show-scrollbar="false" style="flex:1;">
+            <view class="color-list" style="padding: 0;">
+              <view wx:for="{{textColors}}" wx:key="*this"
+                    class="text-color-circle {{textItems[activeTextId - 1] && textItems[activeTextId - 1].color === item ? 'selected' : ''}}"
+                    style="background-color: {{item}};"
+                    catchtap="changeTextColor"
+                    data-color="{{item}}"></view>
+            </view>
+          </scroll-view>
+        </view>
+
+        <view class="divider"></view>
+        
+        <button class="action-btn primary-btn" catchtap="cancelTextEdit">完成编辑</button>
+      </block>
+
+      <!-- 底部操作按钮 (仅在非文本编辑态时显示分享按钮) -->
+      <view class="bottom-actions" wx:if="{{!activeTextId}}">
+        <button class="action-btn cancel-btn" catchtap="goBack">取消</button>
+        <button class="action-btn primary-btn" catchtap="saveImage">保存到相册</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 隐藏的 Canvas，用于把整个视图渲染为图片保存 -->
+  <canvas type="2d" id="exportCanvas" class="export-canvas"></canvas>
+</view>
