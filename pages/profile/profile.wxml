@@ -3,8 +3,8 @@
     <view class="user-info">
       <image class="avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop" mode="aspectFill"></image>
       <view class="user-details">
-        <text class="user-name">OOTD 达人</text>
-        <text class="user-desc">已记录 32 套穿搭</text>
+        <text class="user-name">Guido</text>
+        <text class="user-desc">{{fetchedCount <= 0 ? '还没有穿搭记录哦' : '已同步 ' + fetchedCount + ' 条 | 最新: ' + latestDate}}</text>
       </view>
     </view>
   </view>
@@ -15,10 +15,10 @@
     </view>
     <view class="calendar-card">
       <view class="calendar-header">
-        <text class="month-title">2026年 2月</text>
+        <text class="month-title">{{year}}年 {{month}}月</text>
         <view class="nav-arrows">
-          <text class="arrow">‹</text>
-          <text class="arrow">›</text>
+          <text class="arrow" bindtap="prevMonth">‹</text>
+          <text class="arrow" bindtap="nextMonth">›</text>
         </view>
       </view>
       <view class="week-days">
@@ -28,30 +28,32 @@
         <view 
           wx:for="{{days}}" 
           wx:key="index"
-          class="day {{item.prev ? 'prev-month' : ''}} {{item.hasRecord ? 'has-dot' : ''}} {{activeDate === item.date && !item.prev ? 'active' : ''}}"
+          class="day {{item.prev ? 'prev-month' : ''}} {{item.hasRecord ? 'has-dot' : ''}} {{activeFullDate === item.fullDate ? 'active' : ''}}"
           bindtap="selectDate"
           data-date="{{item.date}}"
+          data-fulldate="{{item.fullDate}}"
           data-prev="{{item.prev}}"
         >
-          <view class="{{activeDate === item.date && !item.prev ? 'active-bg' : ''}}">{{item.date}}</view>
-          <view class="dot" wx:if="{{item.hasRecord && activeDate !== item.date}}"></view>
+          <view class="{{activeFullDate === item.fullDate ? 'active-bg' : ''}}">{{item.date}}</view>
+          <view class="dot" wx:if="{{item.hasRecord}}"></view>
         </view>
       </view>
 
       <!-- Daily Look Section -->
-      <view class="daily-look" wx:if="{{currentDailyLook}}">
-        <view class="daily-look-img" style="background-color: {{currentDailyLook.bg}}">
-          <text class="daily-emoji">{{currentDailyLook.emoji}}</text>
+      <view class="daily-look" wx:if="{{currentDailyLook}}" bindtap="goToDetail">
+        <image wx:if="{{currentDailyLook.preview_url}}" class="daily-look-img" src="{{currentDailyLook.preview_url}}" mode="aspectFill"></image>
+        <view wx:else class="daily-look-img" style="background-color: #F5F5F7">
+          <text class="daily-emoji">🧥</text>
         </view>
         <view class="daily-look-info">
-          <text class="daily-look-title">{{currentDailyLook.title}}</text>
+          <text class="daily-look-title">{{currentDailyLook.title || '今日搭配'}}</text>
           <text class="daily-look-desc">点击查看详情</text>
         </view>
         <view class="daily-look-arrow">›</view>
       </view>
       <view class="daily-look-empty" wx:else>
         <text>今天还没有记录穿搭哦</text>
-        <button class="add-record-btn" bindtap="switchTab" data-path="/pages/canvas/canvas">去记录</button>
+        <button class="add-record-btn" size="mini" bindtap="goToRecord">去记录</button>
       </view>
     </view>
 

@@ -112,9 +112,10 @@ Page({
   },
 
   editLook() {
-    // 带上 ID 跳转到画布进行重新编辑
     if (this.data.look && this.data.look.id) {
-      wx.redirectTo({ url: `/pages/canvas/canvas?id=${this.data.look.id}` });
+      wx.redirectTo({ 
+        url: `/pages/canvas/canvas?id=${this.data.look.id}&date=${this.data.look.date}` 
+      });
     } else {
       wx.redirectTo({ url: '/pages/canvas/canvas' });
     }

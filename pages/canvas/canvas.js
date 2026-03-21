@@ -34,6 +34,13 @@ Page({
     } else {
       this.fetchClothes();
     }
+
+    if (options.date) {
+      this.setData({ recordDate: options.date });
+    } else {
+      // 默认记录为今天
+      this.setData({ recordDate: this.formatDate(new Date()) });
+    }
   },
 
   loadOutfit(id) {
@@ -67,6 +74,7 @@ Page({
           });
           this.setData({
             canvasItems: restoredItems,
+            recordDate: data.record_date || this.formatDate(data.create_time), // 恢复记录日期
             nextId: Math.max(...restoredItems.map(i => i.id)) + 1
           });
         });
@@ -75,6 +83,13 @@ Page({
       wx.hideLoading();
       console.error('还原穿搭失败', err);
     });
+  },
+  
+  formatDate(date) {
+    if (!date) return '';
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return '';
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   },
 
   onShow() {
@@ -317,7 +332,10 @@ Page({
         name: 'outfitFunctions',
         data: {
           type: 'addOutfit',
-          data: outfitData
+          data: {
+            ...outfitData,
+            recordDate: this.data.recordDate
+          }
         }
       });
 

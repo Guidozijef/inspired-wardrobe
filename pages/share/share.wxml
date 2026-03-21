@@ -30,7 +30,7 @@
           <view class="color-list">
             <view wx:for="{{backgrounds}}" wx:key="id"
                   class="color-card {{selectedBg.id === item.id ? 'selected' : ''}}"
-                  style="background: {{item.css}};"
+                  style="background: {{item.css}}; background-size: {{item.grid || item.dots ? '20px 20px' : 'cover'}};"
                   catchtap="selectBg"
                   data-bg="{{item}}"></view>
           </view>

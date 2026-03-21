@@ -21,7 +21,8 @@
 .day { width: 14.28%; height: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 14px; color: #334155; font-weight: 500; margin-bottom: 8px; position: relative; }
 .day.prev-month { color: #CBD5E1; }
 .active-bg { width: 32px; height: 32px; background-color: #8A2BE2; color: #ffffff; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(138,43,226,0.3); }
-.dot { width: 4px; height: 4px; background-color: #8A2BE2; border-radius: 2px; position: absolute; bottom: 2px; }
+.dot { width: 4px; height: 4px; background-color: #8A2BE2; border-radius: 2px; position: absolute; bottom: 4px; z-index: 10; }
+.active-bg + .dot { background-color: #ffffff; }
 
 .daily-look { display: flex; align-items: center; padding-top: 20px; margin-top: 20px; border-top: 1px solid #F1F5F9; }
 .daily-look-img { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 16px; }
@@ -31,7 +32,7 @@
 .daily-look-desc { font-size: 12px; color: #94A3B8; }
 .daily-look-arrow { color: #CBD5E1; font-size: 20px; }
 .daily-look-empty { display: flex; justify-content: space-between; align-items: center; padding-top: 20px; margin-top: 20px; border-top: 1px solid #F1F5F9; color: #94A3B8; font-size: 14px; }
-.add-record-btn { margin: 0; padding: 6px 16px; font-size: 12px; font-weight: bold; background-color: #8A2BE2; color: white; border-radius: 16px; display: flex; align-items: center; justify-content: center; }
+.add-record-btn { width: 200px; margin: 0; padding: 6px 20px; font-size: 12px; font-weight: bold; background-color: #8A2BE2; color: white; border-radius: 16px; display: flex; align-items: center; justify-content: center; }
 
 .section-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px; margin-top: 24px; }
 .section-btn { font-size: 14px; color: #8A2BE2; font-weight: bold; }

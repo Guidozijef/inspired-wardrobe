@@ -2,22 +2,14 @@ Page({
   data: {
     statusBarHeight: 20,
     navBarHeight: 44,
-    days: [
-      { date: 28, prev: true }, { date: 29, prev: true }, { date: 30, prev: true }, { date: 31, prev: true },
-      { date: 1 }, { date: 2 }, { date: 3 }, { date: 4, hasRecord: true },
-      { date: 5 }, { date: 6 }, { date: 7 }, { date: 8 },
-      { date: 9 }, { date: 10 }, { date: 11 }, { date: 12 },
-      { date: 13 }, { date: 14 }, { date: 15 }, { date: 16 },
-      { date: 17 }, { date: 18 }, { date: 19 }, { date: 20 },
-      { date: 21 }, { date: 22 }, { date: 23 }, { date: 24 },
-      { date: 25 }, { date: 26, hasRecord: true }, { date: 27 }, { date: 28 }
-    ],
-    activeDate: 26,
-    dailyLooks: {
-      4: { id: 1, title: '立春穿搭', emoji: '🧥👖', bg: '#F3E8FF' },
-      26: { id: 2, title: '今日通勤', emoji: '👔👞', bg: '#E0F2FE' }
-    },
-    currentDailyLook: { id: 2, title: '今日通勤', emoji: '👔👞', bg: '#E0F2FE' },
+    year: 2026,
+    month: 2,
+    days: [],
+    activeFullDate: '',
+    dailyLooks: {},
+    currentDailyLook: null,
+    fetchedCount: 0,
+    latestDate: '无',
     capsules: [
       { id: 1, title: '五一去大理', count: 12, img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=200&fit=crop' },
       { id: 2, title: '下周打工装', count: 5, img: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=200&h=200&fit=crop' }
@@ -30,70 +22,171 @@ Page({
     slot1Index: 0,
     slot2Index: 0,
     slot3Index: 0,
-    inspirations: [
-      { id: 1, img: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=600&fit=crop', title: '春季极简风', likes: '1.2k', author: 'Vogue' },
-      { id: 2, img: 'https://images.unsplash.com/photo-1434389678232-040b50774107?w=400&h=600&fit=crop', title: '周末出游穿搭', likes: '856', author: 'OOTD 日常' }
-    ]
   },
+
   onLoad() {
     const sysInfo = wx.getSystemInfoSync();
-    const menuButton = wx.getMenuButtonBoundingClientRect();
+    let menuButton = null;
+    try {
+      menuButton = wx.getMenuButtonBoundingClientRect();
+    } catch (e) {}
+    
+    const navBarHeight = menuButton ? (menuButton.top - sysInfo.statusBarHeight) * 2 + menuButton.height : 44;
+    
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    
     this.setData({
       statusBarHeight: sysInfo.statusBarHeight,
-      navBarHeight: (menuButton.top - sysInfo.statusBarHeight) * 2 + menuButton.height
+      navBarHeight: navBarHeight,
+      year: today.getFullYear(),
+      month: today.getMonth() + 1,
+      activeFullDate: todayStr
+    }, () => {
+      this.generateCalendar();
     });
   },
+
+  onShow() {
+    this.fetchOutfits();
+  },
+
+  fetchOutfits() {
+    const { year, month } = this.data;
+    const monthStr = `${year}-${String(month).padStart(2, '0')}`;
+    
+    // 如果已经加载过这个月且没有新变动（这里简单起见，每次进入页面刷新当月，
+    // 切换月份时如果没加载过则加载）
+    wx.showLoading({ title: '加载中...', mask: true });
+    
+    wx.cloud.callFunction({
+      name: 'outfitFunctions',
+      data: { 
+        type: 'getOutfits',
+        data: { monthStr: monthStr }
+      }
+    }).then(res => {
+      wx.hideLoading();
+      if (res.result && res.result.success) {
+        this.processOutfits(res.result.data);
+      }
+    }).catch(err => {
+      wx.hideLoading();
+      console.error('获取穿搭失败', err);
+    });
+  },
+
+  processOutfits(outfits) {
+    const dailyLooks = { ...this.data.dailyLooks }; // 合并旧数据（实现缓存）
+    let latestDateStr = this.data.latestDate;
+
+    if (outfits && outfits.length > 0) {
+      outfits.forEach((item, index) => {
+        const dStr = item.record_date;
+        if (dStr) {
+          if (index === 0 && (latestDateStr === '无' || dStr > latestDateStr)) {
+            latestDateStr = dStr;
+          }
+          // 存入映射表
+          dailyLooks[dStr] = item;
+        }
+      });
+    }
+
+    const activeDateStr = this.data.activeFullDate;
+
+    this.setData({ 
+      dailyLooks,
+      fetchedCount: Object.keys(dailyLooks).length,
+      latestDate: latestDateStr,
+      currentDailyLook: dailyLooks[activeDateStr] || null
+    }, () => {
+      this.generateCalendar();
+    });
+  },
+
+  generateCalendar() {
+    const { year, month, dailyLooks } = this.data;
+    const firstDay = new Date(year, month - 1, 1).getDay();
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const prevMonthDays = new Date(year, month - 1, 0).getDate();
+    
+    let days = [];
+    for (let i = firstDay - 1; i >= 0; i--) {
+      days.push({ date: prevMonthDays - i, prev: true });
+    }
+    for (let i = 1; i <= daysInMonth; i++) {
+      const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+      days.push({ 
+        date: i, 
+        fullDate: dateStr,
+        hasRecord: !!dailyLooks[dateStr] 
+      });
+    }
+    this.setData({ days });
+  },
+
+  prevMonth() {
+    let { year, month } = this.data;
+    if (month === 1) { year--; month = 12; } else { month--; }
+    this.setData({ year, month }, () => {
+      this.fetchOutfits(); // 切换月份时加载数据
+    });
+  },
+
+  nextMonth() {
+    let { year, month } = this.data;
+    if (month === 12) { year++; month = 1; } else { month++; }
+    this.setData({ year, month }, () => {
+      this.fetchOutfits(); // 切换月份时加载数据
+    });
+  },
+
   selectDate(e) {
     if (!e.currentTarget.dataset.prev) {
-      const date = e.currentTarget.dataset.date;
+      const fullDate = e.currentTarget.dataset.fulldate;
       this.setData({ 
-        activeDate: date,
-        currentDailyLook: this.data.dailyLooks[date] || null
+        activeFullDate: fullDate,
+        currentDailyLook: this.data.dailyLooks[fullDate] || null
       });
     }
   },
-  goToCapsule() {
-    wx.navigateTo({ url: '/pages/capsule/capsule' });
-  },
+
   generateRandomLook() {
     if (this.data.isGenerating) return;
-    
     this.setData({ isGenerating: true });
-    
-    // Simulate API call or generation process
     setTimeout(() => {
       const titles = ['今日通勤推荐', '周末休闲风', '运动活力装', '约会晚宴风'];
-      
       const idx1 = Math.floor(Math.random() * 5);
       const idx2 = Math.floor(Math.random() * 5);
       const idx3 = Math.floor(Math.random() * 5);
       const randomTitleIdx = Math.floor(Math.random() * titles.length);
-      
       this.setData({
         isGenerating: false,
         slot1Index: idx1,
         slot2Index: idx2,
         slot3Index: idx3,
-        randomLook: {
-          title: titles[randomTitleIdx]
-        }
+        randomLook: { title: titles[randomTitleIdx] }
       });
     }, 1500);
   },
-  shareWeiXin() {
-    wx.showToast({
-      title: '分享成功',
-      icon: 'success'
-    });
-  },
-  saveRandomLook() {
-    wx.showToast({
-      title: '已保存到穿搭',
-      icon: 'success'
-    });
-  },
+
   switchTab(e) {
     const path = e.currentTarget.dataset.path;
     wx.redirectTo({ url: path });
+  },
+
+  goToRecord() {
+    wx.redirectTo({
+      url: `/pages/canvas/canvas?date=${this.data.activeFullDate}`
+    });
+  },
+
+  goToDetail() {
+    if (this.data.currentDailyLook) {
+      wx.navigateTo({
+        url: `/pages/look_detail/look_detail?id=${this.data.currentDailyLook._id}`
+      });
+    }
   }
 });

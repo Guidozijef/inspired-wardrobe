@@ -6,92 +6,133 @@ cloud.init({
 
 const db = cloud.database();
 
-// 添加搭配
+// 添加/更新搭配
 const addOutfit = async (data) => {
   const { OPENID } = cloud.getWXContext();
   const { 
+    id, 
     canvas_data, 
     clothes_ids, 
     description, 
     scene, 
     title,
-    preview_url
+    preview_url,
+    recordDate
   } = data;
 
+  const outfitData = {
+    _openid: OPENID,
+    canvas_data,
+    clothes_ids,
+    create_time: db.serverDate(),
+    record_date: recordDate || '',
+    description: description || '',
+    last_worn_date: '',
+    preview_url: preview_url || '',
+    scene: scene || '日常',
+    title: title || '我的搭配',
+    update_time: db.serverDate()
+  };
+
   try {
-    const res = await db.collection('outfits').add({
-      data: {
-        _openid: OPENID,
-        canvas_data,
-        clothes_ids,
-        create_time: db.serverDate(),
-        description: description || '',
-        last_worn_date: '',
-        preview_url: preview_url || '',
-        scene: scene || '日常',
-        title: title || '我的搭配'
+    let resultId = id;
+    if (id) {
+      await db.collection('outfits').doc(id).update({
+        data: outfitData
+      });
+    } else {
+      const res = await db.collection('outfits').add({
+        data: outfitData
+      });
+      resultId = res._id;
+    }
+
+    return {
+      success: true,
+      id: resultId,
+      message: '保存成功！'
+    };
+  } catch (err) {
+    return { success: false, errMsg: err.message || err };
+  }
+};
+
+// 获取搭配列表 (支持月份过滤)
+const getOutfits = async (data = {}) => {
+  const { OPENID } = cloud.getWXContext();
+  const { monthStr } = data; // 格式如 "2026-03"
+
+  try {
+    let query = db.collection('outfits').where({
+      _openid: OPENID
+    });
+
+    // 如果指定了月份，利用 record_date 前缀匹配实现分月查询
+    if (monthStr) {
+      query = query.where({
+        record_date: db.RegExp({
+          regexp: '^' + monthStr,
+          options: 'i'
+        })
+      });
+    }
+
+    const res = await query
+      .orderBy('create_time', 'desc')
+      .limit(500)
+      .get();
+
+    // 数据标准化
+    const standardizedData = res.data.map(item => {
+      let record_date = item.record_date || '';
+      let create_time_iso = '';
+
+      if (item.create_time) {
+        const d = (item.create_time instanceof Date) ? item.create_time : new Date(item.create_time);
+        if (!isNaN(d.getTime())) {
+          create_time_iso = d.toISOString();
+          if (!record_date) {
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            record_date = `${year}-${month}-${day}`;
+          }
+        }
       }
+
+      return {
+        ...item,
+        create_time: create_time_iso,
+        record_date: record_date
+      };
     });
 
     return {
       success: true,
-      id: res._id,
-      message: '搭配保存成功！'
+      data: standardizedData
     };
   } catch (err) {
-    return {
-      success: false,
-      errMsg: err.message || err
-    };
+    return { success: false, errMsg: err.message || err };
   }
 };
 
-// 获取搭配列表
-const getOutfits = async () => {
-  const { OPENID } = cloud.getWXContext();
-
-  try {
-    const res = await db.collection('outfits')
-      .where({
-        _openid: OPENID
-      })
-      .orderBy('create_time', 'desc')
-      .get();
-
-    return {
-      success: true,
-      data: res.data
-    };
-  } catch (err) {
-    return {
-      success: false,
-      errMsg: err.message || err
-    };
-  }
-};
-
-// 获取单个搭配详情（包含关联单品信息）
+// 获取单个搭配详情
 const getOutfitDetail = async (id) => {
   const { OPENID } = cloud.getWXContext();
   try {
     const res = await db.collection('outfits').doc(id).get();
     const outfit = res.data;
     
-    // 校验所有权
     if (outfit._openid !== OPENID) {
-      return {
-        success: false,
-        errMsg: '无权访问该数据'
-      };
+      return { success: false, errMsg: '无权访问该数据' };
     }
 
-    // 如果有 clothes_ids，则联表查询单品详情
     if (outfit.clothes_ids && outfit.clothes_ids.length > 0) {
       const _ = db.command;
       const clothesRes = await db.collection('clothes')
         .where({
           _id: _.in(outfit.clothes_ids),
-          _openid: OPENID // 额外验证关联单品的所有权
+          _openid: OPENID
         })
         .get();
       outfit.clothes_info = clothesRes.data;
@@ -99,56 +140,34 @@ const getOutfitDetail = async (id) => {
       outfit.clothes_info = [];
     }
 
-    return {
-      success: true,
-      data: outfit
-    };
+    return { success: true, data: outfit };
   } catch (err) {
-    return {
-      success: false,
-      errMsg: err.message || err
-    };
+    return { success: false, errMsg: err.message || err };
   }
 };
 
 // 删除搭配
 const deleteOutfit = async (id) => {
   const { OPENID } = cloud.getWXContext();
+  if (typeof id === 'object') id = id.id;
 
   try {
-    // 1. 先查出预览图 fileID
     const res = await db.collection('outfits').doc(id).get();
     const outfit = res.data;
 
-    // 校验所有权
     if (outfit._openid !== OPENID) {
-      return {
-        success: false,
-        errMsg: '无权删除该数据'
-      };
+      return { success: false, errMsg: '无权删除该数据' };
     }
 
     const { preview_url } = outfit;
-
-    // 2. 从数据库删除记录
     await db.collection('outfits').doc(id).remove();
-
-    // 3. 从云存储删除预览图
     if (preview_url) {
-      await cloud.deleteFile({
-        fileList: [preview_url],
-      });
+      await cloud.deleteFile({ fileList: [preview_url] });
     }
 
-    return {
-      success: true,
-      message: '搭配已删除'
-    };
+    return { success: true, message: '搭配已删除' };
   } catch (err) {
-    return {
-      success: false,
-      errMsg: err.message || err
-    };
+    return { success: false, errMsg: err.message || err };
   }
 };
 
@@ -157,15 +176,12 @@ exports.main = async (event, context) => {
     case "addOutfit":
       return await addOutfit(event.data);
     case "getOutfits":
-      return await getOutfits();
+      return await getOutfits(event.data);
     case "getOutfitDetail":
       return await getOutfitDetail(event.data.id);
-    case "deleteOutfit":
-      return await deleteOutfit(event.data.id);
+    case 'deleteOutfit':
+      return await deleteOutfit(event.data);
     default:
-      return {
-        success: false,
-        errMsg: 'Unknown type'
-      };
+      return { success: false, errMsg: '未知的请求类型' };
   }
 };
