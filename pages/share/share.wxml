@@ -2,7 +2,7 @@
   <view class="main-content">
     <view class="canvas-wrapper">
       <!-- 预览区：可以将其看作一个画板 -->
-      <view class="canvas-area" style="background: {{selectedBg.css}};" id="previewArea" catchtap="deselectText">
+        <view class="canvas-area" style="background: {{selectedBg.type === 'image' ? 'url(' + selectedBg.value + ') center/cover no-repeat' : selectedBg.css}}; background-size: {{selectedBg.grid || selectedBg.dots ? '20px 20px' : (selectedBg.type === 'image' ? 'cover' : 'auto')}};" id="previewArea" catchtap="deselectText">
         <image class="outfit-image" wx:if="{{look.preview_url}}" src="{{look.preview_url}}" mode="aspectFit"></image>
         
         <!-- 文本元素列表 -->
@@ -58,7 +58,7 @@
         <view class="tool-row">
           <text class="tool-label">颜色</text>
           <scroll-view class="color-scroll" scroll-x="true" show-scrollbar="false" style="flex:1;">
-            <view class="color-list" style="padding: 0;">
+            <view class="color-list">
               <view wx:for="{{textColors}}" wx:key="*this"
                     class="text-color-circle {{textItems[activeTextId - 1] && textItems[activeTextId - 1].color === item ? 'selected' : ''}}"
                     style="background-color: {{item}};"
@@ -75,7 +75,7 @@
 
       <!-- 底部操作按钮 (仅在非文本编辑态时显示分享按钮) -->
       <view class="bottom-actions" wx:if="{{!activeTextId}}">
-        <button class="action-btn cancel-btn" catchtap="goBack">取消</button>
+        <button class="action-btn share-btn" open-type="share">分享给好友</button>
         <button class="action-btn primary-btn" catchtap="saveImage">保存到相册</button>
       </view>
     </view>

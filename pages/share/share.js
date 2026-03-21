@@ -2,22 +2,40 @@ Page({
   data: {
     look: {},
     backgrounds: [
-      { id: 'bg1', type: 'solid', value: '#F2F2F7', css: '#F2F2F7' },
-      { id: 'bg2', type: 'solid', value: '#FFFFFF', css: '#FFFFFF' },
+      { id: 'mini1', type: 'solid', value: '#FFFDF5', css: '#FFFDF5' }, // 奶油米
+      { id: 'mini2', type: 'solid', value: '#F5F5F7', css: '#F5F5F7' }, // 极简灰
+      { id: 'mini3', type: 'solid', value: '#E8EBE4', css: '#E8EBE4' }, // 灰鼠草绿
+      { id: 'mini4', type: 'solid', value: '#F2E6E6', css: '#F2E6E6' }, // 莫兰迪粉
+      { id: 'mini5', type: 'gradient', colors: ['#F9F9F9', '#F1F1F1'], css: 'linear-gradient(180deg, #F9F9F9 0%, #F1F1F1 100%)' }, // 极简渐变1
+      { id: 'mini6', type: 'gradient', colors: ['#FFFDF5', '#F5F0E6'], css: 'linear-gradient(135deg, #FFFDF5 0%, #F5F0E6 100%)' }, // 极简渐变2
+      { id: 'mini7', type: 'solid', value: '#EBDED5', css: '#EBDED5' }, // 陶土色
+      { id: 'mini8', type: 'solid', value: '#1C1C1E', css: '#1C1C1E' }, // 极简黑
+      { id: 'mini9', type: 'solid', value: '#E5E5F2', css: '#E5E5F2' }, // 柔薰衣草
+      { id: 'bg1', type: 'solid', value: '#F2F2F7', css: '#2feef7b8' },
+      { id: 'bg2', type: 'solid', value: '#FFFFFF', css: '#e297fb' },
       { id: 'bg3', type: 'solid', value: '#FFE5E5', css: '#FFE5E5' },
       { id: 'bg4', type: 'solid', value: '#E5F3FF', css: '#E5F3FF' },
       { id: 'bg5', type: 'solid', value: '#E8FFE5', css: '#E8FFE5' },
       { id: 'bg6', type: 'solid', value: '#FFF5E5', css: '#FFF5E5' },
       { id: 'bg7', type: 'solid', value: '#F3E5FF', css: '#F3E5FF' },
-      { id: 'bg8', type: 'solid', value: '#000000', css: '#000000' },
       { id: 'grad1', type: 'gradient', colors: ['#a18cd1', '#fbc2eb'], css: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)' },
       { id: 'grad2', type: 'gradient', colors: ['#ff9a9e', '#fecfef'], css: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)' },
       { id: 'grad3', type: 'gradient', colors: ['#84fab0', '#8fd3f4'], css: 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)' },
       { id: 'grad4', type: 'gradient', colors: ['#fccb90', '#d57eeb'], css: 'linear-gradient(135deg, #fccb90 0%, #d57eeb 100%)' },
-      { id: 'grad5', type: 'gradient', colors: ['#e0c3fc', '#8ec5fc'], css: 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)' }
+      { id: 'grad5', type: 'gradient', colors: ['#e0c3fc', '#8ec5fc'], css: 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)' },
+      { id: 'img1', type: 'image', value: '/assets/backgrounds/bg_light_wood.png', css: 'url(/assets/backgrounds/bg_light_wood.png)' },
+      { id: 'img2', type: 'image', value: '/assets/backgrounds/bg_beige_linen.png', css: 'url(/assets/backgrounds/bg_beige_linen.png)' },
+      { id: 'img3', type: 'image', value: '/assets/backgrounds/bg_soft_marble.png', css: 'url(/assets/backgrounds/bg_soft_marble.png)' },
+      { id: 'grid1', type: 'solid', value: '#FFFFFF', css: 'linear-gradient(#F0F0F0 1px, transparent 1px), linear-gradient(90deg, #F0F0F0 1px, transparent 1px)', grid: true }, // 极简网格
+      { id: 'grid2', type: 'solid', value: '#FFFFFF', css: 'radial-gradient(#D1D1D1 1.5px, transparent 1.5px)', dots: true }, // 极简点阵
     ],
     selectedBg: { id: 'bg1', type: 'solid', value: '#F2F2F7', css: '#F2F2F7' },
-    textColors: ['#333333', '#FFFFFF', '#FF3B30', '#34C759', '#007AFF', '#FF9500', '#AF52DE', '#FFCC00', '#8E8E93'],
+    textColors: [
+      '#000000', '#333333', '#8E8E93', '#FFFFFF', 
+      '#FF3B30', '#FF2D55', '#FF9500', '#FFCC00', 
+      '#34C759', '#4CD964', '#5AC8FA', '#007AFF', 
+      '#5856D6', '#AF52DE', '#A2845E'
+    ],
     inputText: '',
     textItems: [],
     nextTextId: 1,
@@ -75,6 +93,14 @@ Page({
 
   goBack() {
     wx.navigateBack();
+  },
+
+  onShareAppMessage() {
+    return {
+      title: '发现一个超赞的穿搭灵感，快来康康！',
+      path: `/pages/look_detail/look_detail?id=${this.data.look._id}`,
+      imageUrl: this.data.look.preview_url
+    };
   },
 
   selectBg(e) {
@@ -268,24 +294,120 @@ Page({
           const dpr = wx.getSystemInfoSync().pixelRatio;
 
           const exportScale = 2; // 放大 2 倍
+          const footerHeight = 80; // 底部品牌区高度
+          
           canvas.width = width * dpr * exportScale;
-          canvas.height = height * dpr * exportScale;
+          canvas.height = (height + footerHeight) * dpr * exportScale;
           
           ctx.scale(dpr * exportScale, dpr * exportScale);
 
-          // 1. 绘制背景
+          // 1. 绘制背景 (仅在画板区域)
           const bg = this.data.selectedBg;
           if (bg.type === 'gradient') {
             const grd = ctx.createLinearGradient(0, 0, width, height);
             grd.addColorStop(0, bg.colors[0]);
             grd.addColorStop(1, bg.colors[1]);
             ctx.fillStyle = grd;
+            ctx.fillRect(0, 0, width, height);
+          } else if (bg.type === 'image') {
+            try {
+              const bgInfo = await new Promise((resBg) => {
+                wx.getImageInfo({
+                  src: bg.value,
+                  success: resBg,
+                  fail: () => resBg(null)
+                });
+              });
+              if (bgInfo && bgInfo.path) {
+                const bgImg = canvas.createImage();
+                await new Promise((resL) => {
+                  bgImg.onload = resL;
+                  bgImg.src = bgInfo.path;
+                });
+                ctx.drawImage(bgImg, 0, 0, width, height);
+              } else {
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, width, height);
+              }
+            } catch (err) {
+              ctx.fillStyle = '#FFFFFF';
+              ctx.fillRect(0, 0, width, height);
+            }
+          } else if (bg.grid) {
+            // 绘制网格背景
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, width, height);
+            ctx.strokeStyle = '#F0F0F0';
+            ctx.lineWidth = 1;
+            const step = 20;
+            for (let x = 0; x <= width; x += step) {
+              ctx.beginPath();
+              ctx.moveTo(x, 0);
+              ctx.lineTo(x, height);
+              ctx.stroke();
+            }
+            for (let y = 0; y <= height; y += step) {
+              ctx.beginPath();
+              ctx.moveTo(0, y);
+              ctx.lineTo(width, y);
+              ctx.stroke();
+            }
+          } else if (bg.dots) {
+            // 绘制点阵背景
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, width, height);
+            ctx.fillStyle = '#D1D1D1';
+            const step = 20;
+            for (let x = 10; x <= width; x += step) {
+              for (let y = 10; y <= height; y += step) {
+                ctx.beginPath();
+                ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+                ctx.fill();
+              }
+            }
           } else {
             ctx.fillStyle = bg.value;
+            ctx.fillRect(0, 0, width, height);
           }
-          ctx.fillRect(0, 0, width, height);
 
-          // 2. 绘制穿搭预览图
+          // 2. 绘制品牌区 (Footer)
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, height, width, footerHeight);
+          
+          // 分割线
+          ctx.strokeStyle = '#EEEEEE';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(0, height);
+          ctx.lineTo(width, height);
+          ctx.stroke();
+
+          // 小程序名称
+          ctx.font = 'bold 16px sans-serif';
+          ctx.fillStyle = '#333333';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('灵感衣橱 | Inspired Wardrobe', 20, height + footerHeight / 2 - 8);
+          
+          ctx.font = '12px sans-serif';
+          ctx.fillStyle = '#999999';
+          ctx.fillText('发现穿搭灵感，让美触手可及', 20, height + footerHeight / 2 + 12);
+
+          // 模拟小程序码区域
+          ctx.fillStyle = '#f5f5f5';
+          const qrSize = 50;
+          const qrX = width - qrSize - 20;
+          const qrY = height + (footerHeight - qrSize) / 2;
+          ctx.beginPath();
+          ctx.arc(qrX + qrSize / 2, qrY + qrSize / 2, qrSize / 2, 0, Math.PI * 2);
+          ctx.fill();
+          
+          ctx.font = '10px sans-serif';
+          ctx.fillStyle = '#999999';
+          ctx.textAlign = 'center';
+          ctx.fillText('扫码查看', qrX + qrSize / 2, qrY + qrSize / 2 + 4);
+          ctx.textAlign = 'left'; // 重置
+
+          // 3. 绘制穿搭预览图
           if (this.data.look.preview_url) {
             try {
               const info = await new Promise((resImg) => {
@@ -344,10 +466,10 @@ Page({
             canvas,
             x: 0,
             y: 0,
-            width: width * exportScale,
-            height: height * exportScale,
+            width: width * dpr * exportScale,
+            height: (height + footerHeight) * dpr * exportScale,
             destWidth: width * dpr * exportScale,
-            destHeight: height * dpr * exportScale,
+            destHeight: (height + footerHeight) * dpr * exportScale,
             success: (resTemp) => resolve(resTemp.tempFilePath),
             fail: (err) => reject(err)
           });

@@ -65,6 +65,8 @@
   position: relative;
   overflow: hidden;
   transition: background-color 0.3s ease;
+  background-size: cover;
+  background-position: center;
 }
 
 .outfit-image {
@@ -136,7 +138,8 @@
 
 .color-list {
   display: inline-flex;
-  padding: 4px;
+  align-items: center;
+  padding: 8px 4px;
 }
 
 .color-card {
@@ -147,10 +150,12 @@
   border: 2px solid transparent;
   transition: transform 0.2s;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  background-size: cover;
+  background-position: center;
 }
 
 .color-card.selected {
-  transform: scale(1.1);
+  transform: scale(1.02);
   border: 2px solid #8A2BE2;
 }
 
@@ -185,7 +190,7 @@
 }
 
 .text-color-circle.selected {
-  transform: scale(1.2);
+  transform: scale(1.05);
   border-color: #8A2BE2;
 }
 
@@ -248,9 +253,9 @@
   display: none;
 }
 
-.cancel-btn {
-  background: #f5f5f7;
-  color: #666;
+.share-btn {
+  background: #f0e6ff;
+  color: #8A2BE2;
 }
 
 .primary-btn {
