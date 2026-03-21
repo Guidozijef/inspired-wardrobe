@@ -2,13 +2,12 @@ Page({
   data: {
     statusBarHeight: 20,
     navBarHeight: 44,
-    looks: [
-      { id: 1, title: '职场通勤', date: '2026-02-26', emoji: '🧥👖', bg: '#F3E8FF' },
-      { id: 2, title: '约会晚宴', date: '2026-02-25', emoji: '👗👠', bg: '#FFE4E6' },
-      { id: 3, title: '周末运动', date: '2026-02-20', emoji: '🎽👟', bg: '#E0F2FE' },
-      { id: 4, title: '休闲日常', date: '2026-02-18', emoji: '👕🩳', bg: '#DCFCE7' }
-    ],
-    colors: ['#F3E8FF', '#FFE4E6','#E0F2FE', '#DCFCE7']
+    looks: [],
+    colors: ['#F3E8FF', '#FFE4E6','#E0F2FE', '#DCFCE7'],
+    page: 0,
+    pageSize: 10, // 调整为每次加载 10 条
+    isLoading: false,
+    isNoMore: false
   },
   onLoad() {
     const sysInfo = wx.getSystemInfoSync();
@@ -17,37 +16,73 @@ Page({
       statusBarHeight: sysInfo.statusBarHeight,
       navBarHeight: (menuButton.top - sysInfo.statusBarHeight) * 2 + menuButton.height
     });
-    this.fetchLooks();
+    // onLoad 不再主动 fetch，由 onShow 统一处理
   },
   onShow() {
-    this.fetchLooks();
+    this.resetAndFetch();
+  },
+  resetAndFetch() {
+    this.setData({
+      page: 0,
+      looks: [],
+      isNoMore: false,
+      isLoading: false
+    }, () => {
+      this.fetchLooks();
+    });
   },
   getRandomNumber(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   },
   fetchLooks() {
+    if (this.data.isLoading || this.data.isNoMore) return;
+    
+    this.setData({ isLoading: true });
     wx.showLoading({ title: '加载中...', mask: true });
+    
     wx.cloud.callFunction({
       name: 'outfitFunctions',
-      data: { type: 'getOutfits' }
+      data: { 
+        type: 'getOutfits',
+        data: {
+          page: this.data.page,
+          pageSize: this.data.pageSize
+        }
+      }
     }).then(res => {
       wx.hideLoading();
+      this.setData({ isLoading: false });
+      
       if (res.result && res.result.success) {
+        const newData = res.result.data || [];
+        const isNoMore = newData.length < this.data.pageSize;
+        
+        const newLooks = newData.map(item => ({
+          id: item._id,
+          title: item.title || '我的搭配',
+          date: this.formatDate(item.record_date || item.create_time),
+          emoji: '🧥👖', 
+          bg: this.data.colors[this.getRandomNumber(0,3)],
+          preview: item.preview_url || ''
+        }));
+
         this.setData({
-          looks: res.result.data.map(item => ({
-            id: item._id,
-            title: item.title || '我的搭配',
-            date: this.formatDate(item.create_time),
-            emoji: '🧥👖', // 暂用
-            bg: this.data.colors[this.getRandomNumber(0,3)],
-            preview: item.preview_url || ''
-          }))
+          looks: [...this.data.looks, ...newLooks],
+          page: this.data.page + 1,
+          isNoMore: isNoMore
         });
       }
     }).catch(err => {
       wx.hideLoading();
+      this.setData({ isLoading: false });
       console.error('获取搭配失败', err);
     });
+  },
+  /**
+   * 页面上拉触底事件的处理函数
+   */
+  onReachBottom() {
+    this.fetchLooks();
   },
   formatDate(dateStr) {
     if (!dateStr) return '';

@@ -57,17 +57,18 @@ const addOutfit = async (data) => {
   }
 };
 
-// 获取搭配列表 (支持月份过滤)
+// 获取搭配列表 (支持月份过滤 & 分页)
 const getOutfits = async (data = {}) => {
   const { OPENID } = cloud.getWXContext();
-  const { monthStr } = data; // 格式如 "2026-03"
+  const page = Number(data.page || 0);
+  const pageSize = Number(data.pageSize || 10);
+  const { monthStr } = data; 
 
   try {
     let query = db.collection('outfits').where({
       _openid: OPENID
     });
 
-    // 如果指定了月份，利用 record_date 前缀匹配实现分月查询
     if (monthStr) {
       query = query.where({
         record_date: db.RegExp({
@@ -79,7 +80,8 @@ const getOutfits = async (data = {}) => {
 
     const res = await query
       .orderBy('create_time', 'desc')
-      .limit(500)
+      .skip(page * pageSize)
+      .limit(pageSize)
       .get();
 
     // 数据标准化

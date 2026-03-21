@@ -16,6 +16,11 @@
         </view>
       </view>
     </view>
+    <view class="loading-status" wx:if="{{isLoading}}">加载中...</view>
+    <view class="loading-status" wx:if="{{isNoMore && looks.length > 0}}">已经到底啦~</view>
+    <view class="empty-state" wx:if="{{isNoMore && looks.length === 0}}">
+      <text>还没有穿搭记录哦</text>
+    </view>
   </view>
 
   <!-- Custom Tab Bar -->

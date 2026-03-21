@@ -22,7 +22,8 @@
 .day.prev-month { color: #CBD5E1; }
 .active-bg { width: 32px; height: 32px; background-color: #8A2BE2; color: #ffffff; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(138,43,226,0.3); }
 .dot { width: 4px; height: 4px; background-color: #8A2BE2; border-radius: 2px; position: absolute; bottom: 4px; z-index: 10; }
-.active-bg + .dot { background-color: #ffffff; }
+/* 选中时不需要多余的白点 */
+.active-bg + .dot { display: none; }
 
 .daily-look { display: flex; align-items: center; padding-top: 20px; margin-top: 20px; border-top: 1px solid #F1F5F9; }
 .daily-look-img { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 16px; }
