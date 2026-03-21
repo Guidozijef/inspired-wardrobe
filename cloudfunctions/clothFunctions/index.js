@@ -293,6 +293,19 @@ exports.main = async (event, context) => {
       return await getClothDetail(event.data.id);
     case "deleteCloth":
       return await deleteCloth(event.data.id);
+    case "getRandomItems":
+      try {
+        const { OPENID } = cloud.getWXContext();
+        // 随机获取一些单品用于推荐
+        const res = await db.collection('clothes')
+          .where({ _openid: OPENID })
+          .aggregate()
+          .sample({ size: 40 })
+          .end();
+        return { success: true, data: res.list };
+      } catch (err) {
+        return { success: false, errMsg: err.message || err };
+      }
     case "doCutout":
       try {
         const {code, imageBase64, message } = await aiCutout(event.data.fileID)

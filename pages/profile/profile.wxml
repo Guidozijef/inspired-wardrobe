@@ -57,22 +57,7 @@
       </view>
     </view>
 
-    <!-- Scene Capsules -->
-    <!-- <view class="section-header">
-      <text class="section-title">场景胶囊</text>
-      <text class="section-btn" bindtap="goToCapsule">新建</text>
-    </view>
-    <scroll-view class="capsules-scroll" scroll-x="true">
-      <view class="capsule-card" wx:for="{{capsules}}" wx:key="id" bindtap="goToCapsule">
-        <view class="capsule-img-wrapper">
-          <image class="capsule-img" src="{{item.img}}" mode="aspectFill"></image>
-        </view>
-        <view class="capsule-title">{{item.title}}</view>
-        <view class="capsule-desc">{{item.count}}件单品</view>
-      </view>
-    </scroll-view> -->
-
-    <!-- Random Outfit Generator -->
+    <!-- Random Outfit Generator (Slot Machine - RESTORED) -->
     <view class="section-header">
       <text class="section-title">灵感扭蛋机</text>
       <text class="section-desc">不知道穿什么？来抽一套吧！</text>
@@ -108,35 +93,7 @@
       </view>
     </view>
 
-    <!-- <view class="section-header">
-      <text class="section-title">发现灵感</text>
-    </view>
-    <view class="waterfall">
-      <view class="waterfall-col">
-        <view class="card" wx:for="{{inspirations}}" wx:key="id" wx:if="{{index % 2 === 0}}">
-          <image class="card-img" src="{{item.img}}" mode="widthFix"></image>
-          <view class="card-info">
-            <text class="card-title">{{item.title}}</text>
-            <view class="card-meta">
-              <text class="author">{{item.author}}</text>
-              <view class="likes"><text class="heart">♥</text> {{item.likes}}</view>
-            </view>
-          </view>
-        </view>
-      </view>
-      <view class="waterfall-col">
-        <view class="card" wx:for="{{inspirations}}" wx:key="id" wx:if="{{index % 2 !== 0}}">
-          <image class="card-img" src="{{item.img}}" mode="widthFix"></image>
-          <view class="card-info">
-            <text class="card-title">{{item.title}}</text>
-            <view class="card-meta">
-              <text class="author">{{item.author}}</text>
-              <view class="likes"><text class="heart">♥</text> {{item.likes}}</view>
-            </view>
-          </view>
-        </view>
-      </view>
-    </view> -->
+
   </view>
 
   <!-- Custom Tab Bar -->

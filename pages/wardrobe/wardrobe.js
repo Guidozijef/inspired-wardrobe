@@ -114,25 +114,6 @@ Page({
     wx.navigateTo({ url: "/pages/search/search" });
   },
 
-  goToDetail(e) {
-    const item = e.currentTarget.dataset.item;
-    wx.navigateTo({
-      url: `/pages/detail/detail?title=${item.title}&emoji=${item.emoji}&desc=${item.desc}`,
-    });
-  },
-
-  showActionSheet() {
-    this.setData({ showAction: true });
-  },
-
-  hideActionSheet() {
-    this.setData({ showAction: false });
-  },
-
-  stopProp() {
-    // Prevent event bubbling
-  },
-
   goToEdit(eOrPath) {
     let path = '';
     let id = '';
@@ -153,6 +134,18 @@ Page({
     }
 
     wx.navigateTo({ url });
+  },
+
+  showActionSheet() {
+    this.setData({ showAction: true });
+  },
+
+  hideActionSheet() {
+    this.setData({ showAction: false });
+  },
+
+  stopProp() {
+    // Prevent event bubbling
   },
 
   async goPhotoalbum() {

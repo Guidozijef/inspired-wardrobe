@@ -47,3 +47,89 @@
 .tab-icon { width: 24px; height: 24px; margin-bottom: 4px; }
 .tab-text { font-size: 10px; color: #999999; font-weight: 500; }
 .tab-item.active .tab-text { color: #8A2BE2; }
+
+/* Recommendation Section Styles */
+.recommend-section {
+  padding: 20px;
+  background-color: #ffffff;
+  margin: 10px 16px 30px;
+  border-radius: 24px;
+  box-shadow: 0 8px 24px rgba(138,43,226,0.06);
+}
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.section-title-group {
+  display: flex;
+  align-items: center;
+}
+.section-emoji {
+  font-size: 20px;
+  margin-right: 8px;
+}
+.section-label {
+  font-size: 16px;
+  font-weight: bold;
+  color: #1E293B;
+  letter-spacing: 0.5px;
+}
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  color: #8A2BE2;
+  font-weight: 600;
+  background: rgba(138,43,226,0.05);
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+.refresh-icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 4px;
+}
+.recommend-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.recommend-items {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  margin-bottom: 16px;
+}
+.rec-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 30%;
+}
+.rec-img {
+  width: 70px;
+  height: 70px;
+  background-color: #F8FAFC;
+  border-radius: 16px;
+  padding: 8px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+}
+.rec-name {
+  font-size: 11px;
+  color: #64748B;
+  text-align: center;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rec-tip {
+  font-size: 12px;
+  color: #94A3B8;
+  font-style: italic;
+  margin-top: 4px;
+}
+
