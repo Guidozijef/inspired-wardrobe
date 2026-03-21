@@ -173,16 +173,28 @@ const updateCloth = async (data) => {
   }
 }
 
-// 获取衣物列表
-const getClothes = async () => {
-  const { OPENID } = cloud.getWXContext()
+// 获取衣物列表 (支持分类 & 分页)
+const getClothes = async (data = {}) => {
+  const { OPENID } = cloud.getWXContext();
+  const { category } = data;
+  const page = Number(data.page || 0);
+  const pageSize = Number(data.pageSize || 10);
 
   try {
-    const res = await db.collection('clothes')
-      .where({
-        _openid: OPENID
-      })
+    let query = db.collection('clothes').where({
+      _openid: OPENID
+    });
+
+    if (category && category !== '全部') {
+      query = query.where({
+        category: category
+      });
+    }
+
+    const res = await query
       .orderBy('create_time', 'desc')
+      .skip(page * pageSize)
+      .limit(pageSize)
       .get()
 
     return {
@@ -276,7 +288,7 @@ exports.main = async (event, context) => {
     case "updateCloth":
       return await updateCloth(event.data);
     case "getClothes":
-      return await getClothes();
+      return await getClothes(event.data);
     case "getClothDetail":
       return await getClothDetail(event.data.id);
     case "deleteCloth":

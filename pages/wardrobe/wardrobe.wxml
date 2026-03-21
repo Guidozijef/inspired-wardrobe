@@ -1,22 +1,25 @@
 <view class="container">
-  <!-- Header -->
-  <view class="header" style="padding-top: {{statusBarHeight + 40}}px; padding-bottom: 10px;">
-    <text class="title">我的衣橱</text>
-    <view class="search-btn" bindtap="goToSearch">
-      <image class="icon" src="https://img.icons8.com/ios-glyphs/30/666666/search--v1.png"></image>
+  <!-- Sticky Top Section -->
+  <view class="sticky-area">
+    <!-- Header -->
+    <view class="header" style="padding-top: {{statusBarHeight + 40}}px; padding-bottom: 10px;">
+      <text class="title">我的衣橱</text>
+      <view class="search-btn" bindtap="goToSearch">
+        <image class="icon" src="https://img.icons8.com/ios-glyphs/30/666666/search--v1.png"></image>
+      </view>
     </view>
-  </view>
 
-  <!-- Categories -->
-  <scroll-view class="categories" scroll-x="true">
-    <view 
-      wx:for="{{categories}}" 
-      wx:key="index"
-      class="category-item {{activeCategory === index ? 'active' : ''}}"
-      bindtap="switchCategory"
-      data-index="{{index}}"
-    >{{item}}</view>
-  </scroll-view>
+    <!-- Categories -->
+    <scroll-view class="categories" scroll-x="true">
+      <view 
+        wx:for="{{categories}}" 
+        wx:key="index"
+        class="category-item {{activeCategory === index ? 'active' : ''}}"
+        bindtap="switchCategory"
+        data-index="{{index}}"
+      >{{item}}</view>
+    </scroll-view>
+  </view>
 
   <!-- Grid / Empty State -->
   <view class="grid" wx:if="{{items.length > 0}}">
@@ -37,6 +40,8 @@
         </view>
       </view>
     </view>
+    <view class="loading-status" wx:if="{{isLoading}}">加载中...</view>
+    <view class="loading-status" wx:if="{{isNoMore && items.length > 0}}">到底啦，快去添加新单品吧~</view>
   </view>
 
   <!-- Empty State -->
