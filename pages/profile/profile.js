@@ -14,10 +14,13 @@ Page({
       { id: 1, title: '五一去大理', count: 12, img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=200&fit=crop' },
       { id: 2, title: '下周打工装', count: 5, img: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=200&h=200&fit=crop' }
     ],
-    // 还原扭蛋机数据
-    slot1Items: ['🧥', '👕', '🎽', '👔', '👗', '🧥', '👕', '🎽', '👔', '👗'],
-    slot2Items: ['👖', '🩳', '👗', '👖', '🩳', '👖', '🩳', '👗', '👖', '🩳'],
-    slot3Items: ['👟', '👞', '👠', '🥾', '👡', '👟', '👞', '👠', '🥾', '👡'],
+    // 扭蛋机主数据
+    allTops: [],
+    allBottoms: [],
+    allShoes: [],
+    slot1Items: [], 
+    slot2Items: [],
+    slot3Items: [],
     slot1Index: 0,
     slot2Index: 0,
     slot3Index: 0,
@@ -45,29 +48,111 @@ Page({
       activeFullDate: todayStr
     }, () => {
       this.generateCalendar();
+      this.prepareSlotItems(); // 准备扭蛋机单品
     });
+  },
+
+  // 获取并缓存所有单品数据
+  prepareSlotItems() {
+    console.log('正在拉取全量衣橱数据用于扭蛋机...');
+    wx.cloud.callFunction({
+      name: 'clothFunctions',
+      data: { type: 'getRandomItems' }
+    }).then(res => {
+      if (res.result && res.result.success) {
+        const all = res.result.data || [];
+        if (all.length === 0) return;
+
+        // 分类提取并存储全量数据
+        const tops = all.filter(i => i.category === '上装').map(i => ({ url: i.image_url, name: i.name }));
+        const bottoms = all.filter(i => i.category === '下装').map(i => ({ url: i.image_url, name: i.name }));
+        const shoes = all.filter(i => i.category === '鞋履').map(i => ({ url: i.image_url, name: i.name }));
+        
+        // 如果分类为空，则用其他衣服充当
+        const allMapped = all.map(i => ({ url: i.image_url, name: i.name }));
+        
+        this.setData({
+          allTops: tops.length > 0 ? tops : allMapped,
+          allBottoms: bottoms.length > 0 ? bottoms : allMapped,
+          allShoes: shoes.length > 0 ? shoes : allMapped
+        }, () => {
+          // 初始化首屏显示的 10 个展示位（随机展示一些）
+          this.refreshSlotDisplay();
+        });
+      }
+    }).catch(err => {
+      console.error('获取全量单品异常:', err);
+    });
+  },
+
+  // 刷新滚筒上显示的 10 个占位物品（为了动画效果）
+  refreshSlotDisplay() {
+    const { allTops, allBottoms, allShoes } = this.data;
+    const getRandomSub = (list) => {
+      let sub = [];
+      for(let i=0; i<10; i++) {
+        sub.push(list[Math.floor(Math.random() * list.length)]);
+      }
+      return sub;
+    };
+
+    if (allTops.length > 0) {
+      this.setData({
+        slot1Items: getRandomSub(allTops),
+        slot2Items: getRandomSub(allBottoms),
+        slot3Items: getRandomSub(allShoes)
+      });
+    }
   },
 
   onShow() {
     this.fetchOutfits();
   },
 
-  // 灵感扭蛋机逻辑
+  // 灵感扭蛋机逻辑：点击时从全量数据中“真随机”抽取
   generateRandomLook() {
     if (this.data.isGenerating) return;
-    this.setData({ isGenerating: true });
+    const { allTops, allBottoms, allShoes } = this.data;
+    if (allTops.length === 0) {
+      wx.showToast({ title: '衣橱还是空的哦', icon: 'none' });
+      return;
+    }
+
+    // 1. 从全量库里先选出本次“中奖”的单品
+    const targetTop = allTops[Math.floor(Math.random() * allTops.length)];
+    const targetBottom = allBottoms[Math.floor(Math.random() * allBottoms.length)];
+    const targetShoes = allShoes[Math.floor(Math.random() * allShoes.length)];
+
+    // 2. 随机生成停止位置 (0-9 之间，建议选 5-9 增加滚动感，但逻辑上 0-9 均可)
+    const stopIdx1 = Math.floor(Math.random() * 5) + 4; // 比如停在 4-8 位
+    const stopIdx2 = Math.floor(Math.random() * 5) + 4;
+    const stopIdx3 = Math.floor(Math.random() * 5) + 4;
+
+    // 3. 将中奖单品悄悄安插到展示列表对应的位置（这时转盘还没转，或者正在加速）
+    const slot1 = [...this.data.slot1Items];
+    const slot2 = [...this.data.slot2Items];
+    const slot3 = [...this.data.slot3Items];
+    
+    slot1[stopIdx1] = targetTop;
+    slot2[stopIdx2] = targetBottom;
+    slot3[stopIdx3] = targetShoes;
+
+    this.setData({
+      isGenerating: true,
+      slot1Items: slot1,
+      slot2Items: slot2,
+      slot3Items: slot3
+    });
+
+    // 4. 等待 1.5s 动画，然后停止到目标点
     setTimeout(() => {
       const titles = ['今日通勤推荐', '周末休闲风', '运动活力装', '约会晚宴风'];
-      const idx1 = Math.floor(Math.random() * 5);
-      const idx2 = Math.floor(Math.random() * 5);
-      const idx3 = Math.floor(Math.random() * 5);
-      const randomTitleIdx = Math.floor(Math.random() * titles.length);
       this.setData({
         isGenerating: false,
-        slot1Index: idx1,
-        slot2Index: idx2,
-        slot3Index: idx3,
-        randomLook: { title: titles[randomTitleIdx] }
+        slot1Index: stopIdx1,
+        slot2Index: stopIdx2,
+        slot3Index: stopIdx3,
+        randomLook: { title: titles[Math.floor(Math.random() * titles.length)] }
       });
     }, 1500);
   },

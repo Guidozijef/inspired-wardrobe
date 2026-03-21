@@ -66,17 +66,23 @@
       <view class="slot-machine">
         <view class="slot-window">
           <view class="slot-reel {{isGenerating ? 'spinning-1' : 'transitioning'}}" style="transform: translateY(-{{isGenerating ? 0 : slot1Index * 80}}px)">
-            <view class="slot-item" wx:for="{{slot1Items}}" wx:key="index">{{item}}</view>
+            <view class="slot-item" wx:for="{{slot1Items}}" wx:key="index">
+              <image class="slot-item-img" src="{{item.url}}" mode="aspectFit"></image>
+            </view>
           </view>
         </view>
         <view class="slot-window">
           <view class="slot-reel {{isGenerating ? 'spinning-2' : 'transitioning'}}" style="transform: translateY(-{{isGenerating ? 0 : slot2Index * 80}}px)">
-            <view class="slot-item" wx:for="{{slot2Items}}" wx:key="index">{{item}}</view>
+            <view class="slot-item" wx:for="{{slot2Items}}" wx:key="index">
+              <image class="slot-item-img" src="{{item.url}}" mode="aspectFit"></image>
+            </view>
           </view>
         </view>
         <view class="slot-window">
           <view class="slot-reel {{isGenerating ? 'spinning-3' : 'transitioning'}}" style="transform: translateY(-{{isGenerating ? 0 : slot3Index * 80}}px)">
-            <view class="slot-item" wx:for="{{slot3Items}}" wx:key="index">{{item}}</view>
+            <view class="slot-item" wx:for="{{slot3Items}}" wx:key="index">
+              <image class="slot-item-img" src="{{item.url}}" mode="aspectFit"></image>
+            </view>
           </view>
         </view>
       </view>

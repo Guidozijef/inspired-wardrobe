@@ -298,9 +298,9 @@ exports.main = async (event, context) => {
         const { OPENID } = cloud.getWXContext();
         // 随机获取一些单品用于推荐
         const res = await db.collection('clothes')
-          .where({ _openid: OPENID })
           .aggregate()
-          .sample({ size: 40 })
+          .match({ _openid: OPENID })
+          .limit(1000) // 限制1000件通常已覆盖个人衣橱
           .end();
         return { success: true, data: res.list };
       } catch (err) {
