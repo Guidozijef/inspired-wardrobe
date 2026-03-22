@@ -3,7 +3,8 @@
 .user-info { display: flex; align-items: center; }
 .avatar { width: 64px; height: 64px; border-radius: 32px; margin-right: 16px; border: 2px solid #F1F5F9; }
 .user-details { display: flex; flex-direction: column; }
-.user-name { font-size: 20px; font-weight: bold; color: #1E293B; margin-bottom: 4px; }
+.user-name { font-size: 20px; font-weight: bold; color: #1E293B; margin-bottom: 2px; }
+.user-id { font-size: 11px; color: #94A3B8; background-color: #F1F5F9; padding: 2px 8px; border-radius: 4px; margin-bottom: 6px; align-self: flex-start; font-family: monospace; }
 .user-desc { font-size: 14px; color: #64748B; }
 
 .content-scroll { padding: 0 20px; }

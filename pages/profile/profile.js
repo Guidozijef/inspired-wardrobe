@@ -26,6 +26,7 @@ Page({
     slot3Index: 0,
     isGenerating: false,
     randomLook: null,
+    openid: ''
   },
 
   onLoad() {
@@ -49,6 +50,23 @@ Page({
     }, () => {
       this.generateCalendar();
       this.prepareSlotItems(); // 准备扭蛋机单品
+      this.fetchUserOpenId();   // 获取用户ID
+    });
+  },
+
+  // 获取用户唯一标识
+  fetchUserOpenId() {
+    wx.cloud.callFunction({
+      name: 'clothFunctions',
+      data: { type: 'getOpenId' }
+    }).then(res => {
+      if (res.result && res.result.openid) {
+        this.setData({
+          openid: res.result.openid
+        });
+      }
+    }).catch(err => {
+      console.error('获取 OpenID 失败:', err);
     });
   },
 

@@ -323,6 +323,8 @@ exports.main = async (event, context) => {
           errMsg: err.message || err
         }
       }
+    case "getOpenId":
+      return await getOpenId();
     default:
       return {
         success: false,

@@ -4,6 +4,7 @@
       <image class="avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop" mode="aspectFill"></image>
       <view class="user-details">
         <text class="user-name">Guido</text>
+        <text class="user-id" wx:if="{{openid}}">ID: {{openid}}</text>
         <text class="user-desc">{{fetchedCount <= 0 ? '还没有穿搭记录哦' : '已同步 ' + fetchedCount + ' 条 | 最新: ' + latestDate}}</text>
       </view>
     </view>
