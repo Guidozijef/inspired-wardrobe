@@ -420,11 +420,10 @@ Page({
           ctx.fillText('扫码查看', qrX + qrSize / 2, qrY + qrSize / 2 + 4);
           ctx.textAlign = 'left'; // 重置
 
-          // 3. 绘制穿搭预览图 (单图或多图)
+          // 3. 绘制穿搭预览图 (多图堆叠布局)
           if (this.data.isMulti) {
-            // 绘制 3 张图：上中下垂直布局或者并排
-            const spacing = 10;
-            const singleImgHeight = (height - spacing * 2) / 3;
+            const spacing = 20; // 对应 CSS 中的 margin-bottom
+            let currentY = 25;  // 对应 CSS 中的 padding-top
             
             for (let i = 0; i < this.data.imageUrls.length; i++) {
               const url = this.data.imageUrls[i];
@@ -432,22 +431,22 @@ Page({
                 const info = await new Promise((resImg) => {
                   wx.getImageInfo({ src: url, success: resImg, fail: () => resImg(null) });
                 });
-
+ 
                 if (info && info.path) {
                   const img = canvas.createImage();
                   await new Promise((resL) => {
                     img.onload = resL;
                     img.src = info.path;
                   });
-
-                  // 按比例缩放每一张图
+ 
+                  // 真正的自适应高度：宽度固定，高度按比例缩放
                   const imgRatio = info.width / info.height;
-                  const targetW = width * 0.8;
-                  const targetH = Math.min(singleImgHeight, targetW / imgRatio);
-                  const posX = (width - targetW) / 2;
-                  const posY = i * (singleImgHeight + spacing) + (singleImgHeight - targetH) / 2;
-
-                  ctx.drawImage(img, posX, posY, targetW, targetH);
+                  const drawW = width * 0.95;
+                  const drawH = drawW / imgRatio;
+                  const posX = (width - drawW) / 2;
+ 
+                  ctx.drawImage(img, posX, currentY, drawW, drawH);
+                  currentY += drawH + spacing;
                 }
               } catch (e) { console.error('绘制多图失败:', e); }
             }
