@@ -3,7 +3,12 @@
     <view class="canvas-wrapper">
       <!-- 预览区：可以将其看作一个画板 -->
         <view class="canvas-area" style="background: {{selectedBg.type === 'image' ? 'url(' + selectedBg.value + ') center/cover no-repeat' : selectedBg.css}}; background-size: {{selectedBg.grid || selectedBg.dots ? '20px 20px' : (selectedBg.type === 'image' ? 'cover' : 'auto')}};" id="previewArea" catchtap="deselectText">
-        <image class="outfit-image" wx:if="{{look.preview_url}}" src="{{look.preview_url}}" mode="aspectFit"></image>
+        <image class="outfit-image" wx:if="{{!isMulti && look.preview_url}}" src="{{look.preview_url}}" mode="aspectFit"></image>
+        
+        <!-- 多图预览模式 -->
+        <view class="multi-item-preview" wx:if="{{isMulti}}">
+          <image wx:for="{{imageUrls}}" wx:key="*this" class="multi-item-img" src="{{item}}" mode="aspectFit"></image>
+        </view>
         
         <!-- 文本元素列表 -->
         <block wx:for="{{textItems}}" wx:key="id">
@@ -41,7 +46,7 @@
         <!-- 添加文本功能 -->
         <view class="text-tool">
           <input class="text-input" placeholder="输入要添加的文字..." value="{{inputText}}" bindinput="onTextInput" />
-          <button class="add-text-btn" catchtap="addText">添加文字</button>
+          <button class="add-text-btn" size="mini" catchtap="addText">添加文字</button>
         </view>
       </block>
       

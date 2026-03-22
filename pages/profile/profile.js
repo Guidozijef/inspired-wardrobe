@@ -242,8 +242,21 @@ Page({
     }
   },
 
-  // 分享功能
+  // 分享扭蛋机结果到分享页
   shareWeiXin() {
-    wx.showToast({ title: '分享功能准备中', icon: 'none' });
+    const { slot1Items, slot2Items, slot3Items, slot1Index, slot2Index, slot3Index } = this.data;
+    if (!slot1Items.length || this.data.isGenerating) return;
+
+    const selectedItems = [
+      slot1Items[slot1Index].url,
+      slot2Items[slot2Index].url,
+      slot3Items[slot3Index].url
+    ];
+
+    // 将 3 个 URL 拼接成字符串传递
+    const itemsQuery = encodeURIComponent(selectedItems.join(','));
+    wx.navigateTo({
+      url: `/pages/share/share?items=${itemsQuery}&type=recommendation`
+    });
   }
 });

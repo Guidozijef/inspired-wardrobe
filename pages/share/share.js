@@ -9,7 +9,7 @@ Page({
       { id: 'mini5', type: 'gradient', colors: ['#F9F9F9', '#F1F1F1'], css: 'linear-gradient(180deg, #F9F9F9 0%, #F1F1F1 100%)' }, // 极简渐变1
       { id: 'mini6', type: 'gradient', colors: ['#FFFDF5', '#F5F0E6'], css: 'linear-gradient(135deg, #FFFDF5 0%, #F5F0E6 100%)' }, // 极简渐变2
       { id: 'mini7', type: 'solid', value: '#EBDED5', css: '#EBDED5' }, // 陶土色
-      { id: 'mini8', type: 'solid', value: '#1C1C1E', css: '#1C1C1E' }, // 极简黑
+      // { id: 'mini8', type: 'solid', value: '#1C1C1E', css: '#1C1C1E' }, // 极简黑
       { id: 'mini9', type: 'solid', value: '#E5E5F2', css: '#E5E5F2' }, // 柔薰衣草
       { id: 'bg1', type: 'solid', value: '#F2F2F7', css: '#2feef7b8' },
       { id: 'bg2', type: 'solid', value: '#FFFFFF', css: '#e297fb' },
@@ -47,11 +47,24 @@ Page({
       startY: 0,
       initX: 0,
       initY: 0
-    }
+    },
+    isMulti: false,
+    imageUrls: []
   },
 
   onLoad(options) {
-    if (options.id) {
+    if (options.items) {
+      // 扭蛋机多图模式
+      const urls = decodeURIComponent(options.items).split(',');
+      this.setData({
+        isMulti: true,
+        imageUrls: urls,
+        look: {
+          title: options.type === 'recommendation' ? '今日扭蛋灵感' : '我的灵感推荐',
+          preview_url: urls[0] // 兼容部分旧逻辑
+        }
+      });
+    } else if (options.id) {
       this.fetchDetail(options.id);
     }
   },
@@ -407,8 +420,39 @@ Page({
           ctx.fillText('扫码查看', qrX + qrSize / 2, qrY + qrSize / 2 + 4);
           ctx.textAlign = 'left'; // 重置
 
-          // 3. 绘制穿搭预览图
-          if (this.data.look.preview_url) {
+          // 3. 绘制穿搭预览图 (单图或多图)
+          if (this.data.isMulti) {
+            // 绘制 3 张图：上中下垂直布局或者并排
+            const spacing = 10;
+            const singleImgHeight = (height - spacing * 2) / 3;
+            
+            for (let i = 0; i < this.data.imageUrls.length; i++) {
+              const url = this.data.imageUrls[i];
+              try {
+                const info = await new Promise((resImg) => {
+                  wx.getImageInfo({ src: url, success: resImg, fail: () => resImg(null) });
+                });
+
+                if (info && info.path) {
+                  const img = canvas.createImage();
+                  await new Promise((resL) => {
+                    img.onload = resL;
+                    img.src = info.path;
+                  });
+
+                  // 按比例缩放每一张图
+                  const imgRatio = info.width / info.height;
+                  const targetW = width * 0.8;
+                  const targetH = Math.min(singleImgHeight, targetW / imgRatio);
+                  const posX = (width - targetW) / 2;
+                  const posY = i * (singleImgHeight + spacing) + (singleImgHeight - targetH) / 2;
+
+                  ctx.drawImage(img, posX, posY, targetW, targetH);
+                }
+              } catch (e) { console.error('绘制多图失败:', e); }
+            }
+          } else if (this.data.look.preview_url) {
+            // 原有单图逻辑
             try {
               const info = await new Promise((resImg) => {
                 wx.getImageInfo({
