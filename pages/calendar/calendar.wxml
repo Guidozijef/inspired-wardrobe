@@ -1,9 +1,4 @@
 <view class="container">
-  <!-- Custom Nav Bar Placeholder (if needed) -->
-  <view class="header" style="padding-top: {{statusBarHeight + 10}}px; padding-bottom: 20px;">
-    <view class="section-title" style="font-size: 24px;">穿搭助手</view>
-  </view>
-
   <view class="content-scroll">
     <view class="section-header">
       <text class="section-title">穿搭日历</text>
