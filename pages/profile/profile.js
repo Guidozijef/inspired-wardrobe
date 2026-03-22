@@ -1,3 +1,5 @@
+import { compressImage } from '../utils'
+
 Page({
   data: {
     statusBarHeight: 20,
@@ -82,9 +84,18 @@ Page({
   },
 
   // 微信头像选择机制
-  onChooseAvatar(e) {
+  async onChooseAvatar(e) {
     const { avatarUrl } = e.detail;
-    this.setData({ tempAvatarUrl: avatarUrl });
+    wx.showLoading({ title: '正在处理头像...', mask: true });
+    try {
+      const compressed = await compressImage(avatarUrl);
+      this.setData({ tempAvatarUrl: compressed });
+    } catch (err) {
+      console.error('压缩头像失败', err);
+      this.setData({ tempAvatarUrl: avatarUrl });
+    } finally {
+      wx.hideLoading();
+    }
   },
 
   // 微信昵称输入机制
