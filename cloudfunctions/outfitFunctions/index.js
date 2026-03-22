@@ -6,6 +6,24 @@ cloud.init({
 
 const db = cloud.database();
 
+// 辅助函数：更新用户的统计数量
+async function updateUserCount(openid, field, change) {
+  const _ = db.command;
+  try {
+    const userRes = await db.collection('users').where({ _openid: openid }).get();
+    if (userRes.data.length > 0) {
+      await db.collection('users').doc(userRes.data[0]._id).update({
+        data: {
+          [field]: _.inc(change),
+          update_time: db.serverDate()
+        }
+      });
+    }
+  } catch (err) {
+    console.error('更新统计失败:', err);
+  }
+}
+
 // 添加/更新搭配
 const addOutfit = async (data) => {
   const { OPENID } = cloud.getWXContext();
@@ -45,6 +63,9 @@ const addOutfit = async (data) => {
         data: outfitData
       });
       resultId = res._id;
+
+      // 同步更新统计
+      await updateUserCount(OPENID, 'outfitCount', 1);
     }
 
     return {
@@ -166,6 +187,9 @@ const deleteOutfit = async (id) => {
     if (preview_url) {
       await cloud.deleteFile({ fileList: [preview_url] });
     }
+
+    // 同步更新统计
+    await updateUserCount(OPENID, 'outfitCount', -1);
 
     return { success: true, message: '搭配已删除' };
   } catch (err) {

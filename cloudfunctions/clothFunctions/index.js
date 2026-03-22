@@ -98,6 +98,24 @@ async function saveProcessedImage(base64Data) {
   return uploadRes.fileID
 }
 
+// 辅助函数：更新用户的统计数量
+async function updateUserCount(openid, field, change) {
+  const _ = db.command;
+  try {
+    const userRes = await db.collection('users').where({ _openid: openid }).get();
+    if (userRes.data.length > 0) {
+      await db.collection('users').doc(userRes.data[0]._id).update({
+        data: {
+          [field]: _.inc(change),
+          update_time: db.serverDate()
+        }
+      });
+    }
+  } catch (err) {
+    console.error('更新统计失败:', err);
+  }
+}
+
 
 // 添加单品衣服
 const addCloth = async (data) => {
@@ -120,6 +138,9 @@ const addCloth = async (data) => {
         update_time: db.serverDate()
       }
     })
+
+    // 同步更新统计
+    await updateUserCount(OPENID, 'clothesCount', 1);
 
     return {
       success: true,
@@ -273,6 +294,9 @@ const deleteCloth = async (id) => {
       })
     }
 
+    // 同步更新统计
+    await updateUserCount(OPENID, 'clothesCount', -1);
+
     return {
       success: true,
       message: '衣服已从衣橱移除'
@@ -292,7 +316,27 @@ const getUserProfile = async () => {
   try {
     const res = await db.collection('users').where({ _openid: OPENID }).get();
     if (res.data.length > 0) {
-      return { success: true, data: res.data[0] };
+      const user = res.data[0];
+      
+      // 自动同步缺失的统计数据 (迁移逻辑)
+      if (user.clothesCount === undefined || user.outfitCount === undefined) {
+        const clothesRes = await db.collection('clothes').where({ _openid: OPENID }).count();
+        const outfitsRes = await db.collection('outfits').where({ _openid: OPENID }).count();
+        
+        const updateData = {
+          clothesCount: clothesRes.total,
+          outfitCount: outfitsRes.total,
+          update_time: db.serverDate()
+        };
+        
+        await db.collection('users').doc(user._id).update({
+          data: updateData
+        });
+        
+        return { success: true, data: { ...user, ...updateData } };
+      }
+      
+      return { success: true, data: user };
     }
     return { success: true, data: null };
   } catch (err) {
@@ -322,6 +366,8 @@ const updateUserProfile = async (data) => {
           _openid: OPENID,
           nickName: nickName || 'The Curator',
           avatarUrl: avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop',
+          clothesCount: 0,
+          outfitCount: 0,
           create_time: db.serverDate(),
           update_time: db.serverDate()
         }

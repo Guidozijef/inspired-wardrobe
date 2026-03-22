@@ -5,7 +5,20 @@
       <view class="user-details">
         <text class="user-name">{{nickName}}</text>
         <text class="user-id" wx:if="{{openid}}">ID: {{openid}}</text>
-        <text class="user-desc">{{fetchedCount <= 0 ? '点击设置个人信息' : (fetchedCount + ' 条穿搭 | 最新: ' + latestDate)}}</text>
+        <text class="user-desc">{{nickName}} 的个人时尚衣橱</text>
+      </view>
+    </view>
+
+    <!-- Stats Bar -->
+    <view class="stats-bar">
+      <view class="stats-item">
+        <text class="stats-num">{{clothesCount}}</text>
+        <text class="stats-label">单品</text>
+      </view>
+      <view class="stats-divider"></view>
+      <view class="stats-item">
+        <text class="stats-num">{{outfitCount}}</text>
+        <text class="stats-label">搭配</text>
       </view>
     </view>
   </view>

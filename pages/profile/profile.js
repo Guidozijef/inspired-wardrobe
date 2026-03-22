@@ -9,7 +9,8 @@ Page({
     tempAvatarUrl: '',
     tempNickName: '',
     isUpdatingProfile: false,
-    fetchedCount: 0,
+    outfitCount: 0,
+    clothesCount: 0,
     latestDate: '无'
   },
 
@@ -27,38 +28,23 @@ Page({
       navBarHeight: navBarHeight
     }, () => {
       this.fetchUserOpenId();   // 获取用户ID
-      this.fetchUserProfile();  // 获取用户信息
-      this.fetchBasicStats();   // 获取基础统计（穿搭数）
+      this.fetchUserProfile();  // 获取用户信息 (包含统计)
     });
   },
 
-  // 获取基础统计信息
-  fetchBasicStats() {
-    wx.cloud.callFunction({
-      name: 'outfitFunctions',
-      data: { type: 'getOutfits', data: { monthStr: '' } } // 获取全量以计算总数
-    }).then(res => {
-      if (res.result && res.result.success) {
-        const outfits = res.result.data || [];
-        this.setData({
-          fetchedCount: outfits.length,
-          latestDate: outfits.length > 0 ? outfits[0].record_date : '无'
-        });
-      }
-    });
-  },
-
-  // 获取用户个人信息 (从 users 集合)
+  // 获取用户个人信息 (从 users 集合，包含 clothesCount 和 outfitCount)
   fetchUserProfile() {
     wx.cloud.callFunction({
       name: 'clothFunctions',
       data: { type: 'getUserProfile' }
     }).then(res => {
       if (res.result && res.result.success && res.result.data) {
-        const { nickName, avatarUrl } = res.result.data;
+        const { nickName, avatarUrl, clothesCount, outfitCount } = res.result.data;
         this.setData({
           nickName: nickName || this.data.nickName,
-          avatarUrl: avatarUrl || this.data.avatarUrl
+          avatarUrl: avatarUrl || this.data.avatarUrl,
+          clothesCount: clothesCount || 0,
+          outfitCount: outfitCount || 0
         });
       }
     }).catch(err => {
