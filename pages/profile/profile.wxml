@@ -1,11 +1,11 @@
 <view class="container">
   <view class="header" style="padding-top: {{statusBarHeight + 10}}px; padding-bottom: 10px;">
-    <view class="user-info">
-      <image class="avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop" mode="aspectFill"></image>
+    <view class="user-info" bindtap="editProfile">
+      <image class="avatar" src="{{avatarUrl}}" mode="aspectFill"></image>
       <view class="user-details">
-        <text class="user-name">Guido</text>
+        <text class="user-name">{{nickName}}</text>
         <text class="user-id" wx:if="{{openid}}">ID: {{openid}}</text>
-        <text class="user-desc">{{fetchedCount <= 0 ? '还没有穿搭记录哦' : '已同步 ' + fetchedCount + ' 条 | 最新: ' + latestDate}}</text>
+        <text class="user-desc">{{fetchedCount <= 0 ? '点击设置个人信息' : (fetchedCount + ' 条穿搭 | 最新: ' + latestDate)}}</text>
       </view>
     </view>
   </view>

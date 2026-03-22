@@ -26,7 +26,10 @@ Page({
     slot3Index: 0,
     isGenerating: false,
     randomLook: null,
-    openid: ''
+    openid: '',
+    nickName: 'The Curator',
+    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop',
+    isUpdatingProfile: false
   },
 
   onLoad() {
@@ -51,6 +54,108 @@ Page({
       this.generateCalendar();
       this.prepareSlotItems(); // 准备扭蛋机单品
       this.fetchUserOpenId();   // 获取用户ID
+      this.fetchUserProfile();  // 获取用户信息
+    });
+  },
+
+  // 获取用户个人信息 (从 users 集合)
+  fetchUserProfile() {
+    wx.cloud.callFunction({
+      name: 'clothFunctions',
+      data: { type: 'getUserProfile' }
+    }).then(res => {
+      if (res.result && res.result.success && res.result.data) {
+        const { nickName, avatarUrl } = res.result.data;
+        this.setData({
+          nickName: nickName || this.data.nickName,
+          avatarUrl: avatarUrl || this.data.avatarUrl
+        });
+      }
+    }).catch(err => {
+      console.error('获取用户信息失败:', err);
+    });
+  },
+
+  // 编辑个人信息入口
+  editProfile() {
+    wx.showActionSheet({
+      itemList: ['修改昵称', '修改头像'],
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          this.editName();
+        } else if (res.tapIndex === 1) {
+          this.editAvatar();
+        }
+      }
+    });
+  },
+
+  // 修改昵称
+  editName() {
+    wx.showModal({
+      title: '修改昵称',
+      placeholderText: '请输入新的昵称',
+      content: this.data.nickName,
+      editable: true,
+      success: (res) => {
+        if (res.confirm && res.content.trim()) {
+          this.performUpdate({ nickName: res.content.trim() });
+        }
+      }
+    });
+  },
+
+  // 修改头像
+  editAvatar() {
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sourceType: ['album', 'camera'],
+      success: (res) => {
+        const tempFilePath = res.tempFiles[0].tempFilePath;
+        this.uploadAvatar(tempFilePath);
+      }
+    });
+  },
+
+  // 上传头像到云存储
+  uploadAvatar(filePath) {
+    wx.showLoading({ title: '上传中...', mask: true });
+    const cloudPath = `avatars/${Date.now()}-${Math.floor(Math.random() * 1000)}.png`;
+    
+    wx.cloud.uploadFile({
+      cloudPath,
+      filePath,
+      success: res => {
+        this.performUpdate({ avatarUrl: res.fileID });
+      },
+      fail: err => {
+        wx.hideLoading();
+        wx.showToast({ title: '上传失败', icon: 'none' });
+      }
+    });
+  },
+
+  // 统一执行更新
+  performUpdate(updateData) {
+    wx.showLoading({ title: '更新中...', mask: true });
+    wx.cloud.callFunction({
+      name: 'clothFunctions',
+      data: {
+        type: 'updateUserProfile',
+        data: updateData
+      }
+    }).then(res => {
+      wx.hideLoading();
+      if (res.result && res.result.success) {
+        this.setData(updateData);
+        wx.showToast({ title: '更新成功', icon: 'success' });
+      } else {
+        wx.showToast({ title: '更新失败', icon: 'none' });
+      }
+    }).catch(err => {
+      wx.hideLoading();
+      wx.showToast({ title: '更新出错', icon: 'none' });
     });
   },
 
@@ -60,9 +165,9 @@ Page({
       name: 'clothFunctions',
       data: { type: 'getOpenId' }
     }).then(res => {
-      if (res.result && res.result.openid) {
+      if (res.result && res.result.displayId) {
         this.setData({
-          openid: res.result.openid
+          openid: res.result.displayId
         });
       }
     }).catch(err => {

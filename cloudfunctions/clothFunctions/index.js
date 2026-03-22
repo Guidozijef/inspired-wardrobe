@@ -1,5 +1,6 @@
 const cloud = require("wx-server-sdk");
 const axios = require('axios');
+const crypto = require('crypto');
 const AK = "WrgzN4mbcOSv7m1UMsy0Nuym"
 const SK = "zajIwznQyN5TlKsq16AVLmesajMhX7Jj"
 
@@ -11,8 +12,14 @@ const db = cloud.database();
 // 获取openid
 const getOpenId = async () => {
   const wxContext = cloud.getWXContext();
+  const openid = wxContext.OPENID;
+  
+  // 生成一个更友好的唯一 ID (IW-前缀 + OpenID 的哈希前 8 位)
+  const displayId = 'IW-' + crypto.createHash('md5').update(openid).digest('hex').substring(0, 8).toUpperCase();
+  
   return {
-    openid: wxContext.OPENID,
+    displayId: displayId,
+    openid: openid,
     appid: wxContext.APPID,
     unionid: wxContext.UNIONID,
   };
@@ -101,7 +108,7 @@ const addCloth = async (data) => {
     const res = await db.collection('clothes').add({
       data: {
         _openid: OPENID,
-        name: name || '未命名衣物',
+        name: name || '新入单品',
         image_url: fileID,
         category: category || '其他',
         seasons: seasons || [],
@@ -279,6 +286,54 @@ const deleteCloth = async (id) => {
 }
 
 
+// 获取用户信息
+const getUserProfile = async () => {
+  const { OPENID } = cloud.getWXContext();
+  try {
+    const res = await db.collection('users').where({ _openid: OPENID }).get();
+    if (res.data.length > 0) {
+      return { success: true, data: res.data[0] };
+    }
+    return { success: true, data: null };
+  } catch (err) {
+    return { success: false, errMsg: err.message || err };
+  }
+}
+
+// 更新用户信息
+const updateUserProfile = async (data) => {
+  const { OPENID } = cloud.getWXContext();
+  const { nickName, avatarUrl } = data;
+  try {
+    const res = await db.collection('users').where({ _openid: OPENID }).get();
+    if (res.data.length > 0) {
+      // 更新
+      await db.collection('users').doc(res.data[0]._id).update({
+        data: {
+          nickName: nickName || res.data[0].nickName,
+          avatarUrl: avatarUrl || res.data[0].avatarUrl,
+          update_time: db.serverDate()
+        }
+      });
+    } else {
+      // 新增
+      await db.collection('users').add({
+        data: {
+          _openid: OPENID,
+          nickName: nickName || 'The Curator',
+          avatarUrl: avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop',
+          create_time: db.serverDate(),
+          update_time: db.serverDate()
+        }
+      });
+    }
+    return { success: true, message: '个人信息已更新' };
+  } catch (err) {
+    return { success: false, errMsg: err.message || err };
+  }
+}
+
+
 // 云函数入口函数
 exports.main = async (event, context) => {
   console.log('脚本加载成功')
@@ -325,6 +380,10 @@ exports.main = async (event, context) => {
       }
     case "getOpenId":
       return await getOpenId();
+    case "getUserProfile":
+      return await getUserProfile();
+    case "updateUserProfile":
+      return await updateUserProfile(event.data);
     default:
       return {
         success: false,
