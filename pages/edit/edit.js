@@ -21,6 +21,7 @@ Page({
     pickerRect: null,
     // 当前图片是否已经完成抠图（避免重复抠图）
     hasCutout: false,
+    showLimitModal: false,
     // 当前选择点在圆形调色盘中的位置（用于小圆圈展示）
     pickerX: 110,
     pickerY: 80,
@@ -146,16 +147,11 @@ Page({
       // 3. [新增] 检查次数限制标识
       if (cutoutRes.result.limitReached) {
         wx.hideLoading();
-        wx.showModal({
-          title: '次数已用完',
-          content: '今日 AI 抠图 5 次额度已用完。别担心，明天 0 点将自动充值 5 次额度！',
-          showCancel: false,
-          confirmText: '我知道了'
-        });
         this.setData({
           currImage: localPath,
           currFileID: originalFileID,
-          hasCutout: false
+          hasCutout: false,
+          showLimitModal: true
         });
         return;
       }
@@ -522,10 +518,19 @@ Page({
     this.setData({ seasons });
   },
 
+
   toggleOccasion(e) {
     const index = e.currentTarget.dataset.index;
     const occasions = this.data.occasions;
     occasions[index].active = !occasions[index].active;
     this.setData({ occasions });
+  },
+
+  closeLimitModal() {
+    this.setData({ showLimitModal: false });
+  },
+
+  stopTouchMove() {
+    return;
   }
 });

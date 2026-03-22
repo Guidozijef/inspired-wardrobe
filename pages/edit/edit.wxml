@@ -135,4 +135,19 @@
     <button wx:if="{{editingId}}" class="action-btn delete-btn" bindtap="deleteItem">删除单品</button>
     <button class="action-btn primary-btn {{editingId ? 'half-width' : ''}}" bindtap="saveItem">{{editingId ? '保存修改' : '保存单品'}}</button>
   </view>
+
+  <!-- 自定义 AI 额度用完弹窗 -->
+  <view wx:if="{{showLimitModal}}" class="limit-mask" catchtouchmove="stopTouchMove">
+    <view class="limit-panel">
+      <view class="limit-icon-wrap">
+        <text class="limit-icon">⚡</text>
+      </view>
+      <text class="limit-title">今日额度已用完</text>
+      <text class="limit-desc">AI 抠图每日 5 次免费额度已用完\n明天 0 点将自动充值，如果继续上传将不会AI 抠图！</text>
+      <view class="limit-divider"></view>
+      <view class="limit-btn" bindtap="closeLimitModal">
+        <text class="limit-btn-text">我知道了</text>
+      </view>
+    </view>
+  </view>
 </view>
