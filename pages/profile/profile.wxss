@@ -27,14 +27,14 @@
 }
 
 .stats-num {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 800;
   color: #1E293B;
   margin-bottom: 4px;
 }
 
 .stats-label {
-  font-size: 13px;
+  font-size: 12px;
   color: #94A3B8;
   font-weight: 500;
 }

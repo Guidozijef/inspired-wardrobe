@@ -13,6 +13,8 @@ Page({
     isUpdatingProfile: false,
     outfitCount: 0,
     clothesCount: 0,
+    usedCutouts: 0,
+    totalCutouts: 5,
     latestDate: '无'
   },
 
@@ -41,12 +43,21 @@ Page({
       data: { type: 'getUserProfile' }
     }).then(res => {
       if (res.result && res.result.success && res.result.data) {
-        const { nickName, avatarUrl, clothesCount, outfitCount } = res.result.data;
+        const { nickName, avatarUrl, clothesCount, outfitCount, todayCutoutCount, lastCutoutDate } = res.result.data;
+        
+        // 计算 AI 抠图已用次数
+        const today = new Date(Date.now() + 8 * 3600 * 1000).toISOString().split('T')[0];
+        let usedCutouts = 0;
+        if (lastCutoutDate === today) {
+          usedCutouts = todayCutoutCount || 0;
+        }
+
         this.setData({
           nickName: nickName || this.data.nickName,
           avatarUrl: avatarUrl || this.data.avatarUrl,
           clothesCount: clothesCount !== undefined ? clothesCount : 0,
-          outfitCount: outfitCount !== undefined ? outfitCount : 0
+          outfitCount: outfitCount !== undefined ? outfitCount : 0,
+          usedCutouts
         });
       }
     }).catch(err => {

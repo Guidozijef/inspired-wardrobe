@@ -424,20 +424,72 @@ exports.main = async (event, context) => {
       }
     case "doCutout":
       try {
-        const {code, imageBase64, message } = await aiCutout(event.data.fileID)
-        if (code !== 200) {
-          return { success: false, errMsg: message }
+        const { OPENID } = cloud.getWXContext();
+        const originalFileID = event.data.fileID;
+        
+        // 1. 获取用户当前的抠图统计
+        const userRes = await db.collection('users').where({ _openid: OPENID }).get();
+        const user = userRes.data.length > 0 ? userRes.data[0] : null;
+        
+        const now = new Date();
+        // 转换为北京时间日期字符串 YYYY-MM-DD
+        const today = new Date(now.getTime() + 8 * 3600 * 1000).toISOString().split('T')[0];
+        
+        let count = 0;
+        if (user && user.lastCutoutDate === today) {
+          count = user.todayCutoutCount || 0;
         }
-        const newFileID = await saveProcessedImage(imageBase64)
+        
+        // 2. 检查次数限制 (5次)
+        if (count >= 5) {
+          return {
+            success: true,
+            fileID: originalFileID,
+            limitReached: true,
+            message: '今日 5 次 AI 自动抠图机会已用完，已为你保留原图上传。'
+          };
+        }
+        
+        // 3. 执行抠图
+        const { code, imageBase64, message } = await aiCutout(originalFileID);
+        if (code !== 200) {
+          return { success: false, errMsg: message };
+        }
+        const newFileID = await saveProcessedImage(imageBase64);
+        
+        // 4. 更新用户的抠图统计
+        const updateData = {
+          todayCutoutCount: count + 1,
+          lastCutoutDate: today,
+          update_time: db.serverDate()
+        };
+        
+        if (user) {
+          await db.collection('users').doc(user._id).update({ data: updateData });
+        } else {
+          // 如果用户记录不存在，创建基础记录
+          await db.collection('users').add({
+            data: {
+              _openid: OPENID,
+              nickName: '新用户',
+              avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop',
+              clothesCount: 0,
+              outfitCount: 0,
+              ...updateData,
+              create_time: db.serverDate()
+            }
+          });
+        }
+        
         return {
           success: true,
           fileID: newFileID
-        }
+        };
       } catch (err) {
         return {
           success: false,
           errMsg: err.message || err
-        }
+        };
       }
     case "getOpenId":
       return await getOpenId();

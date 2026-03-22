@@ -143,7 +143,24 @@ Page({
 
       const cutoutFileID = cutoutRes.result.fileID;
 
-      // 3. [新增] 自动裁剪透明边界
+      // 3. [新增] 检查次数限制标识
+      if (cutoutRes.result.limitReached) {
+        wx.hideLoading();
+        wx.showModal({
+          title: '次数已用完',
+          content: '今日 AI 抠图 5 次额度已用完。别担心，明天 0 点将自动充值 5 次额度！',
+          showCancel: false,
+          confirmText: '我知道了'
+        });
+        this.setData({
+          currImage: localPath,
+          currFileID: originalFileID,
+          hasCutout: false
+        });
+        return;
+      }
+
+      // 4. [新增] 自动裁剪透明边界
       wx.showLoading({ title: '正在优化裁剪...', mask: true });
       const croppedFilePath = await this.autoCropImage(cutoutFileID);
       
