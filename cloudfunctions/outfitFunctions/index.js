@@ -6,18 +6,33 @@ cloud.init({
 
 const db = cloud.database();
 
-// 辅助函数：更新用户的统计数量
+// 辅助函数：更新用户的统计数量 (具备 Upsert 逻辑)
 async function updateUserCount(openid, field, change) {
   const _ = db.command;
   try {
     const userRes = await db.collection('users').where({ _openid: openid }).get();
     if (userRes.data.length > 0) {
+      // 如果用户已存在，执行增量更新
       await db.collection('users').doc(userRes.data[0]._id).update({
         data: {
           [field]: _.inc(change),
           update_time: db.serverDate()
         }
       });
+    } else {
+      // 如果用户不存在 (新用户第一次操作)，创建并初始化统计
+      const userData = {
+        _openid: openid,
+        nickName: '新用户',
+        avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop',
+        clothesCount: 0,
+        outfitCount: 0,
+        create_time: db.serverDate(),
+        update_time: db.serverDate()
+      };
+      // 只有在增加时才初始化为 change，减少时逻辑上不应进入此处但为安全设为 0
+      userData[field] = Math.max(0, change);
+      await db.collection('users').add({ data: userData });
     }
   } catch (err) {
     console.error('更新统计失败:', err);

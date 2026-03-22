@@ -43,8 +43,8 @@ Page({
         this.setData({
           nickName: nickName || this.data.nickName,
           avatarUrl: avatarUrl || this.data.avatarUrl,
-          clothesCount: clothesCount || 0,
-          outfitCount: outfitCount || 0
+          clothesCount: clothesCount !== undefined ? clothesCount : 0,
+          outfitCount: outfitCount !== undefined ? outfitCount : 0
         });
       }
     }).catch(err => {
