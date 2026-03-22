@@ -1,0 +1,121 @@
+<view class="container">
+  <!-- Custom Nav Bar Placeholder (if needed) -->
+  <view class="header" style="padding-top: {{statusBarHeight + 10}}px; padding-bottom: 20px;">
+    <view class="section-title" style="font-size: 24px;">穿搭助手</view>
+  </view>
+
+  <view class="content-scroll">
+    <view class="section-header">
+      <text class="section-title">穿搭日历</text>
+    </view>
+    <view class="calendar-card">
+      <view class="calendar-header">
+        <text class="month-title">{{year}}年 {{month}}月</text>
+        <view class="nav-arrows">
+          <text class="arrow" bindtap="prevMonth">‹</text>
+          <text class="arrow" bindtap="nextMonth">›</text>
+        </view>
+      </view>
+      <view class="week-days">
+        <text>日</text><text>一</text><text>二</text><text>三</text><text>四</text><text>五</text><text>六</text>
+      </view>
+      <view class="days-grid">
+        <view 
+          wx:for="{{days}}" 
+          wx:key="index"
+          class="day {{item.prev ? 'prev-month' : ''}} {{item.hasRecord ? 'has-dot' : ''}} {{activeFullDate === item.fullDate ? 'active' : ''}}"
+          bindtap="selectDate"
+          data-date="{{item.date}}"
+          data-fulldate="{{item.fullDate}}"
+          data-prev="{{item.prev}}"
+        >
+          <view class="{{activeFullDate === item.fullDate ? 'active-bg' : ''}}">{{item.date}}</view>
+          <view class="dot" wx:if="{{item.hasRecord}}"></view>
+        </view>
+      </view>
+
+      <!-- Daily Look Section -->
+      <view class="daily-look" wx:if="{{currentDailyLook}}" bindtap="goToDetail">
+        <image wx:if="{{currentDailyLook.preview_url}}" class="daily-look-img" src="{{currentDailyLook.preview_url}}" mode="aspectFill"></image>
+        <view wx:else class="daily-look-img" style="background-color: #F5F5F7">
+          <text class="daily-emoji">🧥</text>
+        </view>
+        <view class="daily-look-info">
+          <text class="daily-look-title">{{currentDailyLook.title || '今日搭配'}}</text>
+          <text class="daily-look-desc">点击查看详情</text>
+        </view>
+        <view class="daily-look-arrow">›</view>
+      </view>
+      <view class="daily-look-empty" wx:else>
+        <text>今天还没有记录穿搭哦</text>
+        <button class="add-record-btn" size="mini" bindtap="goToRecord">去记录</button>
+      </view>
+    </view>
+
+    <!-- Random Outfit Generator (Slot Machine) -->
+    <view class="section-header">
+      <text class="section-title">灵感扭蛋机</text>
+      <text class="section-desc">不知道穿什么？来抽一套吧！</text>
+    </view>
+    <view class="random-card">
+      <view class="slot-machine">
+        <view class="slot-window">
+          <view class="slot-reel {{isGenerating ? 'spinning-1' : 'transitioning'}}" style="transform: translateY(-{{isGenerating ? 0 : slot1Index * 80}}px)">
+            <view class="slot-item" wx:for="{{slot1Items}}" wx:key="index">
+              <image class="slot-item-img" src="{{item.url}}" mode="aspectFit"></image>
+            </view>
+          </view>
+        </view>
+        <view class="slot-window">
+          <view class="slot-reel {{isGenerating ? 'spinning-2' : 'transitioning'}}" style="transform: translateY(-{{isGenerating ? 0 : slot2Index * 80}}px)">
+            <view class="slot-item" wx:for="{{slot2Items}}" wx:key="index">
+              <image class="slot-item-img" src="{{item.url}}" mode="aspectFit"></image>
+            </view>
+          </view>
+        </view>
+        <view class="slot-window">
+          <view class="slot-reel {{isGenerating ? 'spinning-3' : 'transitioning'}}" style="transform: translateY(-{{isGenerating ? 0 : slot3Index * 80}}px)">
+            <view class="slot-item" wx:for="{{slot3Items}}" wx:key="index">
+              <image class="slot-item-img" src="{{item.url}}" mode="aspectFit"></image>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="random-info" wx:if="{{randomLook}}">
+        <text class="random-title">{{randomLook.title}}</text>
+      </view>
+      <view class="random-actions">
+        <button class="random-btn primary-btn" bindtap="generateRandomLook">
+          {{isGenerating ? '生成中...' : (randomLook ? '✨ 再次生成' : '✨ 随机生成穿搭')}}
+        </button>
+      </view>
+      <view class="random-actions" style="margin-top: 10px;">
+        <button class="share-btn random-btn" bindtap="shareWeiXin"><image style="height: 20px;width:20px;margin-right:10px" class="icon" src="https://img.icons8.com/fluency-systems-filled/48/ffffff/weixing.png"></image>发送给好友</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- Custom Tab Bar (5 items) -->
+  <view class="tab-bar glass">
+    <view class="tab-item" bindtap="switchTab" data-path="/pages/wardrobe/wardrobe">
+      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/999999/shirt.png"></image>
+      <text class="tab-text">衣橱</text>
+    </view>
+    <view class="tab-item" bindtap="switchTab" data-path="/pages/canvas/canvas">
+      <image class="tab-icon" src="https://img.icons8.com/glyph-neue/50/999999/fantasy--v1.png"></image>
+      <text class="tab-text">画布</text>
+    </view>
+    <view class="tab-item" bindtap="switchTab" data-path="/pages/looks/looks">
+      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/999999/hanger.png"></image>
+      <text class="tab-text">穿搭</text>
+    </view>
+    <view class="tab-item active">
+      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/8A2BE2/calendar.png"></image>
+      <text class="tab-text">日历</text>
+    </view>
+    <view class="tab-item" bindtap="switchTab" data-path="/pages/profile/profile">
+      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/999999/user.png"></image>
+      <text class="tab-text">我的</text>
+    </view>
+  </view>
+</view>

@@ -93,6 +93,10 @@
       <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/999999/hanger.png"></image>
       <text class="tab-text">穿搭</text>
     </view>
+    <view class="tab-item" bindtap="switchTab" data-path="/pages/calendar/calendar">
+      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/999999/calendar.png"></image>
+      <text class="tab-text">日历</text>
+    </view>
     <view class="tab-item" bindtap="switchTab" data-path="/pages/profile/profile">
       <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/999999/user.png"></image>
       <text class="tab-text">我的</text>

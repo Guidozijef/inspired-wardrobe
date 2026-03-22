@@ -8,53 +8,52 @@
 .user-id { font-size: 11px; color: #94A3B8; background-color: #F1F5F9; padding: 2px 8px; border-radius: 4px; margin-bottom: 6px; align-self: flex-start; font-family: monospace; }
 .user-desc { font-size: 14px; color: #64748B; }
 
-.content-scroll { padding: 0 20px; }
-.section-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px; margin-top: 24px; }
-.section-title { font-size: 18px; font-weight: bold; color: #1E293B; }
-.section-desc { font-size: 12px; color: #94A3B8; margin-left: 8px; }
+.content-scroll {
+  padding: 0 20px;
+}
 
-.calendar-card { background-color: #ffffff; border-radius: 24px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); margin-bottom: 24px; }
-.calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.month-title { font-size: 18px; font-weight: bold; color: #1E293B; }
-.nav-arrows { display: flex; gap: 16px; }
-.arrow { font-size: 20px; color: #94A3B8; font-weight: bold; padding: 0 8px; }
-.week-days { display: flex; justify-content: space-between; margin-bottom: 16px; color: #94A3B8; font-size: 12px; font-weight: 500; }
-.week-days text { width: 14.28%; text-align: center; }
-.days-grid { display: flex; flex-wrap: wrap; }
-.day { width: 14.28%; height: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 14px; color: #334155; font-weight: 500; margin-bottom: 8px; position: relative; }
-.day.prev-month { color: #CBD5E1; }
-.active-bg { width: 32px; height: 32px; background-color: #8A2BE2; color: #ffffff; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(138,43,226,0.3); }
-.dot { width: 4px; height: 4px; background-color: #8A2BE2; border-radius: 2px; position: absolute; bottom: 4px; z-index: 10; }
-.active-bg + .dot { display: none; }
+/* Menu List Styles */
+.menu-list {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 8px 0;
+  margin-top: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+}
 
-.daily-look { display: flex; align-items: center; padding-top: 20px; margin-top: 20px; border-top: 1px solid #F1F5F9; }
-.daily-look-img { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 16px; }
-.daily-emoji { font-size: 32px; }
-.daily-look-info { flex: 1; display: flex; flex-direction: column; }
-.daily-look-title { font-size: 16px; font-weight: bold; color: #1E293B; margin-bottom: 4px; }
-.daily-look-desc { font-size: 12px; color: #94A3B8; }
-.daily-look-arrow { color: #CBD5E1; font-size: 20px; }
-.daily-look-empty { display: flex; justify-content: space-between; align-items: center; padding-top: 20px; margin-top: 20px; border-top: 1px solid #F1F5F9; color: #94A3B8; font-size: 14px; }
-.add-record-btn { width: 200px; margin: 0; padding: 6px 20px; font-size: 12px; font-weight: bold; background-color: #8A2BE2; color: white; border-radius: 16px; display: flex; align-items: center; justify-content: center; }
+.menu-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #F1F5F9;
+}
 
-/* Slot Machine Styles (RESTORED) */
-.random-card { background-color: #ffffff; border-radius: 24px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); margin-bottom: 24px; display: flex; flex-direction: column; align-items: center; }
-.slot-machine { display: flex; justify-content: center; gap: 16px; margin-bottom: 20px; background-color: #F8FAFC; padding: 20px; border-radius: 16px; width: 100%; box-sizing: border-box; box-shadow: inset 0 4px 8px rgba(0,0,0,0.02); }
-.slot-window { width: 80px; height: 80px; background-color: #ffffff; border-radius: 12px; overflow: hidden; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-.slot-reel { display: flex; flex-direction: column; }
-.slot-reel.transitioning { transition: transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1); }
-.slot-item { width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; font-size: 48px; flex-shrink: 0; }
-.slot-item-img { width: 60px; height: 60px; border-radius: 8px; }
-.spinning-1 { animation: spin-reel 0.4s linear infinite; }
-.spinning-2 { animation: spin-reel 0.5s linear infinite; }
-.spinning-3 { animation: spin-reel 0.6s linear infinite; }
-@keyframes spin-reel { 0% { transform: translateY(0); } 100% { transform: translateY(-400px); } }
-.random-info { text-align: center; margin-bottom: 16px; }
-.random-title { font-size: 18px; font-weight: bold; color: #1E293B; }
-.random-actions { display: flex; gap: 12px; width: 100%; }
-.random-btn { flex: 1; padding: 12px 0; font-size: 16px; font-weight: bold; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0; }
-.primary-btn { background-color: #8A2BE2; color: white; box-shadow: 0 4px 12px rgba(138,43,226,0.3); }
-.share-btn { background-color: #07c160; color: white; box-shadow: 0 4px 12px rgba(7,193,96,0.3); }
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-left {
+  display: flex;
+  align-items: center;
+}
+
+.menu-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 12px;
+}
+
+.menu-text {
+  font-size: 15px;
+  color: #1E293B;
+  font-weight: 500;
+}
+
+.menu-arrow {
+  color: #CBD5E1;
+  font-size: 18px;
+}
 
 .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); }
 
