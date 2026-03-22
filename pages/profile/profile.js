@@ -29,6 +29,9 @@ Page({
     openid: '',
     nickName: 'The Curator',
     avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop',
+    showEditModal: false,
+    tempAvatarUrl: '',
+    tempNickName: '',
     isUpdatingProfile: false
   },
 
@@ -78,45 +81,93 @@ Page({
 
   // 编辑个人信息入口
   editProfile() {
-    wx.showActionSheet({
-      itemList: ['修改昵称', '修改头像'],
-      success: (res) => {
-        if (res.tapIndex === 0) {
-          this.editName();
-        } else if (res.tapIndex === 1) {
-          this.editAvatar();
-        }
-      }
+    this.setData({
+      showEditModal: true,
+      tempAvatarUrl: this.data.avatarUrl,
+      tempNickName: this.data.nickName
     });
   },
 
-  // 修改昵称
-  editName() {
-    wx.showModal({
-      title: '修改昵称',
-      placeholderText: '请输入新的昵称',
-      content: this.data.nickName,
-      editable: true,
-      success: (res) => {
-        if (res.confirm && res.content.trim()) {
-          this.performUpdate({ nickName: res.content.trim() });
-        }
-      }
-    });
+  hideEditModal() {
+    this.setData({ showEditModal: false });
   },
 
-  // 修改头像
-  editAvatar() {
-    wx.chooseMedia({
-      count: 1,
-      mediaType: ['image'],
-      sourceType: ['album', 'camera'],
-      success: (res) => {
-        const tempFilePath = res.tempFiles[0].tempFilePath;
-        this.uploadAvatar(tempFilePath);
-      }
-    });
+  // 微信头像选择机制
+  onChooseAvatar(e) {
+    const { avatarUrl } = e.detail;
+    this.setData({ tempAvatarUrl: avatarUrl });
   },
+
+  // 微信昵称输入机制
+  onNicknameBlur(e) {
+    const nickName = e.detail.value;
+    this.setData({ tempNickName: nickName });
+  },
+
+  onNicknameInput(e) {
+    const nickName = e.detail.value;
+    this.setData({ tempNickName: nickName });
+  },
+
+  // 保存个人信息
+  async saveProfile() {
+    const { tempNickName, tempAvatarUrl, avatarUrl, nickName } = this.data;
+    
+    if (!tempNickName && !tempAvatarUrl) {
+      this.hideEditModal();
+      return;
+    }
+
+    this.setData({ isUpdatingProfile: true });
+    wx.showLoading({ title: '保存中...', mask: true });
+
+    try {
+      let finalAvatarUrl = tempAvatarUrl || avatarUrl;
+
+      // 如果头像发生了变化且是临时文件，则上传到云端
+      if (tempAvatarUrl && tempAvatarUrl !== avatarUrl && !tempAvatarUrl.startsWith('cloud://')) {
+        const cloudPath = `avatars/${Date.now()}-${Math.floor(Math.random() * 1000)}.png`;
+        const uploadRes = await wx.cloud.uploadFile({
+          cloudPath,
+          filePath: tempAvatarUrl
+        });
+        finalAvatarUrl = uploadRes.fileID;
+      }
+
+      const updateData = {
+        nickName: tempNickName || nickName,
+        avatarUrl: finalAvatarUrl
+      };
+
+      const res = await wx.cloud.callFunction({
+        name: 'clothFunctions',
+        data: {
+          type: 'updateUserProfile',
+          data: updateData
+        }
+      });
+
+      wx.hideLoading();
+      if (res.result && res.result.success) {
+        this.setData({
+          ...updateData,
+          showEditModal: false,
+          isUpdatingProfile: false
+        });
+        wx.showToast({ title: '已同步个人信息', icon: 'success' });
+      } else {
+        throw new Error(res.result.errMsg || '更新失败');
+      }
+    } catch (err) {
+      console.error('保存失败:', err);
+      wx.hideLoading();
+      this.setData({ isUpdatingProfile: false });
+      wx.showToast({ title: '更新失败', icon: 'none' });
+    }
+  },
+
+  // 原有的修改昵称 (保留或删除)
+  // ...
 
   // 上传头像到云存储
   uploadAvatar(filePath) {

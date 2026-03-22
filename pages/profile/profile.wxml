@@ -122,4 +122,31 @@
       <text class="tab-text">我的</text>
     </view>
   </view>
+
+  <!-- Profile Edit Modal -->
+  <view class="modal-mask" wx:if="{{showEditModal}}" bindtap="hideEditModal"></view>
+  <view class="edit-modal-wrapper {{showEditModal ? 'modal-active' : ''}}">
+    <view class="edit-modal">
+      <view class="modal-handle"></view>
+      <view class="modal-header">
+        <text class="modal-title">设置个人信息</text>
+        <text class="modal-close" bindtap="hideEditModal">✕</text>
+      </view>
+      
+      <view class="edit-section">
+        <view class="edit-label">设置头像</view>
+        <button class="avatar-wrapper" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+          <image class="edit-avatar-img" src="{{tempAvatarUrl || avatarUrl}}"></image>
+          <view class="avatar-edit-tag">更换头像</view>
+        </button>
+      </view>
+
+      <view class="edit-section">
+        <view class="edit-label">设置昵称</view>
+        <input type="nickname" class="nickname-input" placeholder="请输入昵称" value="{{nickName}}" bindblur="onNicknameBlur" bindinput="onNicknameInput"/>
+      </view>
+
+      <button class="save-profile-btn" bindtap="saveProfile" loading="{{isUpdatingProfile}}">保存并应用</button>
+    </view>
+  </view>
 </view>
