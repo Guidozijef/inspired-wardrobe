@@ -29,13 +29,14 @@
   </view>
 
   <view class="bottom-bar">
-    <view class="delete-icon-btn" bindtap="deleteLook">
+    <button class="delete-icon-btn" bindtap="deleteLook">
       <image class="btn-icon-only" src="https://img.icons8.com/ios-glyphs/30/ff4d4f/trash.png"></image>
-    </view>
+      删除
+    </button>
     <button class="action-btn share-btn" bindtap="shareImage">
       <image class="btn-icon" src="https://img.icons8.com/ios-glyphs/30/8A2BE2/share.png"></image>
       分享
     </button>
-    <button class="action-btn primary-btn" bindtap="editLook">重新编辑</button>
+    <!-- <button class="action-btn primary-btn" bindtap="editLook">重新编辑</button> -->
   </view>
 </view>
