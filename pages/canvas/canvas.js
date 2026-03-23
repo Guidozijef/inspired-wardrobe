@@ -15,6 +15,7 @@ Page({
     menuButtonWidth: 80,
     showSaveModal: false,
     outfitTitle: '',
+    editingOutfitId: '',
     helperCanvasWidth: 375,
     helperCanvasHeight: 500
   },
@@ -30,6 +31,7 @@ Page({
     
     // 如果有传递 ID，则进入“重新编辑”模式，还原画布内容
     if (options.id) {
+      this.setData({ editingOutfitId: options.id });
       this.loadOutfit(options.id);
     } else {
       this.fetchClothes();
@@ -56,25 +58,24 @@ Page({
       if (res.result && res.result.success) {
         const data = res.result.data;
         const config = JSON.parse(data.canvas_data.layout_config);
+        const clothesIds = data.clothes_ids || []; // 用于回退匹配（兼容旧数据）
         
-        // 此处需要注意：URL 需要从 clothes 集合中重新映射，或者保存时就存好全量信息
-        // 目前简单还原布局，假设 item.url 已经包含在保存的 context 中
-        // 为了稳健性，我们在保存时其实存了 url，但上面的序列化只存了基础配置
-        // 需要在 fetchClothes 之后进行 matching，或者更直接地在保存时存好 url
-        
-        // 方案：先 fetch 基础单品库，再匹配还原
+        // 方案：先 fetch 基础单品库，再通过 db_id 或 clothes_ids 匹配还原
         this.fetchClothes().then(() => {
-          const restoredItems = config.map(conf => {
-            const original = this.data.allItems.find(i => i._id === conf.id || i.id === conf.id);
+          const restoredItems = config.map((conf, index) => {
+            // 优先用 db_id 匹配（新版保存的数据），回退用 clothes_ids 按索引匹配（旧数据）
+            const matchId = conf.db_id || clothesIds[index];
+            const original = this.data.allItems.find(i => i._id === matchId);
             return {
               ...conf,
+              db_id: matchId || conf.db_id,
               url: original ? original.image_url : '',
-              active: false
+              active: index === 0 // 第一个单品默认激活，可立即拖拽
             };
           });
           this.setData({
             canvasItems: restoredItems,
-            recordDate: data.record_date || this.formatDate(data.create_time), // 恢复记录日期
+            recordDate: data.record_date || this.formatDate(data.create_time),
             nextId: Math.max(...restoredItems.map(i => i.id)) + 1
           });
         });
@@ -310,6 +311,7 @@ Page({
       const clothes_ids = canvasItems.map(item => item.db_id || item.id);
       const layout_config = JSON.stringify(canvasItems.map(item => ({
         id: item.id,
+        db_id: item.db_id,
         x: item.x,
         y: item.y,
         scale: item.scale,
@@ -333,6 +335,7 @@ Page({
         data: {
           type: 'addOutfit',
           data: {
+            id: this.data.editingOutfitId || undefined,
             ...outfitData,
             recordDate: this.data.recordDate
           }
