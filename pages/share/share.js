@@ -307,7 +307,7 @@ Page({
           const dpr = wx.getSystemInfoSync().pixelRatio;
 
           const exportScale = 2; // 放大 2 倍
-          const footerHeight = 80; // 底部品牌区高度
+          const footerHeight = 100; // 底部品牌区高度
           
           canvas.width = width * dpr * exportScale;
           canvas.height = (height + footerHeight) * dpr * exportScale;
@@ -405,20 +405,22 @@ Page({
           ctx.fillStyle = '#999999';
           ctx.fillText('发现穿搭灵感，让美触手可及', 20, height + footerHeight / 2 + 12);
 
-          // 模拟小程序码区域
-          ctx.fillStyle = '#f5f5f5';
-          const qrSize = 50;
+          // 绘制小程序码图片
+          const qrSize = 80;
           const qrX = width - qrSize - 20;
           const qrY = height + (footerHeight - qrSize) / 2;
-          ctx.beginPath();
-          ctx.arc(qrX + qrSize / 2, qrY + qrSize / 2, qrSize / 2, 0, Math.PI * 2);
-          ctx.fill();
           
-          ctx.font = '10px sans-serif';
-          ctx.fillStyle = '#999999';
-          ctx.textAlign = 'center';
-          ctx.fillText('扫码查看', qrX + qrSize / 2, qrY + qrSize / 2 + 4);
-          ctx.textAlign = 'left'; // 重置
+          try {
+            const qrImg = canvas.createImage();
+            await new Promise((resLoad, rejLoad) => {
+              qrImg.onload = resLoad;
+              qrImg.onerror = rejLoad;
+              qrImg.src = '/pages/images/qrX.jpg';
+            });
+            ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+          } catch (qrErr) {
+            console.error('加载小程序码失败:', qrErr);
+          }
 
           // 3. 绘制穿搭预览图 (多图堆叠布局)
           if (this.data.isMulti) {

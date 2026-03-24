@@ -17,6 +17,39 @@ const getOpenId = async () => {
   // 生成一个更友好的唯一 ID (IW-前缀 + OpenID 的哈希前 8 位)
   const displayId = 'IW-' + crypto.createHash('md5').update(openid).digest('hex').substring(0, 8).toUpperCase();
   
+  // 保存 displayId 到用户表中
+  try {
+    const userRes = await db.collection('users').where({ _openid: openid }).get();
+    if (userRes.data.length > 0) {
+      const user = userRes.data[0];
+      if (!user.displayId) {
+        // 更新旧用户，补充 displayId
+        await db.collection('users').doc(user._id).update({
+          data: {
+            displayId: displayId,
+            update_time: db.serverDate()
+          }
+        });
+      }
+    } else {
+      // 记录不存在时新建
+      await db.collection('users').add({
+        data: {
+          _openid: openid,
+          displayId: displayId,
+          nickName: 'The Curator',
+          avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop',
+          clothesCount: 0,
+          outfitCount: 0,
+          create_time: db.serverDate(),
+          update_time: db.serverDate()
+        }
+      });
+    }
+  } catch (err) {
+    console.error('保存 displayId 失败:', err);
+  }
+  
   return {
     displayId: displayId,
     openid: openid,
@@ -115,7 +148,8 @@ async function updateUserCount(openid, field, change) {
       // 如果用户不存在 (新用户第一次操作)，创建并初始化统计
       const userData = {
         _openid: openid,
-        nickName: '新用户',
+        displayId: 'IW-' + crypto.createHash('md5').update(openid).digest('hex').substring(0, 8).toUpperCase(),
+        nickName: 'The Curator',
         avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop',
         clothesCount: 0,
         outfitCount: 0,
@@ -379,6 +413,7 @@ const updateUserProfile = async (data) => {
       await db.collection('users').add({
         data: {
           _openid: OPENID,
+          displayId: 'IW-' + crypto.createHash('md5').update(OPENID).digest('hex').substring(0, 8).toUpperCase(),
           nickName: nickName || 'The Curator',
           avatarUrl: avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop',
           clothesCount: 0,
@@ -471,7 +506,8 @@ exports.main = async (event, context) => {
           await db.collection('users').add({
             data: {
               _openid: OPENID,
-              nickName: '新用户',
+              displayId: 'IW-' + crypto.createHash('md5').update(OPENID).digest('hex').substring(0, 8).toUpperCase(),
+              nickName: 'The Curator',
               avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop',
               clothesCount: 0,
               outfitCount: 0,
