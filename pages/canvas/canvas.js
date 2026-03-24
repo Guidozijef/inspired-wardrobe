@@ -70,7 +70,8 @@ Page({
               ...conf,
               db_id: matchId || conf.db_id,
               url: original ? original.image_url : '',
-              active: index === 0 // 第一个单品默认激活，可立即拖拽
+              active: index === 0, // 第一个单品默认激活，可立即拖拽
+              rotation: conf.rotation || 0
             };
           });
           this.setData({
@@ -220,6 +221,7 @@ Page({
       y: 100,
       active: true,
       scale: 1,
+      rotation: 0,
       zIndex: Math.max(...this.data.canvasItems.map(i => i.zIndex || 0), 0) + 1
     };
     
@@ -257,7 +259,8 @@ Page({
         ...item,
         x: item.x,
         y: item.y,
-        scale: item.scale
+        scale: item.scale,
+        rotation: item.rotation || 0
       }));
       this.setData({ canvasItems: items });
     }
@@ -315,6 +318,7 @@ Page({
         x: item.x,
         y: item.y,
         scale: item.scale,
+        rotation: item.rotation || 0,
         zIndex: item.zIndex
       })));
 
@@ -355,6 +359,49 @@ Page({
       wx.hideLoading();
       wx.showToast({ title: '操作失败: ' + err.message, icon: 'none' });
       console.error('保存流程失败', err);
+    }
+  },
+
+  startRotate(e) {
+    const id = e.currentTarget.dataset.id;
+    const items = this.data.canvasItems;
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+
+    const touch = e.touches[0];
+    this.rotatingId = id; // 立即记录，防止滑动过快错过
+    
+    // 我们需要获取 movable-view 的中心点，微信小程序中属性选择器 [data-id] 返回值可能为空，改用 #item-id
+    wx.createSelectorQuery().select(`#item-${id}`).boundingClientRect(rect => {
+      if (rect) {
+        this.rotateCenter = {
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2
+        };
+        const dx = touch.clientX - this.rotateCenter.x;
+        const dy = touch.clientY - this.rotateCenter.y;
+        this.initAngle = (Math.atan2(dy, dx) * 180 / Math.PI) || 0;
+        this.startRotation = item.rotation || 0;
+      }
+    }).exec();
+  },
+
+  doRotate(e) {
+    if (this.rotatingId !== e.currentTarget.dataset.id || !this.rotateCenter) return;
+    
+    const touch = e.touches[0];
+    const dx = touch.clientX - this.rotateCenter.x;
+    const dy = touch.clientY - this.rotateCenter.y;
+    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+    
+    let delta = angle - this.initAngle;
+    let newRotation = this.startRotation + delta;
+    
+    const index = this.data.canvasItems.findIndex(i => i.id === this.rotatingId);
+    if (index !== -1) {
+      this.setData({
+        [`canvasItems[${index}].rotation`]: newRotation
+      });
     }
   },
 
@@ -453,7 +500,17 @@ Page({
                   }
 
                   ctx.save();
-                  ctx.drawImage(img, relativeX + offsetX, relativeY + offsetY, drawW, drawH);
+                  // 将坐标系平移到 movable-view 的中心
+                  const centerX = relativeX + rectW / 2;
+                  const centerY = relativeY + rectH / 2;
+                  ctx.translate(centerX, centerY);
+                  // 旋转
+                  if (item.rotation) {
+                    ctx.rotate(item.rotation * Math.PI / 180);
+                  }
+                  // 在中心点绘制（因此坐标需要减去宽高的一半）
+                  // 注意 offsetX / offsetY 也要加上
+                  ctx.drawImage(img, -rectW / 2 + offsetX, -rectH / 2 + offsetY, drawW, drawH);
                   ctx.restore();
 
                   // 更新边界

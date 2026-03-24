@@ -9,10 +9,11 @@
 .watermark { position: absolute; top: 100px; left: 20px; font-size: 40px; font-family: serif; color: #E2E8F0; font-weight: bold; letter-spacing: 8px; pointer-events: none; }
 
 .canvas-item { width: 180px; height: 180px; display: flex; align-items: center; justify-content: center; position: relative; }
-.canvas-item.no-border { border: none !important; }
-.canvas-item:not(.no-border) { border: 2px dashed #8A2BE2; border-radius: 8px; }
+.item-rotator { box-sizing: border-box; border: 2px dashed transparent; border-radius: 8px; transition: border-color 0.2s; }
+.item-rotator.active { border-color: #8A2BE2; }
 .canvas-img { width: 100%; height: 100%; display: block; }
-.rotate-btn { position: absolute; top: -14px; right: -14px; width: 28px; height: 28px; background-color: #FF3B30; border-radius: 14px; display: flex; align-items: center; justify-content: center; z-index: 100; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+.delete-btn { position: absolute; top: -14px; right: -14px; width: 28px; height: 28px; background-color: #FF3B30; border-radius: 14px; display: flex; align-items: center; justify-content: center; z-index: 100; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+.rotate-handle { position: absolute; bottom: -14px; right: -14px; width: 28px; height: 28px; background-color: #8A2BE2; border-radius: 14px; display: flex; align-items: center; justify-content: center; z-index: 100; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
 
 .nav-left-actions { display: flex; gap: 16px; align-items: center; position: relative; z-index: 12; }
 
