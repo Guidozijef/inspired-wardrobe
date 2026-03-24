@@ -70,9 +70,16 @@ const addOutfit = async (data) => {
   try {
     let resultId = id;
     if (id) {
-      await db.collection('outfits').doc(id).update({
+      const updateRes = await db.collection('outfits').where({
+        _id: id,
+        _openid: OPENID
+      }).update({
         data: outfitData
       });
+      
+      if (updateRes.stats.updated === 0) {
+        throw new Error('无权修改该搭配或搭配不存在');
+      }
     } else {
       const res = await db.collection('outfits').add({
         data: outfitData
@@ -101,20 +108,17 @@ const getOutfits = async (data = {}) => {
   const { monthStr } = data; 
 
   try {
-    let query = db.collection('outfits').where({
-      _openid: OPENID
-    });
+    let condition = { _openid: OPENID };
 
     if (monthStr) {
-      query = query.where({
-        record_date: db.RegExp({
-          regexp: '^' + monthStr,
-          options: 'i'
-        })
+      condition.record_date = db.RegExp({
+        regexp: '^' + monthStr,
+        options: 'i'
       });
     }
 
-    const res = await query
+    const res = await db.collection('outfits')
+      .where(condition)
       .orderBy('create_time', 'desc')
       .skip(page * pageSize)
       .limit(pageSize)

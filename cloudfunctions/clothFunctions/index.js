@@ -258,17 +258,14 @@ const getClothes = async (data = {}) => {
   const pageSize = Number(data.pageSize || 10);
 
   try {
-    let query = db.collection('clothes').where({
-      _openid: OPENID
-    });
+    let condition = { _openid: OPENID };
 
     if (category && category !== '全部') {
-      query = query.where({
-        category: category
-      });
+      condition.category = category;
     }
 
-    const res = await query
+    const res = await db.collection('clothes')
+      .where(condition)
       .orderBy('create_time', 'desc')
       .skip(page * pageSize)
       .limit(pageSize)
