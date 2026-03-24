@@ -82,23 +82,23 @@
   <!-- Custom Tab Bar -->
   <view class="tab-bar glass">
     <view class="tab-item" bindtap="switchTab" data-path="/pages/wardrobe/wardrobe">
-      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/999999/shirt.png"></image>
+      <image class="tab-icon" src="../images/tabbar/shirt.png"></image>
       <text class="tab-text">衣橱</text>
     </view>
     <view class="tab-item active">
-      <image class="tab-icon" src="https://img.icons8.com/glyph-neue/50/8A2BE2/fantasy--v1.png"></image>
+      <image class="tab-icon" src="../images/tabbar/fantasy_active.png"></image>
       <text class="tab-text">画布</text>
     </view>
     <view class="tab-item" bindtap="switchTab" data-path="/pages/looks/looks">
-      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/999999/hanger.png"></image>
+      <image class="tab-icon" src="../images/tabbar/hanger.png"></image>
       <text class="tab-text">穿搭</text>
     </view>
     <view class="tab-item" bindtap="switchTab" data-path="/pages/calendar/calendar">
-      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/999999/calendar.png"></image>
+      <image class="tab-icon" src="../images/tabbar/calendar.png"></image>
       <text class="tab-text">日历</text>
     </view>
     <view class="tab-item" bindtap="switchTab" data-path="/pages/profile/profile">
-      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/999999/user.png"></image>
+      <image class="tab-icon" src="../images/tabbar/user.png"></image>
       <text class="tab-text">我的</text>
     </view>
   </view>

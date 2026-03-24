@@ -60,23 +60,23 @@
   <!-- Custom Tab Bar -->
   <view class="tab-bar glass">
     <view class="tab-item" bindtap="switchTab" data-path="/pages/wardrobe/wardrobe">
-      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/999999/shirt.png"></image>
+      <image class="tab-icon" src="../images/tabbar/shirt.png"></image>
       <text class="tab-text">衣橱</text>
     </view>
     <view class="tab-item" bindtap="switchTab" data-path="/pages/canvas/canvas">
-      <image class="tab-icon" src="https://img.icons8.com/glyph-neue/50/999999/fantasy--v1.png"></image>
+      <image class="tab-icon" src="../images/tabbar/fantasy.png"></image>
       <text class="tab-text">画布</text>
     </view>
     <view class="tab-item" bindtap="switchTab" data-path="/pages/looks/looks">
-      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/999999/hanger.png"></image>
+      <image class="tab-icon" src="../images/tabbar/hanger.png"></image>
       <text class="tab-text">穿搭</text>
     </view>
     <view class="tab-item" bindtap="switchTab" data-path="/pages/calendar/calendar">
-      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/999999/calendar.png"></image>
+      <image class="tab-icon" src="../images/tabbar/calendar.png"></image>
       <text class="tab-text">日历</text>
     </view>
     <view class="tab-item active">
-      <image class="tab-icon" src="https://img.icons8.com/ios-glyphs/50/8A2BE2/user.png"></image>
+      <image class="tab-icon" src="../images/tabbar/user_active.png"></image>
       <text class="tab-text">我的</text>
     </view>
   </view>
@@ -94,7 +94,7 @@
       <view class="edit-section">
         <view class="edit-label">设置头像</view>
         <button class="avatar-wrapper" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
-          <image class="edit-avatar-img" src="{{tempAvatarUrl || avatarUrl}}"></image>
+          <image class="edit-avatar-img" mode='aspectFill' src="{{tempAvatarUrl || avatarUrl}}"></image>
           <view class="avatar-edit-tag">更换头像</view>
         </button>
       </view>
