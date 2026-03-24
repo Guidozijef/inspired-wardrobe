@@ -29,7 +29,7 @@
 .stats-num {
   font-size: 18px;
   font-weight: 800;
-  color: #1E293B;
+  color: #8A2BE2;
   margin-bottom: 4px;
 }
 
