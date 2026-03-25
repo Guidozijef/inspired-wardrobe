@@ -54,16 +54,22 @@
     </view>
     <view class="random-card">
       <view class="slot-machine">
-        <view class="slot-window outfit-window">
+        <view class="slot-window outfit-window" wx:if="{{allOutfits && allOutfits.length > 0}}">
           <view class="slot-reel {{isGenerating ? 'spinning-outfit' : 'transitioning'}}" style="transform: translateY(-{{isGenerating ? 0 : slotIndex * 200}}px)">
             <view class="slot-item outfit-item" wx:for="{{slotItems}}" wx:key="index">
               <image class="slot-item-img outfit-item-img" src="{{item.url}}" mode="aspectFill"></image>
             </view>
           </view>
         </view>
+        <view class="slot-window outfit-window" wx:else style="display: flex; align-items: center; justify-content: center; background-color: #F8FAFC; border: 2px dashed #CBD5E1;">
+          <text style="font-size: 60px; filter: grayscale(100%); opacity: 0.5;">🧥</text>
+        </view>
       </view>
       <view class="random-info" wx:if="{{randomLook}}">
         <text class="random-title">{{randomLook.title}}</text>
+      </view>
+      <view class="random-info" wx:elif="{{!allOutfits || allOutfits.length === 0}}">
+        <text class="random-title" style="color: #94A3B8; font-size: 14px; font-weight: normal;">快去画布搭配属于你的第一套穿搭吧</text>
       </view>
       <view class="random-actions">
         <button class="random-btn primary-btn" bindtap="generateRandomLook">

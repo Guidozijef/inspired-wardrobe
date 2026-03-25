@@ -52,7 +52,10 @@ Page({
     }).then(res => {
       if (res.result && res.result.success) {
         const allOutfits = res.result.data || [];
-        if (allOutfits.length === 0) return;
+        if (allOutfits.length === 0) {
+          this.setData({ allOutfits: [], slotItems: [] });
+          return;
+        }
 
         const outfitsMapped = allOutfits
           .filter(i => i.preview_url)
@@ -193,7 +196,11 @@ Page({
   },
 
   shareWeiXin() {
-    const { slotItems, slotIndex } = this.data;
+    const { slotItems, slotIndex, allOutfits } = this.data;
+    if (!allOutfits || allOutfits.length === 0) {
+      wx.showToast({ title: '快去添加穿搭后再分享吧', icon: 'none' });
+      return;
+    }
     if (!slotItems.length || this.data.isGenerating) return;
 
     const selectedItems = [

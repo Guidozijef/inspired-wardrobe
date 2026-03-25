@@ -23,11 +23,12 @@ Page({
       { id: 'grad3', type: 'gradient', colors: ['#84fab0', '#8fd3f4'], css: 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)' },
       { id: 'grad4', type: 'gradient', colors: ['#fccb90', '#d57eeb'], css: 'linear-gradient(135deg, #fccb90 0%, #d57eeb 100%)' },
       { id: 'grad5', type: 'gradient', colors: ['#e0c3fc', '#8ec5fc'], css: 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)' },
+      { id: 'grid1', type: 'solid', value: '#FFFFFF', css: 'linear-gradient(#F0F0F0 1px, transparent 1px), linear-gradient(90deg, #F0F0F0 1px, transparent 1px)', grid: true }, // 极简网格
+      { id: 'grid2', type: 'solid', value: '#FFFFFF', css: 'radial-gradient(#D1D1D1 1.5px, transparent 1.5px)', dots: true }, // 极简点阵
       { id: 'img1', type: 'image', value: '/assets/backgrounds/bg_light_wood.png', css: 'url(/assets/backgrounds/bg_light_wood.png)' },
       { id: 'img2', type: 'image', value: '/assets/backgrounds/bg_beige_linen.png', css: 'url(/assets/backgrounds/bg_beige_linen.png)' },
       { id: 'img3', type: 'image', value: '/assets/backgrounds/bg_soft_marble.png', css: 'url(/assets/backgrounds/bg_soft_marble.png)' },
-      { id: 'grid1', type: 'solid', value: '#FFFFFF', css: 'linear-gradient(#F0F0F0 1px, transparent 1px), linear-gradient(90deg, #F0F0F0 1px, transparent 1px)', grid: true }, // 极简网格
-      { id: 'grid2', type: 'solid', value: '#FFFFFF', css: 'radial-gradient(#D1D1D1 1.5px, transparent 1.5px)', dots: true }, // 极简点阵
+
     ],
     selectedBg: { id: 'bg1', type: 'solid', value: '#F2F2F7', css: '#F2F2F7' },
     textColors: [
