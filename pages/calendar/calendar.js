@@ -9,15 +9,9 @@ Page({
     dailyLooks: {},
     currentDailyLook: null,
     // 扭蛋机主数据
-    allTops: [],
-    allBottoms: [],
-    allShoes: [],
-    slot1Items: [], 
-    slot2Items: [],
-    slot3Items: [],
-    slot1Index: 0,
-    slot2Index: 0,
-    slot3Index: 0,
+    allOutfits: [],
+    slotItems: [], 
+    slotIndex: 0,
     isGenerating: false,
     randomLook: null
   },
@@ -50,25 +44,26 @@ Page({
     this.fetchOutfits();
   },
 
-  // 获取并缓存所有单品数据
+  // 获取并缓存所有穿搭数据
   prepareSlotItems() {
     wx.cloud.callFunction({
-      name: 'clothFunctions',
-      data: { type: 'getRandomItems' }
+      name: 'outfitFunctions',
+      data: { type: 'getOutfits', data: { page: 0, pageSize: 100 } }
     }).then(res => {
       if (res.result && res.result.success) {
-        const all = res.result.data || [];
-        if (all.length === 0) return;
+        const allOutfits = res.result.data || [];
+        if (allOutfits.length === 0) return;
 
-        const tops = all.filter(i => i.category === '上装').map(i => ({ url: i.image_url, name: i.name }));
-        const bottoms = all.filter(i => i.category === '下装').map(i => ({ url: i.image_url, name: i.name }));
-        const shoes = all.filter(i => i.category === '鞋履').map(i => ({ url: i.image_url, name: i.name }));
-        const allMapped = all.map(i => ({ url: i.image_url, name: i.name }));
+        const outfitsMapped = allOutfits
+          .filter(i => i.preview_url)
+          .map(i => ({ 
+            url: i.preview_url, 
+            name: i.title || '日常穿搭',
+            id: i._id 
+          }));
         
         this.setData({
-          allTops: tops.length > 0 ? tops : allMapped,
-          allBottoms: bottoms.length > 0 ? bottoms : allMapped,
-          allShoes: shoes.length > 0 ? shoes : allMapped
+          allOutfits: outfitsMapped
         }, () => {
           this.refreshSlotDisplay();
         });
@@ -77,63 +72,48 @@ Page({
   },
 
   refreshSlotDisplay() {
-    const { allTops, allBottoms, allShoes } = this.data;
+    const { allOutfits } = this.data;
     const getRandomSub = (list) => {
       let sub = [];
-      for(let i=0; i<10; i++) {
+      for(let i=0; i<15; i++) {
         sub.push(list[Math.floor(Math.random() * list.length)]);
       }
       return sub;
     };
 
-    if (allTops.length > 0) {
+    if (allOutfits && allOutfits.length > 0) {
       this.setData({
-        slot1Items: getRandomSub(allTops),
-        slot2Items: getRandomSub(allBottoms),
-        slot3Items: getRandomSub(allShoes)
+        slotItems: getRandomSub(allOutfits)
       });
     }
   },
 
   generateRandomLook() {
     if (this.data.isGenerating) return;
-    const { allTops, allBottoms, allShoes } = this.data;
-    if (allTops.length === 0) {
-      wx.showToast({ title: '衣橱还是空的哦', icon: 'none' });
+    const { allOutfits } = this.data;
+    if (!allOutfits || allOutfits.length === 0) {
+      wx.showToast({ title: '还没有记录穿搭哦', icon: 'none' });
       return;
     }
 
-    const targetTop = allTops[Math.floor(Math.random() * allTops.length)];
-    const targetBottom = allBottoms[Math.floor(Math.random() * allBottoms.length)];
-    const targetShoes = allShoes[Math.floor(Math.random() * allShoes.length)];
+    const targetOutfit = allOutfits[Math.floor(Math.random() * allOutfits.length)];
 
-    const stopIdx1 = Math.floor(Math.random() * 5) + 4;
-    const stopIdx2 = Math.floor(Math.random() * 5) + 4;
-    const stopIdx3 = Math.floor(Math.random() * 5) + 4;
+    const stopIdx = Math.floor(Math.random() * 5) + 5; // e.g., 5-9
 
-    const slot1 = [...this.data.slot1Items];
-    const slot2 = [...this.data.slot2Items];
-    const slot3 = [...this.data.slot3Items];
+    const slot = [...this.data.slotItems];
     
-    slot1[stopIdx1] = targetTop;
-    slot2[stopIdx2] = targetBottom;
-    slot3[stopIdx3] = targetShoes;
+    slot[stopIdx] = targetOutfit;
 
     this.setData({
       isGenerating: true,
-      slot1Items: slot1,
-      slot2Items: slot2,
-      slot3Items: slot3
+      slotItems: slot
     });
 
     setTimeout(() => {
-      const titles = ['今日通勤推荐', '周末休闲风', '运动活力装', '约会晚宴风'];
       this.setData({
         isGenerating: false,
-        slot1Index: stopIdx1,
-        slot2Index: stopIdx2,
-        slot3Index: stopIdx3,
-        randomLook: { title: titles[Math.floor(Math.random() * titles.length)] }
+        slotIndex: stopIdx,
+        randomLook: { title: targetOutfit.name }
       });
     }, 1500);
   },
@@ -213,13 +193,11 @@ Page({
   },
 
   shareWeiXin() {
-    const { slot1Items, slot2Items, slot3Items, slot1Index, slot2Index, slot3Index } = this.data;
-    if (!slot1Items.length || this.data.isGenerating) return;
+    const { slotItems, slotIndex } = this.data;
+    if (!slotItems.length || this.data.isGenerating) return;
 
     const selectedItems = [
-      slot1Items[slot1Index].url,
-      slot2Items[slot2Index].url,
-      slot3Items[slot3Index].url
+      slotItems[slotIndex].url
     ];
 
     const itemsQuery = encodeURIComponent(selectedItems.join(','));
