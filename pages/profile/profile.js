@@ -55,8 +55,8 @@ Page({
         this.setData({
           nickName: nickName || this.data.nickName,
           avatarUrl: avatarUrl || this.data.avatarUrl,
-          clothesCount: clothesCount !== undefined ? clothesCount : 0,
-          outfitCount: outfitCount !== undefined ? outfitCount : 0,
+          clothesCount: Math.max(0, clothesCount !== undefined ? clothesCount : 0),
+          outfitCount: Math.max(0, outfitCount !== undefined ? outfitCount : 0),
           usedCutouts
         });
       }

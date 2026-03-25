@@ -137,10 +137,15 @@ async function updateUserCount(openid, field, change) {
   try {
     const userRes = await db.collection('users').where({ _openid: openid }).get();
     if (userRes.data.length > 0) {
-      // 如果用户已存在，执行增量更新
-      await db.collection('users').doc(userRes.data[0]._id).update({
+      const user = userRes.data[0];
+      const currentVal = user[field] || 0;
+      
+      // 如果用户已存在，计算新值确保不小于 0
+      const newVal = Math.max(0, currentVal + change);
+      
+      await db.collection('users').doc(user._id).update({
         data: {
-          [field]: _.inc(change),
+          [field]: newVal,
           update_time: db.serverDate()
         }
       });
