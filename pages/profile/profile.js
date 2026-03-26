@@ -14,7 +14,7 @@ Page({
     outfitCount: 0,
     clothesCount: 0,
     usedCutouts: 0,
-    totalCutouts: 5,
+    totalCutouts: 10,
     latestDate: '无'
   },
 

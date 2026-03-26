@@ -478,12 +478,12 @@ exports.main = async (event, context) => {
         }
         
         // 2. 检查次数限制 (5次)
-        if (count >= 5) {
+        if (count >= 10) {
           return {
             success: true,
             fileID: originalFileID,
             limitReached: true,
-            message: '今日 5 次 AI 自动抠图机会已用完，已为你保留原图上传。'
+            message: '今日 10 次 AI 自动抠图机会已用完，已为你保留原图上传。'
           };
         }
         
