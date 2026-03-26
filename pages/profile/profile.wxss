@@ -66,6 +66,26 @@
   border-bottom: 1px solid #F1F5F9;
 }
 
+.feedback-item {
+  position: relative;
+}
+
+.feedback-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%!important;
+  height: 100%;
+  background: transparent;
+  border-radius: 0;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+}
+
+.feedback-overlay::after {
+  border: none;
+}
+
 .menu-item:last-child {
   border-bottom: none;
 }
