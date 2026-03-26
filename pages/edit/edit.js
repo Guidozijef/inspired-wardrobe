@@ -1,6 +1,74 @@
 import { takePhoto, chooseImage } from '../utils'
 import { CATEGORIES, MATERIALS, PATTERNS, SIZES, BRANDS } from '../constants'
 
+const CATEGORY_OPTIONS = [
+  { value: '上衣', label: '👕 上衣' },
+  { value: '裤子', label: '👖 裤子' },
+  { value: '连衣裙', label: '👗 连衣裙' },
+  { value: '裙子', label: '🩱 裙子' },
+  { value: '外套', label: '🧥 外套' },
+  { value: '鞋子', label: '👟 鞋子' },
+  { value: '包包', label: '👜 包包' },
+  { value: '配饰', label: '🧣 配饰' },
+  { value: '首饰', label: '💍 首饰' },
+  { value: '其他时装', label: '✨ 其他时装' }
+]
+
+const MATERIAL_OPTIONS = [
+  { value: '棉', label: '🌿 棉' },
+  { value: '麻', label: '🪴 麻' },
+  { value: '丝绸', label: '🪞 丝绸' },
+  { value: '羊毛', label: '🐑 羊毛' },
+  { value: '聚酯纤维', label: '🧵 聚酯纤维' },
+  { value: '尼龙', label: '🎒 尼龙' },
+  { value: '皮革', label: '🪵 皮革' },
+  { value: '牛仔', label: '👖 牛仔' },
+  { value: '混纺', label: '🧶 混纺' },
+  { value: '其他', label: '✨ 其他' }
+]
+
+const PATTERN_OPTIONS = [
+  { value: '纯色', label: '🎨 纯色' },
+  { value: '条纹', label: '📏 条纹' },
+  { value: '格纹', label: '🪟 格纹' },
+  { value: '波点', label: '⚪ 波点' },
+  { value: '印花', label: '🌺 印花' },
+  { value: '碎花', label: '🌸 碎花' },
+  { value: '几何', label: '🔷 几何' },
+  { value: '拼色', label: '🧩 拼色' },
+  { value: '其他', label: '✨ 其他' }
+]
+
+const SIZE_OPTIONS = [
+  { value: 'XS', label: '📏 XS' },
+  { value: 'S', label: '📏 S' },
+  { value: 'M', label: '📏 M' },
+  { value: 'L', label: '📏 L' },
+  { value: 'XL', label: '📏 XL' },
+  { value: 'XXL', label: '📏 XXL' },
+  { value: '均码', label: '🪡 均码' },
+  { value: '其他', label: '✨ 其他' }
+]
+
+const SEASON_OPTIONS = [
+  { value: '春季', label: '🌷 春季', active: false },
+  { value: '夏季', label: '☀️ 夏季', active: false },
+  { value: '秋季', label: '🍂 秋季', active: false },
+  { value: '冬季', label: '❄️ 冬季', active: false }
+]
+
+const OCCASION_OPTIONS = [
+  { value: '职场通勤', label: '💼 职场通勤', active: false },
+  { value: '约会聚餐', label: '💕 约会聚餐', active: false },
+  { value: '周末休闲', label: '🏖 周末休闲', active: false },
+  { value: '逛街拍照', label: '📷 逛街拍照', active: false },
+  { value: '旅行度假', label: '✈️ 旅行度假', active: false },
+  { value: '运动出汗', label: '🏃 运动出汗', active: false },
+  { value: '聚会派对', label: '🎉 聚会派对', active: false },
+  { value: '居家睡衣', label: '🛋 居家睡衣', active: false },
+  { value: '校园上课', label: '🎓 校园上课', active: false }
+]
+
 Page({
   data: {
     editingId: '',
@@ -14,9 +82,10 @@ Page({
     note: '',
     showMore: false,
 
-    materials: MATERIALS,
-    patterns: PATTERNS,
-    sizes: SIZES,
+    categories: CATEGORY_OPTIONS,
+    materials: MATERIAL_OPTIONS,
+    patterns: PATTERN_OPTIONS,
+    sizes: SIZE_OPTIONS,
     brands: BRANDS,
 
     colors: [
@@ -37,23 +106,8 @@ Page({
     hasCutout: false,
     showLimitModal: false,
 
-    seasons: [
-      { name: '🌷 春季', active: false },
-      { name: '☀️ 夏季', active: false },
-      { name: '🍂 秋季', active: false },
-      { name: '❄️ 冬季', active: false }
-    ],
-    occasions: [
-      { name: '💼 职场通勤', active: false },
-      { name: '💕 约会聚餐', active: false },
-      { name: '🏖 周末休闲', active: false },
-      { name: '📷 逛街拍照', active: false },
-      { name: '✈️ 旅行度假', active: false },
-      { name: '🏃 运动出汗', active: false },
-      { name: '🎉 聚会派对', active: false },
-      { name: '🛋 居家睡衣', active: false },
-      { name: '🎓 校园上课', active: false }
-    ]
+    seasons: SEASON_OPTIONS,
+    occasions: OCCASION_OPTIONS
   },
 
   async onLoad(options) {
@@ -81,11 +135,15 @@ Page({
         const item = res.result.data || {}
         const seasons = this.data.seasons.map((season) => ({
           ...season,
-          active: Array.isArray(item.seasons) && item.seasons.includes(season.name)
+          active: Array.isArray(item.seasons) && (
+            item.seasons.includes(season.value) || item.seasons.includes(season.label)
+          )
         }))
         const occasions = this.data.occasions.map((occasion) => ({
           ...occasion,
-          active: Array.isArray(item.occasions) && item.occasions.includes(occasion.name)
+          active: Array.isArray(item.occasions) && (
+            item.occasions.includes(occasion.value) || item.occasions.includes(occasion.label)
+          )
         }))
         const mainColor = item.color || '#FFFFFF'
 
@@ -301,8 +359,8 @@ Page({
     try {
       wx.showLoading({ title: '保存中...', mask: true })
 
-      const activeSeasons = seasons.filter((item) => item.active).map((item) => item.name)
-      const activeOccasions = occasions.filter((item) => item.active).map((item) => item.name)
+      const activeSeasons = seasons.filter((item) => item.active).map((item) => item.value)
+      const activeOccasions = occasions.filter((item) => item.active).map((item) => item.value)
       const mainColor = colors[activeColor] ? colors[activeColor].hex : ''
       const isEdit = !!editingId
 

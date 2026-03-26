@@ -34,11 +34,19 @@
         />
       </view>
 
-      <view class="form-row" bindtap="selectCategory">
-        <text class="label">分类</text>
-        <view class="value-group">
-          <text class="value">{{category}}</text>
-          <text class="arrow">›</text>
+      <view class="form-card">
+        <view class="card-header">
+          <text class="label">分类</text>
+        </view>
+        <view class="tag-list">
+          <view
+            wx:for="{{categories}}"
+            wx:key="index"
+            class="tag-btn {{category === item.value ? 'active' : ''}}"
+            bindtap="toggleTag"
+            data-type="category"
+            data-val="{{item.value}}"
+          >{{item.label}}</view>
         </view>
       </view>
 
@@ -73,7 +81,7 @@
             class="tag-btn {{item.active ? 'active' : ''}}"
             bindtap="toggleSeason"
             data-index="{{index}}"
-          >{{item.name}}</view>
+          >{{item.label}}</view>
         </view>
       </view>
 
@@ -89,7 +97,7 @@
             class="tag-btn {{item.active ? 'active' : ''}}"
             bindtap="toggleOccasion"
             data-index="{{index}}"
-          >{{item.name}}</view>
+          >{{item.label}}</view>
         </view>
       </view>
 
@@ -126,11 +134,11 @@
             <view
               wx:for="{{materials}}"
               wx:key="index"
-              class="tag-btn {{material === item ? 'active' : ''}}"
+              class="tag-btn {{material === item.value ? 'active' : ''}}"
               bindtap="toggleTag"
               data-type="material"
-              data-val="{{item}}"
-            >{{item}}</view>
+              data-val="{{item.value}}"
+            >{{item.label}}</view>
           </view>
         </view>
 
@@ -142,11 +150,11 @@
             <view
               wx:for="{{patterns}}"
               wx:key="index"
-              class="tag-btn {{pattern === item ? 'active' : ''}}"
+              class="tag-btn {{pattern === item.value ? 'active' : ''}}"
               bindtap="toggleTag"
               data-type="pattern"
-              data-val="{{item}}"
-            >{{item}}</view>
+              data-val="{{item.value}}"
+            >{{item.label}}</view>
           </view>
         </view>
 
@@ -158,11 +166,11 @@
             <view
               wx:for="{{sizes}}"
               wx:key="index"
-              class="tag-btn {{size === item ? 'active' : ''}}"
+              class="tag-btn {{size === item.value ? 'active' : ''}}"
               bindtap="toggleTag"
               data-type="size"
-              data-val="{{item}}"
-            >{{item}}</view>
+              data-val="{{item.value}}"
+            >{{item.label}}</view>
           </view>
         </view>
 
