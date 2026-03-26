@@ -23,11 +23,44 @@
   font-size: 14px;
   color: #333333;
 }
+
+.value-with-icon {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.value-icon-badge {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.value-icon {
+  font-size: 12px;
+  font-weight: 700;
+  color: #8A2BE2;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+}
+
+.value-icon-image {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
 .value-input-placeholder {
   color: #C0C0C0;
 }
 .form-card { background-color: #ffffff; border-radius: 16px; padding: 16px; }
-.card-header { margin-bottom: 12px; display: flex; align-items: baseline; }
+.card-header { margin-bottom: 12px; display: flex; align-items: center; }
 .sub-label { font-size: 12px; color: #999999; margin-left: 4px; }
 .color-list { display: flex; gap: 12px; }
 .color-item { width: 32px; height: 32px; border-radius: 16px; }
@@ -35,6 +68,11 @@
 .tag-list { display: flex; flex-wrap: wrap; gap: 8px; }
 .tag-btn { padding: 5px 9px; background-color: #F2F2F7; color: #666666; font-size: 14px; font-weight: 500; border-radius: 20px; }
 .tag-btn.active { background-color: #F3E8FF; color: #8A2BE2; border: 1px solid rgba(138,43,226,0.3); font-weight: bold; }
+.label-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
 .bottom-bar { padding: 20px; padding-bottom: 40px; background-color: #F2F2F7; margin-top: auto; display: flex; gap: 12px; }
 .action-btn { flex: 1; padding: 14px 0; font-size: 16px; font-weight: bold; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
 .primary-btn { background-color: #8A2BE2; color: white; box-shadow: 0 4px 12px rgba(138,43,226,0.3); }
@@ -49,12 +87,39 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 5px;
   font-weight: bold;
+  height: 24px;
+  padding: 2px 0;
 }
-.more-toggle .arrow {
-  display: flex;
+
+.more-toggle-content {
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 24px;
+}
+
+.more-toggle-text {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  line-height: 24px;
+}
+
+.more-toggle-arrow {
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #8A2BE2;
+  border-bottom: 2px solid #8A2BE2;
+  transform: rotate(45deg);
+  transform-origin: center;
+  margin-top: -2px;
+}
+
+.more-toggle-arrow.expanded {
+  transform: rotate(225deg);
+  margin-top: 2px;
 }
 
 .more-fields {

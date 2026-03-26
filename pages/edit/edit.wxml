@@ -23,7 +23,12 @@
 
     <view class="form-group">
       <view class="form-row">
-        <text class="label">单品名称</text>
+        <view class="label-with-icon">
+          <view class="value-icon-badge">
+            <image class="value-icon-image" src="/assets/icons/field-tag.svg" mode="aspectFit" />
+          </view>
+          <text class="label">单品名称</text>
+        </view>
         <input
           class="value-input"
           type="text"
@@ -36,7 +41,12 @@
 
       <view class="form-card">
         <view class="card-header">
-          <text class="label">分类</text>
+          <view class="label-with-icon">
+            <view class="value-icon-badge">
+              <image class="value-icon-image" src="/assets/icons/field-grid.svg" mode="aspectFit" />
+            </view>
+            <text class="label">分类</text>
+          </view>
         </view>
         <view class="tag-list">
           <view
@@ -52,8 +62,13 @@
 
       <view class="form-card">
         <view class="card-header">
-          <text class="label">主色调</text>
-          <text class="sub-label">自动识别后可继续添加</text>
+          <view class="label-with-icon">
+            <view class="value-icon-badge">
+              <image class="value-icon-image" src="/assets/icons/field-palette.svg" mode="aspectFit" />
+            </view>
+            <text class="label">主色调</text>
+          </view>
+          <text class="sub-label">(AI自动识别)</text>
         </view>
         <view class="color-list">
           <view
@@ -72,7 +87,12 @@
 
       <view class="form-card">
         <view class="card-header">
-          <text class="label">适合季节</text>
+          <view class="label-with-icon">
+            <view class="value-icon-badge">
+              <image class="value-icon-image" src="/assets/icons/field-season.svg" mode="aspectFit" />
+            </view>
+            <text class="label">适合季节</text>
+          </view>
         </view>
         <view class="tag-list">
           <view
@@ -87,8 +107,13 @@
 
       <view class="form-card">
         <view class="card-header">
-          <text class="label">穿着场合</text>
-          <text class="sub-label">可多选</text>
+          <view class="label-with-icon">
+            <view class="value-icon-badge">
+              <image class="value-icon-image" src="/assets/icons/field-calendar.svg" mode="aspectFit" />
+            </view>
+            <text class="label">穿着场合</text>
+          </view>
+          <text class="sub-label">(可多选)</text>
         </view>
         <view class="tag-list">
           <view
@@ -102,33 +127,52 @@
       </view>
 
       <view class="form-row">
-        <text class="label">价格</text>
-        <input
-          class="value-input"
-          type="digit"
-          placeholder="输入价格"
-          value="{{price}}"
-          bindinput="onPriceInput"
-          placeholder-class="value-input-placeholder"
-        />
+        <view class="label-with-icon">
+          <view class="value-icon-badge">
+            <image class="value-icon-image" src="/assets/icons/field-yuan.svg" mode="aspectFit" />
+          </view>
+          <text class="label">价格</text>
+        </view>
+        <view class="value-with-icon">
+          <input
+            class="value-input"
+            type="digit"
+            placeholder="输入价格"
+            value="{{price}}"
+            bindinput="onPriceInput"
+            placeholder-class="value-input-placeholder"
+          />
+        </view>
       </view>
 
       <view class="form-row">
-        <text class="label">备注</text>
-        <input
-          class="value-input"
-          type="text"
-          placeholder="添加备注"
-          value="{{note}}"
-          bindinput="onNoteInput"
-          placeholder-class="value-input-placeholder"
-        />
+        <view class="label-with-icon">
+          <view class="value-icon-badge">
+            <image class="value-icon-image" src="/assets/icons/field-note.svg" mode="aspectFit" />
+          </view>
+          <text class="label">备注</text>
+        </view>
+        <view class="value-with-icon">
+          <input
+            class="value-input"
+            type="text"
+            placeholder="添加备注"
+            value="{{note}}"
+            bindinput="onNoteInput"
+            placeholder-class="value-input-placeholder"
+          />
+        </view>
       </view>
 
       <view class="more-fields" wx:if="{{showMore}}">
         <view class="form-card">
           <view class="card-header">
-            <text class="label">材质</text>
+            <view class="label-with-icon">
+              <view class="value-icon-badge">
+                <image class="value-icon-image" src="/assets/icons/field-fabric.svg" mode="aspectFit" />
+              </view>
+              <text class="label">材质</text>
+            </view>
           </view>
           <view class="tag-list">
             <view
@@ -144,7 +188,12 @@
 
         <view class="form-card">
           <view class="card-header">
-            <text class="label">花纹</text>
+            <view class="label-with-icon">
+              <view class="value-icon-badge">
+                <image class="value-icon-image" src="/assets/icons/field-pattern.svg" mode="aspectFit" />
+              </view>
+              <text class="label">花纹</text>
+            </view>
           </view>
           <view class="tag-list">
             <view
@@ -160,7 +209,12 @@
 
         <view class="form-card">
           <view class="card-header">
-            <text class="label">尺码</text>
+            <view class="label-with-icon">
+              <view class="value-icon-badge">
+                <image class="value-icon-image" src="/assets/icons/field-ruler.svg" mode="aspectFit" />
+              </view>
+              <text class="label">尺码</text>
+            </view>
           </view>
           <view class="tag-list">
             <view
@@ -175,21 +229,30 @@
         </view>
 
         <view class="form-row">
-          <text class="label">品牌</text>
-          <input
-            class="value-input"
-            type="text"
-            placeholder="输入品牌"
-            value="{{brand}}"
-            bindinput="onBrandInput"
-            placeholder-class="value-input-placeholder"
-          />
+          <view class="label-with-icon">
+            <view class="value-icon-badge">
+              <image class="value-icon-image" src="/assets/icons/field-brand.svg" mode="aspectFit" />
+            </view>
+            <text class="label">品牌</text>
+          </view>
+          <view class="value-with-icon">
+            <input
+              class="value-input"
+              type="text"
+              placeholder="输入品牌"
+              value="{{brand}}"
+              bindinput="onBrandInput"
+              placeholder-class="value-input-placeholder"
+            />
+          </view>
         </view>
       </view>
 
       <view class="more-toggle" bindtap="toggleMore">
-        <text>{{showMore ? '收起更多信息' : '查看更多信息'}}</text>
-        <text class="arrow">{{showMore ? '︿' : '﹀'}}</text>
+        <view class="more-toggle-content">
+          <view class="more-toggle-text">{{showMore ? '收起更多信息' : '查看更多信息'}}</view>
+          <view class="more-toggle-arrow {{showMore ? 'expanded' : ''}}"></view>
+        </view>
       </view>
 
     </view>
@@ -198,7 +261,12 @@
   <view wx:if="{{colorPickerVisible}}" class="picker-mask" catchtouchmove="stopTouchMove">
     <view class="picker-panel">
       <view class="picker-header">
-        <text class="label">选择主色调</text>
+        <view class="label-with-icon">
+          <view class="value-icon-badge">
+            <image class="value-icon-image" src="/assets/icons/field-picker.svg" mode="aspectFit" />
+          </view>
+          <text class="label">选择主色调</text>
+        </view>
       </view>
 
       <view class="picker-preview" style="background-color: {{tempColor}};"></view>
