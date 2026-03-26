@@ -1,74 +1,116 @@
 <view class="container">
-  <view class="header" style="padding-top: 90px; padding-bottom: 10px;">
-    <view class="user-info" bindtap="editProfile">
-      <image class="avatar" src="{{avatarUrl}}" mode="aspectFill"></image>
-      <view class="user-details">
-        <text class="user-name">{{nickName}}</text>
-        <text class="user-id" wx:if="{{openid}}">ID: {{openid}}</text>
-        <text class="user-desc">{{nickName}} 的个人时尚衣橱</text>
-      </view>
-    </view>
+  <view class="page-glow glow-top"></view>
+  <view class="page-glow glow-middle"></view>
 
-    <view class="stats-bar">
-      <view class="stats-item">
-        <text class="stats-num">{{clothesCount}}</text>
-        <text class="stats-label">单品</text>
+  <view class="hero-shell" style="padding-top: {{heroTopPadding}}px;">
+    <view class="hero-card">
+      <view class="hero-top">
+        <view class="avatar-ring" bindtap="editProfile">
+          <image class="avatar" src="{{avatarUrl}}" mode="aspectFill"></image>
+        </view>
+        <view class="hero-copy">
+          <view class="hero-text" bindtap="editProfile">
+            <text class="hero-kicker">PERSONAL WARDROBE</text>
+            <text class="user-name">{{nickName}}</text>
+            <text class="user-desc">{{nickName}} 的个人时尚衣橱</text>
+          </view>
+          <view class="user-id" wx:if="{{openid}}" catchtap="copyUserId">ID · {{openid}}</view>
+        </view>
       </view>
-      <view class="stats-divider"></view>
-      <view class="stats-item">
-        <text class="stats-num">{{outfitCount}}</text>
-        <text class="stats-label">搭配</text>
-      </view>
-      <view class="stats-divider"></view>
-      <view class="stats-item">
-        <text class="stats-num">{{usedCutouts}} / {{totalCutouts}}</text>
-        <text class="stats-label">今日 AI 抠图</text>
+
+      <view class="stats-card">
+        <view class="stats-item">
+          <text class="stats-num">{{clothesCount}}</text>
+          <text class="stats-label">单品总数</text>
+        </view>
+        <view class="stats-divider"></view>
+        <view class="stats-item">
+          <text class="stats-num">{{outfitCount}}</text>
+          <text class="stats-label">搭配灵感</text>
+        </view>
+        <view class="stats-divider"></view>
+        <view class="stats-item">
+          <text class="stats-num">{{usedCutouts}}/{{totalCutouts}}</text>
+          <text class="stats-label">AI 抠图</text>
+        </view>
       </view>
     </view>
   </view>
 
   <view class="content-scroll">
-    <view class="menu-list">
-      <view class="menu-item" bindtap="editProfile">
-        <view class="menu-left">
-          <image class="menu-icon" src="https://img.icons8.com/ios-glyphs/50/8A2BE2/user-male-circle.png"></image>
-          <text class="menu-text">修改个人信息</text>
-        </view>
-        <text class="menu-arrow">›</text>
+    <view class="menu-panel">
+      <view class="panel-head">
+        <text class="panel-title">账号与服务</text>
+        <text class="panel-subtitle">个人信息与服务入口</text>
       </view>
 
-      <view class="menu-item">
-        <view class="menu-left">
-          <image class="menu-icon" src="https://img.icons8.com/ios-glyphs/50/8A2BE2/settings.png"></image>
-          <text class="menu-text">系统设置</text>
+      <view class="menu-list">
+        <view class="menu-item" bindtap="editProfile">
+          <view class="menu-left">
+            <view class="menu-icon-wrap">
+              <image class="menu-icon" src="https://img.icons8.com/ios-glyphs/50/8A2BE2/user-male-circle.png"></image>
+            </view>
+            <view class="menu-copy">
+              <text class="menu-text">修改个人信息</text>
+              <text class="menu-desc">头像与昵称</text>
+            </view>
+          </view>
+          <text class="menu-arrow">›</text>
         </view>
-        <text class="menu-arrow">›</text>
-      </view>
 
-      <view class="menu-item feedback-item">
-        <view class="menu-left">
-          <image class="menu-icon" src="https://img.icons8.com/ios-glyphs/50/8A2BE2/topic.png"></image>
-          <text class="menu-text">意见反馈</text>
+        <view class="menu-item">
+          <view class="menu-left">
+            <view class="menu-icon-wrap">
+              <image class="menu-icon" src="https://img.icons8.com/ios-glyphs/50/8A2BE2/settings.png"></image>
+            </view>
+            <view class="menu-copy">
+              <text class="menu-text">系统设置</text>
+              <text class="menu-desc">版本与配置</text>
+            </view>
+          </view>
+          <text class="menu-arrow">›</text>
         </view>
-        <text class="menu-arrow">›</text>
-        <button class="feedback-overlay" open-type="feedback" hover-class="none"></button>
-      </view>
 
-      <view class="menu-item feedback-item">
-        <view class="menu-left">
-          <image class="menu-icon" src="https://img.icons8.com/ios-glyphs/50/8A2BE2/customer-support.png"></image>
-          <text class="menu-text">联系客服</text>
+        <view class="menu-item feedback-item">
+          <view class="menu-left">
+            <view class="menu-icon-wrap">
+              <image class="menu-icon" src="https://img.icons8.com/ios-glyphs/50/8A2BE2/topic.png"></image>
+            </view>
+            <view class="menu-copy">
+              <text class="menu-text">意见反馈</text>
+              <text class="menu-desc">功能建议与问题反馈</text>
+            </view>
+          </view>
+          <text class="menu-arrow">›</text>
+          <button class="feedback-overlay" open-type="feedback" hover-class="none"></button>
         </view>
-        <text class="menu-arrow">›</text>
-        <button class="feedback-overlay" open-type="contact" hover-class="none"></button>
-      </view>
 
-      <view class="menu-item">
-        <view class="menu-left">
-          <image class="menu-icon" src="https://img.icons8.com/ios-glyphs/50/8A2BE2/info.png"></image>
-          <text class="menu-text">关于我们</text>
+        <view class="menu-item feedback-item">
+          <view class="menu-left">
+            <view class="menu-icon-wrap">
+              <image class="menu-icon" src="https://img.icons8.com/ios-glyphs/50/8A2BE2/customer-support.png"></image>
+            </view>
+            <view class="menu-copy">
+              <text class="menu-text">联系客服</text>
+              <text class="menu-desc">微信原生客服</text>
+            </view>
+          </view>
+          <text class="menu-arrow">›</text>
+          <button class="feedback-overlay" open-type="contact" hover-class="none"></button>
         </view>
-        <text class="menu-arrow">›</text>
+
+        <view class="menu-item">
+          <view class="menu-left">
+            <view class="menu-icon-wrap">
+              <image class="menu-icon" src="https://img.icons8.com/ios-glyphs/50/8A2BE2/info.png"></image>
+            </view>
+            <view class="menu-copy">
+              <text class="menu-text">关于我们</text>
+              <text class="menu-desc">产品介绍</text>
+            </view>
+          </view>
+          <text class="menu-arrow">›</text>
+        </view>
       </view>
     </view>
   </view>

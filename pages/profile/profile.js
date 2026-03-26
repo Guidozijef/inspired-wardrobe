@@ -4,6 +4,7 @@ Page({
   data: {
     statusBarHeight: 20,
     navBarHeight: 44,
+    heroTopPadding: 64,
     openid: '',
     nickName: 'The Curator',
     avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop',
@@ -26,10 +27,12 @@ Page({
     } catch (e) {}
     
     const navBarHeight = menuButton ? (menuButton.top - sysInfo.statusBarHeight) * 2 + menuButton.height : 44;
+    const heroTopPadding = menuButton ? Math.ceil(menuButton.bottom + 16) : sysInfo.statusBarHeight + navBarHeight + 16;
     
     this.setData({
       statusBarHeight: sysInfo.statusBarHeight,
-      navBarHeight: navBarHeight
+      navBarHeight: navBarHeight,
+      heroTopPadding: heroTopPadding
     }, () => {
       this.fetchUserOpenId();   // 获取用户ID
       this.fetchUserProfile();  // 获取用户信息 (包含统计)
@@ -92,6 +95,20 @@ Page({
 
   hideEditModal() {
     this.setData({ showEditModal: false });
+  },
+
+  copyUserId() {
+    if (!this.data.openid) return;
+
+    wx.setClipboardData({
+      data: this.data.openid,
+      success: () => {
+        wx.showToast({
+          title: 'ID 已复制',
+          icon: 'success'
+        });
+      }
+    });
   },
 
   // 微信头像选择机制
