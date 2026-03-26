@@ -1,35 +1,34 @@
 <view class="container">
   <view class="nav-header" style="padding-top: 47px; height: 87px;">
     <view class="nav-btn" bindtap="goBack">
-      <text class="back-icon">‹</text> 取消
+      <text class="back-icon">‹</text>
+      <text>取消</text>
     </view>
-    <view class="nav-title" style="top: 45px; height: 50px; line-height:50px;">编辑单品</view>
+    <view class="nav-title" style="top: 45px; height: 50px; line-height: 50px;">编辑单品</view>
   </view>
 
   <view class="content">
-    <!-- AI Cutout Result -->
     <view class="cutout-box">
-      <!-- <text class="emoji-large">🧥</text> -->
-      <image src="{{ currImage }}" mode="aspectFit" style="height:240px;width: 100%;"/>
+      <image wx:if="{{currImage}}" src="{{currImage}}" mode="aspectFit" style="height: 240px; width: 100%;" />
       <view class="success-tag" wx:if="{{hasCutout}}">
         <image class="tag-icon" src="https://img.icons8.com/ios-filled/30/8A2BE2/sparkling--v1.png"></image>
         <text>AI 抠图成功</text>
       </view>
     </view>
+
     <view class="reupload-btn" bindtap="reupload">
       <image class="reupload-icon" src="https://img.icons8.com/ios-glyphs/30/007AFF/refresh.png"></image>
       <text>重新上传</text>
     </view>
 
-    <!-- Form -->
     <view class="form-group">
       <view class="form-row">
         <text class="label">单品名称</text>
-        <input 
-          class="value-input" 
-          type="text" 
-          placeholder="给这件衣服起个名字" 
-          value="{{name}}" 
+        <input
+          class="value-input"
+          type="text"
+          placeholder="给这件衣服起个名字"
+          value="{{name}}"
           bindinput="onNameInput"
           placeholder-class="value-input-placeholder"
         />
@@ -46,13 +45,13 @@
       <view class="form-card">
         <view class="card-header">
           <text class="label">主色调</text>
-          <text class="sub-label">(已自动提取)</text>
+          <text class="sub-label">自动识别后可继续添加</text>
         </view>
         <view class="color-list">
-          <view 
-            wx:for="{{colors}}" 
+          <view
+            wx:for="{{colors}}"
             wx:key="index"
-            class="color-item" 
+            class="color-item"
             style="background-color: {{item.hex}}; border: {{activeColor === index ? '2px solid #8A2BE2' : '1px solid #EEEEEE'}};"
             bindtap="switchColor"
             data-index="{{index}}"
@@ -68,8 +67,8 @@
           <text class="label">适合季节</text>
         </view>
         <view class="tag-list">
-          <view 
-            wx:for="{{seasons}}" 
+          <view
+            wx:for="{{seasons}}"
             wx:key="index"
             class="tag-btn {{item.active ? 'active' : ''}}"
             bindtap="toggleSeason"
@@ -80,11 +79,12 @@
 
       <view class="form-card">
         <view class="card-header">
-          <text class="label">穿着场合 (多选)</text>
+          <text class="label">穿着场合</text>
+          <text class="sub-label">可多选</text>
         </view>
         <view class="tag-list">
-          <view 
-            wx:for="{{occasions}}" 
+          <view
+            wx:for="{{occasions}}"
             wx:key="index"
             class="tag-btn {{item.active ? 'active' : ''}}"
             bindtap="toggleOccasion"
@@ -92,10 +92,101 @@
           >{{item.name}}</view>
         </view>
       </view>
+
+      <view class="form-row">
+        <text class="label">价格</text>
+        <input
+          class="value-input"
+          type="digit"
+          placeholder="输入价格"
+          value="{{price}}"
+          bindinput="onPriceInput"
+          placeholder-class="value-input-placeholder"
+        />
+      </view>
+
+      <view class="form-row">
+        <text class="label">备注</text>
+        <input
+          class="value-input"
+          type="text"
+          placeholder="添加备注"
+          value="{{note}}"
+          bindinput="onNoteInput"
+          placeholder-class="value-input-placeholder"
+        />
+      </view>
+
+      <view class="more-fields" wx:if="{{showMore}}">
+        <view class="form-card">
+          <view class="card-header">
+            <text class="label">材质</text>
+          </view>
+          <view class="tag-list">
+            <view
+              wx:for="{{materials}}"
+              wx:key="index"
+              class="tag-btn {{material === item ? 'active' : ''}}"
+              bindtap="toggleTag"
+              data-type="material"
+              data-val="{{item}}"
+            >{{item}}</view>
+          </view>
+        </view>
+
+        <view class="form-card">
+          <view class="card-header">
+            <text class="label">花纹</text>
+          </view>
+          <view class="tag-list">
+            <view
+              wx:for="{{patterns}}"
+              wx:key="index"
+              class="tag-btn {{pattern === item ? 'active' : ''}}"
+              bindtap="toggleTag"
+              data-type="pattern"
+              data-val="{{item}}"
+            >{{item}}</view>
+          </view>
+        </view>
+
+        <view class="form-card">
+          <view class="card-header">
+            <text class="label">尺码</text>
+          </view>
+          <view class="tag-list">
+            <view
+              wx:for="{{sizes}}"
+              wx:key="index"
+              class="tag-btn {{size === item ? 'active' : ''}}"
+              bindtap="toggleTag"
+              data-type="size"
+              data-val="{{item}}"
+            >{{item}}</view>
+          </view>
+        </view>
+
+        <view class="form-row">
+          <text class="label">品牌</text>
+          <input
+            class="value-input"
+            type="text"
+            placeholder="输入品牌"
+            value="{{brand}}"
+            bindinput="onBrandInput"
+            placeholder-class="value-input-placeholder"
+          />
+        </view>
+      </view>
+
+      <view class="more-toggle" bindtap="toggleMore">
+        <text>{{showMore ? '收起更多信息' : '查看更多信息'}}</text>
+        <text class="arrow">{{showMore ? '︿' : '﹀'}}</text>
+      </view>
+
     </view>
   </view>
 
-  <!-- 自定义拾色器弹窗 -->
   <view wx:if="{{colorPickerVisible}}" class="picker-mask" catchtouchmove="stopTouchMove">
     <view class="picker-panel">
       <view class="picker-header">
@@ -105,7 +196,6 @@
       <view class="picker-preview" style="background-color: {{tempColor}};"></view>
       <view class="picker-hex">当前颜色：{{tempColor}}</view>
 
-      <!-- Canvas 调色盘：圆形展示 + 小圆圈标记当前颜色 -->
       <view class="color-wheel-wrapper">
         <canvas
           id="color-picker-canvas"
@@ -128,22 +218,22 @@
     </view>
   </view>
 
-  <!-- Hidden Canvas for Image Processing (Auto-Crop) -->
   <canvas type="2d" id="processCanvas" style="width: 1000px; height: 1000px; position: absolute; left: -9999px;"></canvas>
 
   <view class="bottom-bar">
     <button wx:if="{{editingId}}" class="action-btn delete-btn" bindtap="deleteItem">删除单品</button>
-    <button class="action-btn primary-btn {{editingId ? 'half-width' : ''}}" bindtap="saveItem">{{editingId ? '保存修改' : '保存单品'}}</button>
+    <button class="action-btn primary-btn {{editingId ? 'half-width' : ''}}" bindtap="saveItem">
+      {{editingId ? '保存修改' : '保存单品'}}
+    </button>
   </view>
 
-  <!-- 自定义 AI 额度用完弹窗 -->
   <view wx:if="{{showLimitModal}}" class="limit-mask" catchtouchmove="stopTouchMove">
     <view class="limit-panel">
       <view class="limit-icon-wrap">
-        <text class="limit-icon">⚡</text>
+        <text class="limit-icon">✦</text>
       </view>
-      <text class="limit-title">今日AI抠图额度已用完</text>
-      <text class="limit-desc">AI 抠图每日 10 次免费额度已用完\n明天 0 点将自动充值，如果继续上传将不会AI 抠图！</text>
+      <text class="limit-title">今日 AI 抠图额度已用完</text>
+      <text class="limit-desc">AI 抠图每天有 10 次免费额度，明天 0 点会自动恢复。继续上传时会保留原图，不再进行 AI 抠图。</text>
       <view class="limit-divider"></view>
       <view class="limit-btn" bindtap="closeLimitModal">
         <text class="limit-btn-text">我知道了</text>

@@ -41,6 +41,28 @@
 .delete-btn { background-color: #ffeef0; color: #ff4d4f; border: 1px solid #ffd8d6; }
 .half-width { flex: 1.5; }
 
+
+.more-toggle {
+  text-align: center;
+  color: #8A2BE2;
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  font-weight: bold;
+}
+.more-toggle .arrow {
+  display: flex;
+  align-items: center;
+}
+
+.more-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 /* 拾色器弹窗样式，延续现有圆角卡片 + 毛玻璃风格 */
 .picker-mask {
   position: fixed;

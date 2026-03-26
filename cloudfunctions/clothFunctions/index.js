@@ -173,7 +173,7 @@ async function updateUserCount(openid, field, change) {
 
 // 添加单品衣服
 const addCloth = async (data) => {
-  const { fileID, name, category, seasons, occasions, color } = data
+  const { fileID, name, category, seasons, occasions, color, material, pattern, size, price, brand, note } = data
   const { OPENID } = cloud.getWXContext()
 
   try {
@@ -186,6 +186,12 @@ const addCloth = async (data) => {
         seasons: seasons || [],
         occasions: occasions || [],
         color: color || '未知',
+        material: material || '',
+        pattern: pattern || '',
+        size: size || '',
+        price: price || '',
+        brand: brand || '',
+        note: note || '',
         wear_count: 0,
         is_favorite: false,
         create_time: db.serverDate(),
@@ -210,7 +216,7 @@ const addCloth = async (data) => {
 }
 // 更新单品衣服
 const updateCloth = async (data) => {
-  const { id, name, category, seasons, occasions, color, fileID } = data
+  const { id, name, category, seasons, occasions, color, fileID, material, pattern, size, price, brand, note } = data
   const { OPENID } = cloud.getWXContext()
   
   try {
@@ -220,6 +226,12 @@ const updateCloth = async (data) => {
       seasons,
       occasions,
       color,
+      material,
+      pattern,
+      size,
+      price,
+      brand,
+      note,
       update_time: db.serverDate()
     }
     
