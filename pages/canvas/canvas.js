@@ -974,22 +974,32 @@ Page({
     ctx.fillRect(0, 0, width, height)
   },
 
-  drawTextItems(ctx) {
+  drawTextItems(ctx, options = {}) {
+    const scale = options.scale || 1
+    const offsetX = options.offsetX || 0
+    const offsetY = options.offsetY || 0
+
     this.data.textItems.forEach((item) => {
       if (!String(item.content || '').trim()) return
       ctx.save()
-      const box = this.estimateTextBox(item, ctx)
-      const textX = item.align === 'center' ? item.x : item.align === 'right' ? item.x - 12 : item.x + 12
-      const textY = item.y + 8
+      const scaledItem = {
+        ...item,
+        x: item.x * scale + offsetX,
+        y: item.y * scale + offsetY,
+        size: item.size * scale
+      }
+      const box = this.estimateTextBox(scaledItem, ctx)
+      const textX = scaledItem.align === 'center' ? scaledItem.x : scaledItem.align === 'right' ? scaledItem.x - 12 : scaledItem.x + 12
+      const textY = scaledItem.y + 8
 
       ctx.translate(box.left + box.width / 2, box.top + box.height / 2)
-      if (item.rotation) {
-        ctx.rotate(item.rotation * Math.PI / 180)
+      if (scaledItem.rotation) {
+        ctx.rotate(scaledItem.rotation * Math.PI / 180)
       }
-      ctx.font = `bold ${item.size}px sans-serif`
-      ctx.fillStyle = item.color
+      ctx.font = `bold ${scaledItem.size}px sans-serif`
+      ctx.fillStyle = scaledItem.color
       ctx.textBaseline = 'top'
-      ctx.textAlign = item.align || 'left'
+      ctx.textAlign = scaledItem.align || 'left'
       ctx.shadowColor = 'rgba(0, 0, 0, 0.1)'
       ctx.shadowBlur = 4
       ctx.shadowOffsetY = 1
@@ -1012,12 +1022,17 @@ Page({
           return
         }
 
-        const width = areaRect.width
-        const height = areaRect.height
+        const areaWidth = areaRect.width
+        const areaHeight = areaRect.height
+        const exportWidth = areaWidth
+        const exportHeight = Math.round(exportWidth * 4 / 3)
+        const contentScale = Math.min(exportWidth / areaWidth, exportHeight / areaHeight)
+        const contentOffsetX = (exportWidth - areaWidth * contentScale) / 2
+        const contentOffsetY = (exportHeight - areaHeight * contentScale) / 2
 
         this.setData({
-          helperCanvasWidth: width,
-          helperCanvasHeight: height
+          helperCanvasWidth: exportWidth,
+          helperCanvasHeight: exportHeight
         }, () => {
           wx.createSelectorQuery().select('#helperCanvas').node().exec(async (res) => {
             if (!res[0] || !res[0].node) {
@@ -1030,13 +1045,13 @@ Page({
               const ctx = canvas.getContext('2d')
               const dpr = wx.getSystemInfoSync().pixelRatio
 
-              canvas.width = width * dpr
-              canvas.height = height * dpr
+              canvas.width = exportWidth * dpr
+              canvas.height = exportHeight * dpr
               ctx.setTransform(1, 0, 0, 1, 0, 0)
               ctx.scale(dpr, dpr)
-              ctx.clearRect(0, 0, width, height)
+              ctx.clearRect(0, 0, exportWidth, exportHeight)
 
-              await this.drawBackground(ctx, canvas, width, height)
+              await this.drawBackground(ctx, canvas, exportWidth, exportHeight)
 
               const itemsWithRects = this.data.canvasItems.map((item, index) => ({
                 ...item,
@@ -1065,10 +1080,10 @@ Page({
 
                 if (!img.width) continue
 
-                const rectW = item.rect.width
-                const rectH = item.rect.height
-                const relativeX = item.rect.left - areaRect.left
-                const relativeY = item.rect.top - areaRect.top
+                const rectW = item.rect.width * contentScale
+                const rectH = item.rect.height * contentScale
+                const relativeX = (item.rect.left - areaRect.left) * contentScale + contentOffsetX
+                const relativeY = (item.rect.top - areaRect.top) * contentScale + contentOffsetY
                 const imgRatio = info.width / info.height
                 const rectRatio = rectW / rectH
 
@@ -1096,16 +1111,20 @@ Page({
                 ctx.restore()
               }
 
-              this.drawTextItems(ctx)
+              this.drawTextItems(ctx, {
+                scale: contentScale,
+                offsetX: contentOffsetX,
+                offsetY: contentOffsetY
+              })
 
               wx.canvasToTempFilePath({
                 canvas,
                 x: 0,
                 y: 0,
-                width,
-                height,
-                destWidth: width * dpr,
-                destHeight: height * dpr,
+                width: exportWidth,
+                height: exportHeight,
+                destWidth: exportWidth * dpr,
+                destHeight: exportHeight * dpr,
                 success: (tempRes) => resolve(tempRes.tempFilePath),
                 fail: reject
               })

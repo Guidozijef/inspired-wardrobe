@@ -3,121 +3,131 @@ Page({
     statusBarHeight: 20,
     navBarHeight: 44,
     look: {
-      id: 1,
-      title: '职场通勤',
-      date: '2026-02-26',
-      emoji: '🧥👖',
+      id: '',
+      title: '',
+      date: '',
+      emoji: '',
       bg: '#F3E8FF',
-      items: ['🧥 基础白衬衫', '👖 直筒西装裤']
+      items: [],
+      preview: ''
     }
   },
+
   onLoad(options) {
-    const sysInfo = wx.getSystemInfoSync();
-    const menuButton = wx.getMenuButtonBoundingClientRect();
+    const sysInfo = wx.getSystemInfoSync()
+    const menuButton = wx.getMenuButtonBoundingClientRect()
     this.setData({
       statusBarHeight: sysInfo.statusBarHeight,
       navBarHeight: (menuButton.top - sysInfo.statusBarHeight) * 2 + menuButton.height
-    });
-    
+    })
+
     if (options.id) {
-      this.fetchDetail(options.id);
+      this.fetchDetail(options.id)
     }
   },
+
   fetchDetail(id) {
-    wx.showLoading({ title: '加载中...', mask: true });
+    wx.showLoading({ title: '\u52a0\u8f7d\u4e2d...', mask: true })
     wx.cloud.callFunction({
       name: 'outfitFunctions',
       data: {
         type: 'getOutfitDetail',
-        data: { id: id }
+        data: { id }
       }
-    }).then(res => {
-      wx.hideLoading();
-      if (res.result && res.result.success) {
-        const data = res.result.data;
+    }).then((res) => {
+      wx.hideLoading()
+      if (res.result && res.result.success && res.result.data) {
+        const data = res.result.data
         this.setData({
           look: {
             id: data._id,
-            title: data.title,
+            title: data.title || '\u6211\u7684\u7a7f\u642d',
             date: this.formatDate(data.create_time),
-            emoji: '🧥👖',
+            emoji: '',
             bg: data.canvas_data ? data.canvas_data.background_color : '#F3E8FF',
             preview: data.preview_url,
             description: data.description,
             scene: data.scene,
-            // 优先从关联查询结果中提取单品名称
-            items: data.clothes_info ? data.clothes_info.map(c => c.name || c.category) : []
+            items: data.clothes_info ? data.clothes_info.map((item) => item.name || item.category) : []
           }
-        });
+        })
       }
-    }).catch(err => {
-      wx.hideLoading();
-      console.error('获取搭配详情失败', err);
-    });
+    }).catch((err) => {
+      wx.hideLoading()
+      console.error('fetch look detail failed', err)
+      wx.showToast({ title: '\u52a0\u8f7d\u5931\u8d25', icon: 'none' })
+    })
   },
+
   formatDate(dateStr) {
-    if (!dateStr) return '';
-    const date = new Date(dateStr);
-    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+    if (!dateStr) return ''
+    const date = new Date(dateStr)
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
   },
+
   goBack() {
-    wx.navigateBack();
+    wx.navigateBack()
   },
+
   shareImage() {
     if (this.data.look && this.data.look.id) {
-      wx.navigateTo({ url: `/pages/share/share?id=${this.data.look.id}` });
-    } else {
-      wx.showToast({ title: '无法分享该穿搭', icon: 'none' });
+      wx.navigateTo({ url: `/pages/share_preview/share_preview?id=${this.data.look.id}` })
+      return
     }
+
+    wx.showToast({ title: '\u65e0\u6cd5\u5206\u4eab\u8be5\u7a7f\u642d', icon: 'none' })
   },
-  // 删除当前穿搭
+
   async deleteLook() {
-    const id = this.data.look.id;
-    if (!id) return;
+    const id = this.data.look.id
+    if (!id) return
 
     wx.showModal({
-      title: '提示',
-      content: '确定要删除这个穿搭方案吗？',
+      title: '\u63d0\u793a',
+      content: '\u786e\u5b9a\u8981\u5220\u9664\u8fd9\u5957\u7a7f\u642d\u5417\uff1f',
       confirmColor: '#ff4d4f',
       success: async (res) => {
-        if (res.confirm) {
-          try {
-            wx.showLoading({ title: '正在删除...', mask: true });
-            const dbRes = await wx.cloud.callFunction({
-              name: 'outfitFunctions',
-              data: {
-                type: 'deleteOutfit',
-                data: { id: id }
-              }
-            });
+        if (!res.confirm) return
 
-            wx.hideLoading();
-
-            if (dbRes.result.success) {
-              wx.showToast({ title: '已删除', icon: 'success' });
-              setTimeout(() => {
-                wx.navigateBack();
-              }, 1000);
-            } else {
-              wx.showToast({ title: '删除失败：' + dbRes.result.errMsg, icon: 'none' });
+        try {
+          wx.showLoading({ title: '\u6b63\u5728\u5220\u9664...', mask: true })
+          const dbRes = await wx.cloud.callFunction({
+            name: 'outfitFunctions',
+            data: {
+              type: 'deleteOutfit',
+              data: { id }
             }
-          } catch (err) {
-            wx.hideLoading();
-            console.error('删除穿搭失败:', err);
-            wx.showToast({ title: '系统错误', icon: 'none' });
+          })
+
+          wx.hideLoading()
+
+          if (dbRes.result && dbRes.result.success) {
+            wx.showToast({ title: '\u5df2\u5220\u9664', icon: 'success' })
+            setTimeout(() => {
+              wx.navigateBack()
+            }, 1000)
+            return
           }
+
+          const errMsg = (dbRes.result && dbRes.result.errMsg) || '\u8bf7\u7a0d\u540e\u518d\u8bd5'
+          wx.showToast({ title: `\u5220\u9664\u5931\u8d25\uff1a${errMsg}`, icon: 'none' })
+        } catch (err) {
+          wx.hideLoading()
+          console.error('delete look failed', err)
+          wx.showToast({ title: '\u7cfb\u7edf\u9519\u8bef', icon: 'none' })
         }
       }
-    });
+    })
   },
 
   editLook() {
     if (this.data.look && this.data.look.id) {
-      wx.redirectTo({ 
-        url: `/pages/canvas/canvas?id=${this.data.look.id}&date=${this.data.look.date}` 
-      });
-    } else {
-      wx.redirectTo({ url: '/pages/canvas/canvas' });
+      wx.redirectTo({
+        url: `/pages/canvas/canvas?id=${this.data.look.id}&date=${this.data.look.date}`
+      })
+      return
     }
+
+    wx.redirectTo({ url: '/pages/canvas/canvas' })
   }
-});
+})

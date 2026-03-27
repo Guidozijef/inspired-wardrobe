@@ -1,0 +1,42 @@
+<view class="container">
+  <view class="content">
+    <view class="poster-shell">
+      <view class="poster-card">
+        <view class="poster-preview">
+          <view class="preview-image-wrap">
+            <image
+              wx:if="{{displayImage}}"
+              class="poster-image"
+              src="{{displayImage}}"
+              mode="aspectFit"
+            />
+            <view wx:else class="poster-loading">{{emptyText}}</view>
+            <view class="poster-overlay">
+              <text class="poster-serial">{{serialText}}</text>
+              <text class="poster-title">{{displayTitle}}</text>
+              <text class="poster-subtitle">{{subtitleText}}</text>
+            </view>
+          </view>
+
+          <view class="poster-footer">
+            <view class="poster-footer-copy">
+              <text class="poster-footer-title">{{appName}}</text>
+              <text class="poster-footer-desc">{{appDesc}}</text>
+            </view>
+            <image class="poster-qr" src="/pages/images/qrX.jpg" mode="aspectFill"></image>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="actions">
+      <button class="action-btn primary-btn" bindtap="savePoster">{{saveLabel}}</button>
+      <view class="action-row">
+        <button class="action-btn success-btn" open-type="share">{{friendLabel}}</button>
+        <button class="action-btn ghost-btn" bindtap="shareToMoments">{{timelineLabel}}</button>
+      </view>
+    </view>
+  </view>
+
+  <canvas type="2d" id="posterCanvas" class="poster-canvas"></canvas>
+</view>
