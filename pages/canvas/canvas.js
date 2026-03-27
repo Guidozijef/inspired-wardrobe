@@ -159,6 +159,7 @@ Page({
       size: item.size || 24,
       color: item.color || '#333333',
       align: item.align || 'center',
+      rotation: item.rotation || 0,
       active: false
     }))
   },
@@ -457,6 +458,7 @@ Page({
       size: 24,
       color: '#333333',
       align: 'center',
+      rotation: 0,
       active: true
     }
 
@@ -517,6 +519,7 @@ Page({
   },
 
   activateText(e) {
+    this.deactivateCanvasItems()
     this.queuePendingEditAction({ type: 'edit', id: e.currentTarget.dataset.id })
   },
 
@@ -608,6 +611,8 @@ Page({
   },
 
   onTextTouchStart(e) {
+    this.deactivateCanvasItems()
+
     const id = e.currentTarget.dataset.id
     const touch = e.touches[0]
     const activeTextIndex = this.getActiveTextIndexById(id)
@@ -775,7 +780,8 @@ Page({
                 y: item.y,
                 size: item.size,
                 color: item.color,
-                align: item.align
+                align: item.align,
+                rotation: item.rotation || 0
               }))
             },
             recordDate: this.data.recordDate
@@ -833,6 +839,66 @@ Page({
     this.setData({
       [`canvasItems[${index}].rotation`]: newRotation
     })
+  },
+
+  startTextRotate(e) {
+    const id = e.currentTarget.dataset.id
+    const index = this.getActiveTextIndexById(id)
+    const item = this.data.textItems[index]
+    if (!item) return
+
+    const touch = e.touches[0]
+    this.textRotatingId = id
+
+    const selector = this.data.editingTextId === id && this.data.canvasInputFocus ? '#text-editor-overlay' : `#text-item-${id}`
+    wx.createSelectorQuery().select(selector).boundingClientRect((rect) => {
+      if (!rect) return
+      this.textRotateCenter = {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2
+      }
+      const dx = touch.clientX - this.textRotateCenter.x
+      const dy = touch.clientY - this.textRotateCenter.y
+      this.textInitAngle = (Math.atan2(dy, dx) * 180 / Math.PI) || 0
+      this.textStartRotation = item.rotation || 0
+    }).exec()
+  },
+
+  doTextRotate(e) {
+    const id = e.currentTarget.dataset.id
+    if (this.textRotatingId !== id || !this.textRotateCenter) return
+
+    const touch = e.touches[0]
+    const dx = touch.clientX - this.textRotateCenter.x
+    const dy = touch.clientY - this.textRotateCenter.y
+    const angle = Math.atan2(dy, dx) * 180 / Math.PI
+    const newRotation = this.textStartRotation + (angle - this.textInitAngle)
+    const index = this.getActiveTextIndexById(id)
+    if (index === -1) return
+
+    this.setData({
+      [`textItems[${index}].rotation`]: newRotation
+    })
+  },
+
+  estimateTextBox(item, ctx) {
+    ctx.font = `bold ${item.size}px sans-serif`
+    const textWidth = Math.max(ctx.measureText(item.content || '').width + 24, 120)
+    const textHeight = item.size * 1.3 + 16
+    let left = item.x
+
+    if (item.align === 'center') {
+      left = item.x - textWidth / 2
+    } else if (item.align === 'right') {
+      left = item.x - textWidth
+    }
+
+    return {
+      left,
+      top: item.y,
+      width: textWidth,
+      height: textHeight
+    }
   },
 
   async drawBackground(ctx, canvas, width, height) {
@@ -912,6 +978,14 @@ Page({
     this.data.textItems.forEach((item) => {
       if (!String(item.content || '').trim()) return
       ctx.save()
+      const box = this.estimateTextBox(item, ctx)
+      const textX = item.align === 'center' ? item.x : item.align === 'right' ? item.x - 12 : item.x + 12
+      const textY = item.y + 8
+
+      ctx.translate(box.left + box.width / 2, box.top + box.height / 2)
+      if (item.rotation) {
+        ctx.rotate(item.rotation * Math.PI / 180)
+      }
       ctx.font = `bold ${item.size}px sans-serif`
       ctx.fillStyle = item.color
       ctx.textBaseline = 'top'
@@ -920,8 +994,7 @@ Page({
       ctx.shadowBlur = 4
       ctx.shadowOffsetY = 1
 
-      const x = item.align === 'center' ? item.x : item.align === 'right' ? item.x - 12 : item.x + 12
-      ctx.fillText(item.content, x, item.y + 8)
+      ctx.fillText(item.content, textX - (box.left + box.width / 2), textY - (box.top + box.height / 2))
       ctx.restore()
     })
   },

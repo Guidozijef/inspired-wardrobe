@@ -50,8 +50,9 @@
 
     <block wx:for="{{textItems}}" wx:key="id">
       <view
+        id="text-item-{{item.id}}"
         class="text-item align-{{item.align || 'left'}} {{item.active ? 'active' : ''}} {{editingTextId === item.id && canvasInputFocus ? 'editing-source' : ''}}"
-        style="left: {{item.x}}px; top: {{item.y}}px; font-size: {{item.size}}px; color: {{item.color}};"
+        style="left: {{item.x}}px; top: {{item.y}}px; font-size: {{item.size}}px; color: {{item.color}}; transform: {{item.align === 'center' ? 'translateX(-50%)' : item.align === 'right' ? 'translateX(-100%)' : 'translateX(0)'}} rotate({{item.rotation || 0}}deg);"
         catchtouchstart="onTextTouchStart"
         catchtouchmove="onTextTouchMove"
         catchtouchend="onTextTouchEnd"
@@ -65,13 +66,21 @@
           catchtouchstart="deleteText"
           data-id="{{item.id}}"
         >×</view>
+        <view
+          wx:if="{{item.active && editingTextId !== item.id}}"
+          class="text-rotate-handle"
+          catchtouchstart="startTextRotate"
+          catchtouchmove="doTextRotate"
+          data-id="{{item.id}}"
+        >↻</view>
       </view>
     </block>
 
     <view
+      id="text-editor-overlay"
       wx:if="{{editingTextIndex > -1 && activeTab === 2 && canvasInputFocus}}"
       class="text-item text-editor-overlay active editing align-{{textItems[editingTextIndex].align || 'left'}}"
-      style="left: {{textItems[editingTextIndex].x}}px; top: {{textItems[editingTextIndex].y}}px; font-size: {{textItems[editingTextIndex].size}}px; color: {{textItems[editingTextIndex].color}};"
+      style="left: {{textItems[editingTextIndex].x}}px; top: {{textItems[editingTextIndex].y}}px; font-size: {{textItems[editingTextIndex].size}}px; color: {{textItems[editingTextIndex].color}}; transform: {{textItems[editingTextIndex].align === 'center' ? 'translateX(-50%)' : textItems[editingTextIndex].align === 'right' ? 'translateX(-100%)' : 'translateX(0)'}} rotate({{textItems[editingTextIndex].rotation || 0}}deg);"
       catchtap="stopBubble"
     >
       <input
@@ -86,6 +95,7 @@
         bindblur="onCanvasTextBlur"
       />
       <view class="text-delete-btn" catchtouchstart="deleteText" data-id="{{editingTextId}}">×</view>
+      <view class="text-rotate-handle" catchtouchstart="startTextRotate" catchtouchmove="doTextRotate" data-id="{{editingTextId}}">↻</view>
     </view>
   </movable-area>
 
