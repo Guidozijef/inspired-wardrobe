@@ -10,7 +10,7 @@
 
   <view class="content">
     <view class="canvas-display" style="background-color: {{look.bg}};">
-      <image wx:if="{{look.preview}}" class="full-preview" src="{{look.preview}}" mode="aspectFill" />
+      <image wx:if="{{look.preview}}" class="full-preview" src="{{look.preview}}" mode="aspectFit" />
       <text wx:else class="emoji-huge">{{look.emoji}}</text>
       <view class="watermark">VOGUE</view>
     </view>
