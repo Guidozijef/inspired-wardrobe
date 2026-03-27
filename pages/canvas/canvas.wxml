@@ -1,24 +1,33 @@
 <view class="container">
   <view class="nav-header glass" style="padding-top: {{statusBarHeight}}px; height: {{statusBarHeight + navBarHeight}}px;">
-    <view class="nav-left-actions" style="position: relative; z-index: 12;">
+    <view class="nav-left-actions">
       <view class="nav-btn" bindtap="clearCanvas">清空</view>
       <view class="nav-btn primary" bindtap="saveCanvas">保存</view>
     </view>
     <view class="nav-title" style="top: {{statusBarHeight}}px; height: {{navBarHeight}}px; line-height: {{navBarHeight}}px;">搭配画布</view>
   </view>
 
-  <!-- Movable Area for Drag and Drop -->
-  <movable-area class="canvas-area">
-    <view class="watermark">VOGUE</view>
-    
-    <movable-view 
+  <movable-area
+    id="canvasArea"
+    class="canvas-area {{activeTab === 2 ? 'text-mode' : ''}}"
+    style="background: {{selectedBg.type === 'image' ? 'transparent' : selectedBg.css}}; background-size: {{selectedBg.grid || selectedBg.dots ? '20px 20px' : 'cover'}};"
+    catchtap="onCanvasTap"
+  >
+    <image
+      wx:if="{{selectedBg.type === 'image'}}"
+      class="canvas-bg-image"
+      src="{{selectedBg.value}}"
+      mode="aspectFill"
+    ></image>
+
+    <movable-view
       id="item-{{item.id}}"
-      wx:for="{{canvasItems}}" 
+      wx:for="{{canvasItems}}"
       wx:key="id"
-      class="canvas-item" 
-      x="{{item.x}}" 
-      y="{{item.y}}" 
-      direction="{{item.active ? 'all' : 'none'}}" 
+      class="canvas-item"
+      x="{{item.x}}"
+      y="{{item.y}}"
+      direction="{{item.active ? 'all' : 'none'}}"
       damping="40"
       friction="2"
       scale="true"
@@ -34,58 +43,178 @@
     >
       <view class="item-rotator {{item.active ? 'active' : ''}}" style="transform: rotate({{item.rotation || 0}}deg); width: 100%; height: 100%; position: relative;">
         <image class="canvas-img" src="{{item.url}}" mode="aspectFit" />
-        <view class="delete-btn" wx:if="{{item.active}}" catchtap="removeItem" data-id="{{item.id}}">
-          <text style="color: white; font-size: 16px; margin-top: -2px;">×</text>
-        </view>
-        <view class="rotate-handle" wx:if="{{item.active}}" catchtouchstart="startRotate" catchtouchmove="doRotate" data-id="{{item.id}}">
-          <text style="color: white; font-size: 16px; margin-top: -2px;">↻</text>
-        </view>
+        <view class="item-delete-btn" wx:if="{{item.active}}" catchtap="removeItem" data-id="{{item.id}}">×</view>
+        <view class="rotate-handle" wx:if="{{item.active}}" catchtouchstart="startRotate" catchtouchmove="doRotate" data-id="{{item.id}}">↻</view>
       </view>
     </movable-view>
+
+    <block wx:for="{{textItems}}" wx:key="id">
+      <view
+        class="text-item align-{{item.align || 'left'}} {{item.active ? 'active' : ''}} {{editingTextId === item.id && canvasInputFocus ? 'editing-source' : ''}}"
+        style="left: {{item.x}}px; top: {{item.y}}px; font-size: {{item.size}}px; color: {{item.color}};"
+        catchtouchstart="onTextTouchStart"
+        catchtouchmove="onTextTouchMove"
+        catchtouchend="onTextTouchEnd"
+        catchtap="activateText"
+        data-id="{{item.id}}"
+      >
+        <text class="{{editingTextId === item.id && canvasInputFocus ? 'text-item-ghost' : ''}}">{{item.content}}</text>
+        <view
+          wx:if="{{item.active && editingTextId !== item.id}}"
+          class="text-delete-btn"
+          catchtouchstart="deleteText"
+          data-id="{{item.id}}"
+        >×</view>
+      </view>
+    </block>
+
+    <view
+      wx:if="{{editingTextIndex > -1 && activeTab === 2 && canvasInputFocus}}"
+      class="text-item text-editor-overlay active editing align-{{textItems[editingTextIndex].align || 'left'}}"
+      style="left: {{textItems[editingTextIndex].x}}px; top: {{textItems[editingTextIndex].y}}px; font-size: {{textItems[editingTextIndex].size}}px; color: {{textItems[editingTextIndex].color}};"
+      catchtap="stopBubble"
+    >
+      <input
+        class="canvas-text-input align-{{textItems[editingTextIndex].align || 'left'}}"
+        value="{{activeTextDraft}}"
+        placeholder="输入文字"
+        placeholder-class="canvas-text-placeholder"
+        focus="{{canvasInputFocus}}"
+        cursor-spacing="16"
+        adjust-position="false"
+        bindinput="onActiveTextInput"
+        bindblur="onCanvasTextBlur"
+      />
+      <view class="text-delete-btn" catchtouchstart="deleteText" data-id="{{editingTextId}}">×</view>
+    </view>
   </movable-area>
-  
-  <!-- Hidden Canvas for Rendering -->
-  <canvas type="2d" id="helperCanvas" style="width: {{helperCanvasWidth}}px; height: {{helperCanvasHeight}}px; position: absolute; left: -9999px;"></canvas>
+
+  <canvas type="2d" id="helperCanvas" class="helper-canvas" style="width: {{helperCanvasWidth}}px; height: {{helperCanvasHeight}}px;"></canvas>
 
   <view class="bottom-drawer">
     <view class="drawer-handle"></view>
     <view class="drawer-tabs">
-      <view 
-        wx:for="{{tabs}}" 
+      <view
+        wx:for="{{tabs}}"
         wx:key="index"
         class="drawer-tab {{activeTab === index ? 'active' : ''}}"
         bindtap="switchDrawerTab"
         data-index="{{index}}"
       >{{item}}</view>
     </view>
-    
-    <!-- Library Categories -->
+
     <scroll-view class="library-categories" scroll-x="true" show-scrollbar="false" wx:if="{{activeTab === 0}}">
-      <view 
-        wx:for="{{categories}}" 
+      <view
+        wx:for="{{categories}}"
         wx:key="index"
         class="lib-cat-item {{activeCategory === index ? 'active' : ''}}"
         bindtap="switchCategory"
         data-index="{{index}}"
       >{{item}}</view>
     </scroll-view>
-    
-    <scroll-view class="item-scroll" scroll-x="true" scroll-with-animation="true" enhanced="true" show-scrollbar="false" wx:if="{{activeTab === 0}}">
-      <view class="scroll-item" wx:for="{{libraryItems}}" wx:key="index" bindtap="addToCanvas" data-item="{{item}}">
+
+    <scroll-view class="item-scroll" scroll-x="true" show-scrollbar="false" wx:if="{{activeTab === 0}}">
+      <view class="scroll-item" wx:for="{{libraryItems}}" wx:key="_id" bindtap="addToCanvas" data-item="{{item}}">
         <image class="library-img" src="{{item.image_url}}" mode="aspectFit" />
       </view>
     </scroll-view>
-    
-    <view class="empty-state" wx:if="{{activeTab !== 0}}">
-      <text>功能开发中...</text>
+
+    <scroll-view class="bg-grid-scroll" scroll-y="true" show-scrollbar="false" wx:if="{{activeTab === 1}}">
+      <view class="bg-grid">
+        <view
+          wx:for="{{backgrounds}}"
+          wx:key="id"
+          class="bg-card {{selectedBg.id === item.id ? 'selected' : ''}}"
+          catchtap="selectBg"
+          data-bg="{{item}}"
+        >
+          <view
+            class="bg-swatch"
+            style="background: {{item.type === 'image' ? 'transparent' : item.css}}; background-size: {{item.grid || item.dots ? '20px 20px' : 'cover'}};"
+          >
+            <image
+              wx:if="{{item.type === 'image'}}"
+              class="bg-thumb"
+              src="{{item.value}}"
+              mode="aspectFill"
+            ></image>
+          </view>
+          <text class="bg-label">{{item.label}}</text>
+        </view>
+      </view>
+    </scroll-view>
+
+    <view class="text-editor-card" wx:if="{{activeTab === 2}}">
+      <block wx:if="{{activeTextIndex > -1}}">
+        <view class="setting-card">
+          <view class="setting-row">
+            <view class="setting-label-group">
+              <text class="setting-title">字号</text>
+              <text class="setting-value">{{textItems[activeTextIndex].size}} px</text>
+            </view>
+            <view class="setting-control setting-slider-control">
+              <slider
+                min="12"
+                max="64"
+                value="{{textItems[activeTextIndex].size}}"
+                activeColor="#8A2BE2"
+                backgroundColor="#E7DDF8"
+                block-color="#8A2BE2"
+                block-size="16"
+                bindchange="changeTextSize"
+                bindchanging="changeTextSize"
+              />
+            </view>
+          </view>
+
+          <view class="setting-row">
+            <view class="setting-label-group">
+              <text class="setting-title">颜色</text>
+            </view>
+            <scroll-view class="setting-control color-scroll" scroll-x="true" show-scrollbar="false">
+              <view class="color-list">
+                <view
+                  wx:for="{{textColors}}"
+                  wx:key="*this"
+                  class="text-color-circle {{textItems[activeTextIndex].color === item ? 'selected' : ''}}"
+                  style="background-color: {{item}};"
+                  catchtap="changeTextColor"
+                  data-color="{{item}}"
+                ></view>
+              </view>
+            </scroll-view>
+          </view>
+
+          <view class="setting-row">
+            <view class="setting-label-group">
+              <text class="setting-title">对齐</text>
+            </view>
+            <view class="setting-control align-row">
+              <view
+                wx:for="{{textAlignOptions}}"
+                wx:key="*this"
+                class="align-chip {{textItems[activeTextIndex].align === item ? 'active' : ''}}"
+                catchtap="changeTextAlign"
+                data-align="{{item}}"
+              >
+                {{item === 'left' ? '左对齐' : item === 'center' ? '居中' : '右对齐'}}
+              </view>
+            </view>
+          </view>
+        </view>
+      </block>
+
+      <view wx:else class="empty-editor">
+        <text class="empty-editor-title">点击画布任意位置添加文字</text>
+      </view>
     </view>
 
     <view class="drag-hint" wx:if="{{activeTab === 0}}">
-      <text class="arrow-up">↑</text> 点击单品放入画布
+      <text class="arrow-up">↑</text>
+      点击单品放入画布
     </view>
   </view>
 
-  <!-- Custom Tab Bar -->
   <view class="tab-bar glass">
     <view class="tab-item" bindtap="switchTab" data-path="/pages/wardrobe/wardrobe">
       <image class="tab-icon" src="../images/tabbar/shirt.png"></image>
@@ -109,24 +238,23 @@
     </view>
   </view>
 
-  <!-- Save Definition Modal -->
   <view class="modal-mask {{showSaveModal ? 'show' : ''}}" bindtap="closeSaveModal">
     <view class="modal-content glass" catchtap="stopBubble">
       <view class="modal-header">
         <text class="modal-title">命名你的穿搭</text>
       </view>
       <view class="modal-body">
-        <input 
-          class="title-input" 
-          placeholder="给这套穿搭起个名字..." 
-          value="{{outfitTitle}}" 
+        <input
+          class="title-input"
+          placeholder="给这套穿搭起个名字..."
+          value="{{outfitTitle}}"
           bindinput="onTitleInput"
           focus="{{showSaveModal}}"
         />
       </view>
       <view class="modal-footer">
         <view class="modal-btn cancel" bindtap="closeSaveModal">取消</view>
-        <view class="modal-btn confirm" bindtap="confirmSave">确定完成</view>
+        <view class="modal-btn confirm" bindtap="confirmSave">确定保存</view>
       </view>
     </view>
   </view>
