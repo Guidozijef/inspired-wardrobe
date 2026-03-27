@@ -314,7 +314,12 @@ Page({
     const item = this.data.textItems.find((textItem) => textItem.id === id)
 
     if (!item.active) {
-      this.activateText(e)
+      const updatedItems = this.data.textItems.map((i) => ({ ...i, active: i.id === id }))
+      this.setData({
+        textItems: updatedItems,
+        activeTextId: id,
+        activeTextDraft: item.content || ''
+      })
     }
 
     this.data.dragInfo = {
@@ -324,6 +329,10 @@ Page({
       initX: item.x,
       initY: item.y
     }
+  },
+
+  onTextTouchEnd() {
+    this.data.dragInfo = { id: null, startX: 0, startY: 0, initX: 0, initY: 0 }
   },
 
   onTextTouchMove(e) {

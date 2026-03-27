@@ -1,4 +1,6 @@
 {
-  "navigationStyle": "custom",
+  "navigationBarTitleText": "编辑模板",
+  "navigationBarBackgroundColor": "#f5f1ff",
+  "navigationBarTextStyle": "black",
   "backgroundColor": "#F2F2F7"
 }

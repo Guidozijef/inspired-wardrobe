@@ -8,11 +8,6 @@
           style="background: {{selectedBg.type === 'image' ? 'transparent' : selectedBg.css}}; background-size: {{selectedBg.grid || selectedBg.dots ? '20px 20px' : 'cover'}};"
           catchtap="onCanvasTap"
         >
-          <view class="safe-guide safe-guide-top"></view>
-          <view class="safe-guide safe-guide-bottom"></view>
-          <view class="safe-guide safe-guide-left"></view>
-          <view class="safe-guide safe-guide-right"></view>
-
           <image
             wx:if="{{selectedBg.type === 'image'}}"
             class="bg-image"
@@ -43,6 +38,7 @@
               style="left: {{item.x}}px; top: {{item.y}}px; font-size: {{item.size}}px; color: {{item.color}};"
               catchtouchstart="onTextTouchStart"
               catchtouchmove="onTextTouchMove"
+              catchtouchend="onTextTouchEnd"
               catchtap="activateText"
               data-id="{{item.id}}"
             >
@@ -78,7 +74,6 @@
     <view class="drawer-handle"></view>
 
     <view class="drawer-topbar">
-      <button class="drawer-back-btn" catchtap="goBack">返回</button>
       <view class="drawer-tabs">
         <view
           class="drawer-tab {{activeDrawerTab === 'background' ? 'active' : ''}}"
