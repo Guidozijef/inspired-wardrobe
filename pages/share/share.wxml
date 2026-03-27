@@ -34,7 +34,7 @@
 
           <block wx:for="{{textItems}}" wx:key="id">
             <view
-              class="text-item align-{{item.align || 'left'}} {{item.active ? 'active' : ''}} {{item.active && activeDrawerTab === 'text' ? 'editing' : ''}}"
+              class="text-item align-{{item.align || 'left'}} {{item.active ? 'active' : ''}} {{editingTextId === item.id && canvasInputFocus ? 'editing-source' : ''}}"
               style="left: {{item.x}}px; top: {{item.y}}px; font-size: {{item.size}}px; color: {{item.color}};"
               catchtouchstart="onTextTouchStart"
               catchtouchmove="onTextTouchMove"
@@ -42,29 +42,39 @@
               catchtap="activateText"
               data-id="{{item.id}}"
             >
-              <input
-                wx:if="{{item.active && activeDrawerTab === 'text'}}"
-                class="canvas-text-input align-{{item.align || 'left'}}"
-                value="{{activeTextDraft}}"
-                placeholder="输入文字"
-                placeholder-class="canvas-text-placeholder"
-                focus="{{canvasInputFocus}}"
-                cursor-spacing="16"
-                adjust-position="false"
-                bindinput="onActiveTextInput"
-                bindblur="onCanvasTextBlur"
-                catchtap="activateText"
-                data-id="{{item.id}}"
-              />
-              <block wx:else>{{item.content}}</block>
+              <text class="{{editingTextId === item.id && canvasInputFocus ? 'text-item-ghost' : ''}}">{{item.content}}</text>
               <view
-                wx:if="{{item.active}}"
+                wx:if="{{item.active && editingTextId !== item.id}}"
                 class="delete-btn"
                 catchtouchstart="deleteText"
                 data-id="{{item.id}}"
               >×</view>
             </view>
           </block>
+
+          <view
+            wx:if="{{editingTextIndex > -1 && activeDrawerTab === 'text' && canvasInputFocus}}"
+            class="text-item text-editor-overlay active editing align-{{textItems[editingTextIndex].align || 'left'}}"
+            style="left: {{textItems[editingTextIndex].x}}px; top: {{textItems[editingTextIndex].y}}px; font-size: {{textItems[editingTextIndex].size}}px; color: {{textItems[editingTextIndex].color}};"
+            catchtap="noop"
+          >
+            <input
+              class="canvas-text-input align-{{textItems[editingTextIndex].align || 'left'}}"
+              value="{{activeTextDraft}}"
+              placeholder="输入文字"
+              placeholder-class="canvas-text-placeholder"
+              focus="{{canvasInputFocus}}"
+              cursor-spacing="16"
+              adjust-position="false"
+              bindinput="onActiveTextInput"
+              bindblur="onCanvasTextBlur"
+            />
+            <view
+              class="delete-btn"
+              catchtouchstart="deleteText"
+              data-id="{{editingTextId}}"
+            >×</view>
+          </view>
         </view>
       </view>
     </view>

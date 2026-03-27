@@ -39,6 +39,8 @@ Page({
     textItems: [],
     nextTextId: 1,
     activeTextId: null,
+    editingTextId: null,
+    editingTextIndex: -1,
     activeTextDraft: '',
     canvasInputFocus: false,
     dragInfo: {
@@ -53,6 +55,9 @@ Page({
   },
 
   onLoad(options) {
+    this.pendingEditAction = null
+    this.pendingActionTimer = null
+
     if (options.items) {
       const urls = decodeURIComponent(options.items).split(',')
       this.setData({
@@ -66,6 +71,156 @@ Page({
     } else if (options.id) {
       this.fetchDetail(options.id)
     }
+  },
+
+  queueCanvasInputFocus() {
+    if (this.canvasInputFocusTimer) {
+      clearTimeout(this.canvasInputFocusTimer)
+    }
+
+    this.canvasInputFocusTimer = setTimeout(() => {
+      this.setData({ canvasInputFocus: true })
+      this.canvasInputFocusTimer = null
+    }, 30)
+  },
+
+  clearCanvasInputFocusTimer() {
+    if (this.canvasInputFocusTimer) {
+      clearTimeout(this.canvasInputFocusTimer)
+      this.canvasInputFocusTimer = null
+    }
+  },
+
+  clearPendingActionTimer() {
+    if (this.pendingActionTimer) {
+      clearTimeout(this.pendingActionTimer)
+      this.pendingActionTimer = null
+    }
+  },
+
+  flushPendingEditAction() {
+    if (!this.pendingEditAction) return
+
+    const action = this.pendingEditAction
+    this.pendingEditAction = null
+    this.clearPendingActionTimer()
+
+    if (action.type === 'edit') {
+      this.openTextEditor(action.id)
+      return
+    }
+
+    if (action.type === 'canvas') {
+      this.handleCanvasTextPlacement(action.x, action.y)
+    }
+  },
+
+  queuePendingEditAction(action) {
+    this.pendingEditAction = action
+
+    if (this.data.editingTextId && this.data.canvasInputFocus) {
+      this.clearCanvasInputFocusTimer()
+      this.clearPendingActionTimer()
+      this.setData({ canvasInputFocus: false })
+      this.pendingActionTimer = setTimeout(() => {
+        this.flushPendingEditAction()
+      }, 80)
+      return
+    }
+
+    this.flushPendingEditAction()
+  },
+
+  openTextEditor(id) {
+    const selectedItem = this.data.textItems.find((item) => item.id === id)
+    const editingTextIndex = this.data.textItems.findIndex((item) => item.id === id)
+    if (!selectedItem || editingTextIndex === -1) return
+
+    const updatedItems = this.data.textItems.map((item) => ({
+      ...item,
+      active: item.id === id
+    }))
+
+    this.setData({
+      textItems: updatedItems,
+      activeTextId: id,
+      editingTextId: id,
+      editingTextIndex,
+      activeTextDraft: selectedItem.content || '',
+      activeDrawerTab: 'text',
+      canvasInputFocus: false
+    }, () => {
+      this.queueCanvasInputFocus()
+    })
+  },
+
+  handleCanvasTextPlacement(relX, relY) {
+    const { activeTextId, activeTextDraft, textItems, nextTextId } = this.data
+
+    if (activeTextId && !String(activeTextDraft || '').trim()) {
+      const currentIndex = textItems.findIndex((item) => item.id === activeTextId)
+      if (currentIndex !== -1) {
+        this.setData({
+          [`textItems[${currentIndex}].x`]: relX,
+          [`textItems[${currentIndex}].y`]: relY,
+          editingTextId: activeTextId,
+          editingTextIndex: currentIndex,
+          canvasInputFocus: false
+        }, () => {
+          this.queueCanvasInputFocus()
+        })
+      }
+      return
+    }
+
+    const newItem = {
+      id: nextTextId,
+      content: '',
+      x: relX,
+      y: relY,
+      size: 24,
+      color: '#333333',
+      align: 'center',
+      active: true
+    }
+
+    const updatedItems = textItems.map((item) => ({ ...item, active: false }))
+    updatedItems.push(newItem)
+
+    this.setData({
+      textItems: updatedItems,
+      nextTextId: nextTextId + 1,
+      activeTextId: newItem.id,
+      editingTextId: newItem.id,
+      editingTextIndex: updatedItems.length - 1,
+      activeTextDraft: '',
+      activeDrawerTab: 'text',
+      canvasInputFocus: false
+    }, () => {
+      this.queueCanvasInputFocus()
+    })
+  },
+
+  removeTextById(id, callback) {
+    const updatedItems = this.data.textItems.filter((item) => item.id !== id)
+    const isActive = this.data.activeTextId === id
+    const isEditing = this.data.editingTextId === id
+
+    this.setData({
+      textItems: updatedItems,
+      activeTextId: isActive ? null : this.data.activeTextId,
+      editingTextId: isEditing ? null : this.data.editingTextId,
+      editingTextIndex: isEditing ? -1 : updatedItems.findIndex((item) => item.id === this.data.editingTextId),
+      activeTextDraft: isActive ? '' : this.data.activeTextDraft,
+      canvasInputFocus: isEditing ? false : this.data.canvasInputFocus
+    }, callback)
+  },
+
+  noop() {},
+
+  onUnload() {
+    this.clearCanvasInputFocusTimer()
+    this.clearPendingActionTimer()
   },
 
   fetchDetail(id) {
@@ -120,7 +275,13 @@ Page({
 
     this.setData({
       activeDrawerTab: nextTab,
-      canvasInputFocus: !!this.data.activeTextId
+      editingTextId: this.data.activeTextId,
+      editingTextIndex: this.data.textItems.findIndex((item) => item.id === this.data.activeTextId),
+      canvasInputFocus: false
+    }, () => {
+      if (this.data.activeTextId) {
+        this.queueCanvasInputFocus()
+      }
     })
   },
 
@@ -130,8 +291,8 @@ Page({
 
   onActiveTextInput(e) {
     const activeTextDraft = e.detail.value
-    const { activeTextId, textItems } = this.data
-    const index = textItems.findIndex((item) => item.id === activeTextId)
+    const { editingTextId, textItems } = this.data
+    const index = textItems.findIndex((item) => item.id === editingTextId)
 
     if (index === -1) {
       this.setData({ activeTextDraft })
@@ -159,63 +320,19 @@ Page({
 
       const relX = Math.min(Math.max(touchX - rect.left, 24), rect.width - 24)
       const relY = Math.min(Math.max(touchY - rect.top - 18, 16), rect.height - 44)
-      const { activeTextId, activeTextDraft, textItems, nextTextId } = this.data
-
-      if (activeTextId && !String(activeTextDraft || '').trim()) {
-        const currentIndex = textItems.findIndex((item) => item.id === activeTextId)
-        if (currentIndex !== -1) {
-          this.setData({
-            [`textItems[${currentIndex}].x`]: relX,
-            [`textItems[${currentIndex}].y`]: relY,
-            canvasInputFocus: true
-          })
-        }
-        return
-      }
-
-      const newItem = {
-        id: nextTextId,
-        content: '',
-        x: relX,
-        y: relY,
-        size: 24,
-        color: '#333333',
-        align: 'center',
-        active: true
-      }
-
-      const updatedItems = textItems.map((item) => ({ ...item, active: false }))
-      updatedItems.push(newItem)
-
-      this.setData({
-        textItems: updatedItems,
-        nextTextId: nextTextId + 1,
-        activeTextId: newItem.id,
-        activeTextDraft: '',
-        activeDrawerTab: 'text',
-        canvasInputFocus: true
-      })
+      this.queuePendingEditAction({ type: 'canvas', x: relX, y: relY })
     }).exec()
   },
 
   activateText(e) {
     const id = e.currentTarget.dataset.id
-    const selectedItem = this.data.textItems.find((item) => item.id === id)
-    const updatedItems = this.data.textItems.map((item) => ({
-      ...item,
-      active: item.id === id
-    }))
-
-    this.setData({
-      textItems: updatedItems,
-      activeTextId: id,
-      activeTextDraft: selectedItem ? selectedItem.content : '',
-      activeDrawerTab: 'text',
-      canvasInputFocus: true
-    })
+    this.queuePendingEditAction({ type: 'edit', id })
   },
 
   deselectText() {
+    this.clearCanvasInputFocusTimer()
+    this.clearPendingActionTimer()
+    this.pendingEditAction = null
     const { activeTextId, textItems } = this.data
     let updatedItems = textItems
 
@@ -233,6 +350,8 @@ Page({
     this.setData({
       textItems: updatedItems,
       activeTextId: null,
+      editingTextId: null,
+      editingTextIndex: -1,
       activeTextDraft: '',
       canvasInputFocus: false
     })
@@ -243,30 +362,37 @@ Page({
   },
 
   onCanvasTextBlur() {
-    const { activeTextId, textItems } = this.data
-    if (!activeTextId) {
-      this.setData({ canvasInputFocus: false })
+    this.clearCanvasInputFocusTimer()
+    const { editingTextId, textItems } = this.data
+    if (!editingTextId) {
+      this.setData({ canvasInputFocus: false }, () => {
+        this.flushPendingEditAction()
+      })
       return
     }
 
-    const activeItem = textItems.find((item) => item.id === activeTextId)
+    const activeItem = textItems.find((item) => item.id === editingTextId)
     if (!activeItem || !String(activeItem.content || '').trim()) {
-      this.deleteText({ currentTarget: { dataset: { id: activeTextId } } })
+      this.removeTextById(editingTextId, () => {
+        this.flushPendingEditAction()
+      })
       return
     }
 
-    this.setData({ canvasInputFocus: false })
+    this.setData({
+      editingTextId: null,
+      editingTextIndex: -1,
+      canvasInputFocus: false
+    }, () => {
+      this.flushPendingEditAction()
+    })
   },
 
   deleteText(e) {
     const id = e.currentTarget.dataset.id
-    const updatedItems = this.data.textItems.filter((item) => item.id !== id)
-    this.setData({
-      textItems: updatedItems,
-      activeTextId: this.data.activeTextId === id ? null : this.data.activeTextId,
-      activeTextDraft: this.data.activeTextId === id ? '' : this.data.activeTextDraft,
-      canvasInputFocus: this.data.activeTextId === id ? false : this.data.canvasInputFocus
-    })
+    this.clearPendingActionTimer()
+    this.pendingEditAction = null
+    this.removeTextById(id)
   },
 
   changeTextColor(e) {
@@ -312,13 +438,23 @@ Page({
     const id = e.currentTarget.dataset.id
     const touch = e.touches[0]
     const item = this.data.textItems.find((textItem) => textItem.id === id)
+    if (!item) return
 
     if (!item.active) {
       const updatedItems = this.data.textItems.map((i) => ({ ...i, active: i.id === id }))
       this.setData({
         textItems: updatedItems,
         activeTextId: id,
-        activeTextDraft: item.content || ''
+        editingTextId: null,
+        editingTextIndex: -1,
+        activeTextDraft: item.content || '',
+        canvasInputFocus: false
+      })
+    } else if (this.data.canvasInputFocus) {
+      this.setData({
+        editingTextId: null,
+        editingTextIndex: -1,
+        canvasInputFocus: false
       })
     }
 
