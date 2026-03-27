@@ -305,6 +305,15 @@ Page({
     this.setData(updates)
   },
 
+  deactivateCanvasItems() {
+    const activeIndex = this.data.canvasItems.findIndex((item) => item.active)
+    if (activeIndex === -1) return
+
+    this.setData({
+      [`canvasItems[${activeIndex}].active`]: false
+    })
+  },
+
   removeItem(e) {
     const id = e.currentTarget.dataset.id
     this.setData({
@@ -488,6 +497,8 @@ Page({
   },
 
   onCanvasTap(e) {
+    this.deactivateCanvasItems()
+
     if (this.data.activeTab !== 2) {
       this.exitTextEditing()
       return
