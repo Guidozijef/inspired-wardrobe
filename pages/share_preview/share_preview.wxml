@@ -6,15 +6,9 @@
           <view class="preview-image-wrap">
             <image
               wx:if="{{displayImage}}"
-              class="poster-image-bg"
-              src="{{displayImage}}"
-              mode="aspectFill"
-            />
-            <image
-              wx:if="{{displayImage}}"
               class="poster-image"
               src="{{displayImage}}"
-              mode="aspectFit"
+              mode="widthFix"
             />
             <view wx:else class="poster-loading">{{emptyText}}</view>
             <view class="poster-overlay">
