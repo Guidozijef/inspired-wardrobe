@@ -5,6 +5,7 @@ Page({
     look: {},
     posterPath: '',
     displayImage: '',
+    exportImage: '',
     displayTitle: '',
     serialText: '',
     subtitleText: '',
@@ -50,15 +51,18 @@ Page({
       }
 
       const look = res.result.data
-      const displayImage = await this.resolvePreviewImage(look)
+      const rawImage = look.preview_url || look.preview || ''
+      const resolvedImage = await this.resolvePreviewImage(look)
       console.log('share preview image source', {
         preview_url: look.preview_url,
         preview: look.preview,
-        displayImage
+        rawImage,
+        resolvedImage
       })
       this.setData({
         look,
-        displayImage,
+        displayImage: resolvedImage || rawImage,
+        exportImage: resolvedImage || rawImage,
         displayTitle: look.title || 'Inspired Look',
         serialText: this.buildSerial(look._id || id),
         subtitleText: this.buildSubtitle(look.create_time)
@@ -202,7 +206,7 @@ Page({
         ctx.save()
         ctx.clip()
 
-        const previewSrc = this.data.displayImage || this.data.look.preview_url || this.data.look.preview
+        const previewSrc = this.data.exportImage || this.data.displayImage || this.data.look.preview_url || this.data.look.preview
         if (previewSrc) {
           try {
             const previewInfo = await this.getImageInfo(previewSrc)
@@ -254,12 +258,9 @@ Page({
         ctx.fillText(this.data.appDesc, 110, footerY + 132)
 
         try {
-          const qrInfo = await this.getImageInfo('/pages/images/qrX.jpg')
-          if (qrInfo && qrInfo.path) {
-            const qrImg = canvas.createImage()
-            await this.loadCanvasImage(qrImg, qrInfo.path)
-            ctx.drawImage(qrImg, 860, footerY + 40, 110, 110)
-          }
+          const qrImg = canvas.createImage()
+          await this.loadCanvasImage(qrImg, '/pages/images/qrX.jpg')
+          ctx.drawImage(qrImg, 860, footerY + 40, 110, 110)
         } catch (err) {
           console.error('load qr image failed', err)
         }
@@ -313,20 +314,48 @@ Page({
     const source = look.preview_url || look.preview || ''
     if (!source) return ''
 
+    let resolvedSource = source
+
     if (source.indexOf('cloud://') === 0) {
       try {
         const res = await wx.cloud.getTempFileURL({
           fileList: [source]
         })
         const file = res.fileList && res.fileList[0]
-        return file && file.tempFileURL ? file.tempFileURL : source
+        resolvedSource = file && file.tempFileURL ? file.tempFileURL : source
       } catch (err) {
         console.error('resolve cloud preview failed', err)
-        return source
+        resolvedSource = source
       }
     }
 
-    return source
+    if (/^https?:\/\//.test(resolvedSource)) {
+      try {
+        const tempFilePath = await this.downloadToTempFile(resolvedSource)
+        return tempFilePath || resolvedSource
+      } catch (err) {
+        console.error('download preview image failed', err)
+        return resolvedSource
+      }
+    }
+
+    return resolvedSource
+  },
+
+  downloadToTempFile(url) {
+    return new Promise((resolve, reject) => {
+      wx.downloadFile({
+        url,
+        success: (res) => {
+          if (res.statusCode >= 200 && res.statusCode < 300 && res.tempFilePath) {
+            resolve(res.tempFilePath)
+            return
+          }
+          reject(new Error(`download failed: ${res.statusCode}`))
+        },
+        fail: reject
+      })
+    })
   },
 
   loadCanvasImage(img, src) {
