@@ -30,10 +30,16 @@
     </view>
 
     <view class="actions">
-      <button class="action-btn primary-btn" bindtap="savePoster">{{saveLabel}}</button>
+      <button class="action-btn primary-btn" bindtap="savePoster">
+        <image class="btn-icon-img" src="/assets/icons/btn-save.svg" mode="aspectFit"/>{{saveLabel}}
+      </button>
       <view class="action-row">
-        <button class="action-btn success-btn" open-type="share">{{friendLabel}}</button>
-        <button class="action-btn ghost-btn" bindtap="shareToMoments">{{timelineLabel}}</button>
+        <button class="action-btn success-btn" open-type="share">
+          <image class="btn-icon-img" src="/assets/icons/btn-friend.svg" mode="aspectFit"/>{{friendLabel}}
+        </button>
+        <button class="action-btn ghost-btn" bindtap="shareToMoments">
+          <image class="btn-icon-img" src="/assets/icons/btn-moments.svg" mode="aspectFit"/>{{timelineLabel}}
+        </button>
       </view>
     </view>
   </view>
