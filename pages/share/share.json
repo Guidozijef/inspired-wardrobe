@@ -1,5 +1,4 @@
 {
-  "navigationBarTitleText": "分享穿搭",
-  "navigationBarBackgroundColor": "#F2F2F7",
+  "navigationStyle": "custom",
   "backgroundColor": "#F2F2F7"
 }

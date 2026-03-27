@@ -1,94 +1,189 @@
 <view class="container" bindtap="deselectText">
-  <view class="main-content">
-    <view class="canvas-wrapper">
-      <!-- 预览区：可以将其看作一个画板 -->
-      <view class="canvas-area {{isMulti ? 'multi-mode' : ''}}" style="background: {{selectedBg.type === 'image' ? 'transparent' : selectedBg.css}}; background-size: {{selectedBg.grid || selectedBg.dots ? '20px 20px' : 'auto'}};" id="previewArea" catchtap="deselectText">
-        <image wx:if="{{selectedBg.type === 'image'}}" src="{{selectedBg.value}}" mode="aspectFill" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; z-index: 0; pointer-events: none;"></image>
-        
-        <image class="outfit-image" wx:if="{{!isMulti && look.preview_url}}" src="{{look.preview_url}}" mode="aspectFit" style="position: relative; z-index: 1;"></image>
-        
-        <view class="multi-item-preview" wx:if="{{isMulti}}" style="position: relative; z-index: 1;">
-          <image wx:for="{{imageUrls}}" wx:key="*this" class="multi-item-img" src="{{item}}" mode="widthFix"></image>
-        </view>
-        
-        <!-- 文本元素列表 -->
-        <block wx:for="{{textItems}}" wx:key="id">
-          <view class="text-item {{item.active ? 'active' : ''}}"
-                style="left: {{item.x}}px; top: {{item.y}}px; font-size: {{item.size}}px; color: {{item.color}};"
-                catchtouchstart="onTextTouchStart"
-                catchtouchmove="onTextTouchMove"
+  <view class="preview-shell">
+    <view class="preview-stage">
+      <view class="canvas-frame">
+        <view
+          id="previewArea"
+          class="canvas-area {{isMulti ? 'multi-mode' : ''}} {{activeDrawerTab === 'text' ? 'text-mode' : ''}}"
+          style="background: {{selectedBg.type === 'image' ? 'transparent' : selectedBg.css}}; background-size: {{selectedBg.grid || selectedBg.dots ? '20px 20px' : 'cover'}};"
+          catchtap="onCanvasTap"
+        >
+          <view class="safe-guide safe-guide-top"></view>
+          <view class="safe-guide safe-guide-bottom"></view>
+          <view class="safe-guide safe-guide-left"></view>
+          <view class="safe-guide safe-guide-right"></view>
+
+          <image
+            wx:if="{{selectedBg.type === 'image'}}"
+            class="bg-image"
+            src="{{selectedBg.value}}"
+            mode="aspectFill"
+          ></image>
+
+          <image
+            wx:if="{{!isMulti && look.preview_url}}"
+            class="outfit-image"
+            src="{{look.preview_url}}"
+            mode="aspectFit"
+          ></image>
+
+          <view wx:if="{{isMulti}}" class="multi-item-preview">
+            <image
+              wx:for="{{imageUrls}}"
+              wx:key="*this"
+              class="multi-item-img"
+              src="{{item}}"
+              mode="widthFix"
+            ></image>
+          </view>
+
+          <block wx:for="{{textItems}}" wx:key="id">
+            <view
+              class="text-item align-{{item.align || 'left'}} {{item.active ? 'active' : ''}} {{item.active && activeDrawerTab === 'text' ? 'editing' : ''}}"
+              style="left: {{item.x}}px; top: {{item.y}}px; font-size: {{item.size}}px; color: {{item.color}};"
+              catchtouchstart="onTextTouchStart"
+              catchtouchmove="onTextTouchMove"
+              catchtap="activateText"
+              data-id="{{item.id}}"
+            >
+              <input
+                wx:if="{{item.active && activeDrawerTab === 'text'}}"
+                class="canvas-text-input align-{{item.align || 'left'}}"
+                value="{{activeTextDraft}}"
+                placeholder="输入文字"
+                placeholder-class="canvas-text-placeholder"
+                focus="{{canvasInputFocus}}"
+                cursor-spacing="16"
+                adjust-position="false"
+                bindinput="onActiveTextInput"
+                bindblur="onCanvasTextBlur"
                 catchtap="activateText"
-                data-id="{{item.id}}">
-            {{item.content}}
-            <!-- 删除按钮 (只在激活时显示)，使用 catchtouchstart 阻止事件冒泡且立即响应 -->
-            <view wx:if="{{item.active}}" class="delete-btn" catchtouchstart="deleteText" data-id="{{item.id}}">×</view>
-          </view>
-        </block>
-      </view>
-    </view>
-
-    <!-- 操作面板 -->
-    <view class="tools-panel glass" catchtap="true">
-      <block wx:if="{{!activeTextId}}">
-        <!-- 背景颜色选择卡片 -->
-        <view class="section-title">背景颜色</view>
-        <scroll-view class="color-scroll" scroll-x="true" show-scrollbar="false">
-          <view class="color-list">
-            <view wx:for="{{backgrounds}}" wx:key="id"
-                  class="color-card {{selectedBg.id === item.id ? 'selected' : ''}}"
-                  style="background: {{item.type === 'image' ? 'transparent' : item.css}}; background-size: {{item.grid || item.dots ? '20px 20px' : 'cover'}};"
-                  catchtap="selectBg"
-                  data-bg="{{item}}">
-              <image wx:if="{{item.type === 'image'}}" src="{{item.value}}" mode="aspectFill" style="width: 100%; height: 100%; display: block;"></image>
+                data-id="{{item.id}}"
+              />
+              <block wx:else>{{item.content}}</block>
+              <view
+                wx:if="{{item.active}}"
+                class="delete-btn"
+                catchtouchstart="deleteText"
+                data-id="{{item.id}}"
+              >×</view>
             </view>
-          </view>
-        </scroll-view>
-
-        <view class="divider"></view>
-
-        <!-- 添加文本功能 -->
-        <view class="text-tool">
-          <input class="text-input" placeholder="输入要添加的文字..." value="{{inputText}}" bindinput="onTextInput" />
-          <button class="add-text-btn" size="mini" catchtap="addText">添加文字</button>
+          </block>
         </view>
-      </block>
-      
-      <block wx:else>
-        <view class="section-title">文字设置</view>
-        
-        <!-- 字体大小 -->
-        <view class="tool-row">
-          <text class="tool-label">大小</text>
-          <slider class="tool-slider" min="12" max="64" value="{{textItems[activeTextId - 1] ? textItems[activeTextId - 1].size : 24}}" activeColor="#8A2BE2" block-size="20" bindchange="changeTextSize" bindchanging="changeTextSize" />
-        </view>
-        
-        <!-- 字体颜色 -->
-        <view class="tool-row">
-          <text class="tool-label">颜色</text>
-          <scroll-view class="color-scroll" scroll-x="true" show-scrollbar="false" style="flex:1;">
-            <view class="color-list">
-              <view wx:for="{{textColors}}" wx:key="*this"
-                    class="text-color-circle {{textItems[activeTextId - 1] && textItems[activeTextId - 1].color === item ? 'selected' : ''}}"
-                    style="background-color: {{item}};"
-                    catchtap="changeTextColor"
-                    data-color="{{item}}"></view>
-            </view>
-          </scroll-view>
-        </view>
-
-        <view class="divider"></view>
-        
-        <button class="action-btn primary-btn" catchtap="cancelTextEdit">完成编辑</button>
-      </block>
-
-      <!-- 底部操作按钮 (仅在非文本编辑态时显示分享按钮) -->
-      <view class="bottom-actions" wx:if="{{!activeTextId}}">
-        <button class="action-btn share-btn" open-type="share">分享给好友</button>
-        <button class="action-btn primary-btn" catchtap="saveImage">保存到相册</button>
       </view>
     </view>
   </view>
 
-  <!-- 隐藏的 Canvas，用于把整个视图渲染为图片保存 -->
+  <view class="drawer" catchtap="true">
+    <view class="drawer-handle"></view>
+
+    <view class="drawer-topbar">
+      <button class="drawer-back-btn" catchtap="goBack">返回</button>
+      <view class="drawer-tabs">
+        <view
+          class="drawer-tab {{activeDrawerTab === 'background' ? 'active' : ''}}"
+          bindtap="switchDrawerTab"
+          data-tab="background"
+        >背景</view>
+        <view
+          class="drawer-tab {{activeDrawerTab === 'text' ? 'active' : ''}}"
+          bindtap="switchDrawerTab"
+          data-tab="text"
+        >文字</view>
+      </view>
+      <button class="drawer-save-btn" catchtap="saveImage">保存</button>
+    </view>
+
+    <view wx:if="{{activeDrawerTab === 'background'}}" class="drawer-content">
+      <scroll-view class="bg-grid-scroll" scroll-y="true" show-scrollbar="false">
+        <view class="bg-grid">
+          <view
+            wx:for="{{backgrounds}}"
+            wx:key="id"
+            class="bg-card {{selectedBg.id === item.id ? 'selected' : ''}}"
+            catchtap="selectBg"
+            data-bg="{{item}}"
+          >
+            <view
+              class="bg-swatch"
+              style="background: {{item.type === 'image' ? 'transparent' : item.css}}; background-size: {{item.grid || item.dots ? '20px 20px' : 'cover'}};"
+            >
+              <image
+                wx:if="{{item.type === 'image'}}"
+                class="bg-thumb"
+                src="{{item.value}}"
+                mode="aspectFill"
+              ></image>
+            </view>
+            <text class="bg-label">{{item.label}}</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <view wx:elif="{{activeDrawerTab === 'text'}}" class="drawer-content">
+      <view class="text-editor-card">
+        <block wx:if="{{activeTextId}}">
+          <view class="setting-card">
+            <view class="setting-block">
+              <view class="setting-head">
+                <text class="setting-title">字号</text>
+                <text class="setting-value">{{textItems[activeTextId - 1] ? textItems[activeTextId - 1].size : 24}} px</text>
+              </view>
+              <slider
+                min="12"
+                max="64"
+                value="{{textItems[activeTextId - 1] ? textItems[activeTextId - 1].size : 24}}"
+                activeColor="#8A2BE2"
+                backgroundColor="#E7DDF8"
+                block-color="#8A2BE2"
+                block-size="18"
+                bindchange="changeTextSize"
+                bindchanging="changeTextSize"
+              />
+            </view>
+
+            <view class="setting-head">
+              <text class="setting-title">颜色</text>
+            </view>
+            <scroll-view class="color-scroll" scroll-x="true" show-scrollbar="false">
+              <view class="color-list">
+                <view
+                  wx:for="{{textColors}}"
+                  wx:key="*this"
+                  class="text-color-circle {{textItems[activeTextId - 1] && textItems[activeTextId - 1].color === item ? 'selected' : ''}}"
+                  style="background-color: {{item}};"
+                  catchtap="changeTextColor"
+                  data-color="{{item}}"
+                ></view>
+              </view>
+            </scroll-view>
+
+            <view class="setting-divider"></view>
+
+            <view class="setting-head">
+              <text class="setting-title">对齐</text>
+            </view>
+            <view class="align-row">
+              <view
+                wx:for="{{textAlignOptions}}"
+                wx:key="*this"
+                class="align-chip {{textItems[activeTextId - 1] && textItems[activeTextId - 1].align === item ? 'active' : ''}}"
+                catchtap="changeTextAlign"
+                data-align="{{item}}"
+              >
+                {{item === 'left' ? '左对齐' : item === 'center' ? '居中' : '右对齐'}}
+              </view>
+            </view>
+          </view>
+        </block>
+
+        <view wx:else class="empty-editor">
+          <text class="empty-editor-title">点击画布任意位置添加文字</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
   <canvas type="2d" id="exportCanvas" class="export-canvas"></canvas>
 </view>

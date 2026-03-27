@@ -16,3 +16,7 @@ view, text, scroll-view, image, button {
   height: 0;
   color: transparent;
 }
+
+button {
+ width: auto!important;
+}
