@@ -11,7 +11,7 @@ Page({
     displayTitle: '',
     serialText: '',
     subtitleText: '',
-    appName: '灵感衣橱',
+    appName: 'AI灵感衣橱',
     appDesc: '发现穿搭灵感，让美触手可及',
     saveLabel: '保存到手机相册',
     friendLabel: '发送给好友',
