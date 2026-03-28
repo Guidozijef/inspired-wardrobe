@@ -4,7 +4,7 @@ Page({
     navBarHeight: 44,
     menuTop: 0,
     menuHeight: 32,
-    version: '1.0.0',
+    version: '-',
     aiCutoutEnabled: true,
     hdExportEnabled: true,
     cacheSize: '计算中...'
@@ -41,6 +41,8 @@ Page({
     } catch (e) {
       this.setData({ version: 'dev' })
     }
+
+    this.calcCacheSize()
   },
 
   calcCacheSize() {
