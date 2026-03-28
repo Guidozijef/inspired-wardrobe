@@ -195,74 +195,116 @@ Page({
         const ctx = canvas.getContext('2d')
         const dpr = wx.getSystemInfoSync().pixelRatio
 
-        // 布局常量，与预览页结构对齐
-        const width = 1080
-        const margin = 28       // 对应 content padding 18px * 1.55
-        const cardPad = 32      // 对应 poster-card padding 16px * 2
-        const cardRadius = 86   // 对应 border-radius 32px * 2.7
-        const imgRadius = 64    // 对应 poster-preview border-radius 24px * 2.7
-        const footerH = 200     // 对应 poster-footer 高度
+        // ── 布局常量 ──────────────────────────────────────
+        const width    = 1080
+        const margin   = 52      // 外边距（为边框留出空间）
+        const cardPad  = 32      // 卡片内边距
+        const cardR    = 0       // 卡片直角（配合 L 形边框）
+        const imgR     = 0       // 图片直角
+        const footerH  = 200     // footer 高度
 
-        // previewX/W 与之前保持一致：60/960
-        const previewX = margin + cardPad   // = 60
-        const previewY = margin + cardPad   // = 60
-        const previewW = width - 2 * (margin + cardPad)  // = 960
+        const previewX = margin + cardPad        // 84
+        const previewY = margin + cardPad        // 84
+        const previewW = width - 2 * previewX   // 912
 
         // 先获取图片尺寸
-        const previewSrc = this.data.exportImage || this.data.displayImage || this.data.look.preview_url || this.data.look.preview
+        const previewSrc = this.data.exportImage || this.data.displayImage
+          || this.data.look.preview_url || this.data.look.preview
         let previewInfo = null
-        if (previewSrc) {
-          previewInfo = await this.getImageInfo(previewSrc)
-        }
+        if (previewSrc) previewInfo = await this.getImageInfo(previewSrc)
 
         const previewH = (previewInfo && previewInfo.width && previewInfo.height)
           ? Math.round(previewW * previewInfo.height / previewInfo.width)
-          : 1220
+          : 1200
 
-        // footer 紧贴图片底部（与预览页一致，无间隙）
         const footerY = previewY + previewH
-        const cardW = width - 2 * margin         // = 1024
-        const cardH = cardPad + previewH + footerH + cardPad
-        const height = 2 * margin + cardH
+        const cardW   = width - 2 * margin
+        const cardH   = cardPad + previewH + footerH + cardPad
+        const height  = 2 * margin + cardH + 28   // 底部多 28px 放品牌文字
 
-        canvas.width = width * dpr
+        canvas.width  = width  * dpr
         canvas.height = height * dpr
         ctx.scale(dpr, dpr)
 
-        // 1. 页面背景渐变（与预览页 .container 背景一致）
+        // ── 1. 页面背景 ──────────────────────────────────
         const bgGrad = ctx.createLinearGradient(0, 0, 0, height)
         bgGrad.addColorStop(0, '#fbfaff')
-        bgGrad.addColorStop(1, '#f4f6fb')
+        bgGrad.addColorStop(1, '#f0eef9')
         ctx.fillStyle = bgGrad
         ctx.fillRect(0, 0, width, height)
 
         // 顶部紫色光晕
-        const radGrad = ctx.createRadialGradient(540, 0, 0, 540, 0, height * 0.42)
-        radGrad.addColorStop(0, 'rgba(168, 124, 255, 0.14)')
+        const radGrad = ctx.createRadialGradient(540, 0, 0, 540, 0, height * 0.4)
+        radGrad.addColorStop(0, 'rgba(168, 124, 255, 0.16)')
         radGrad.addColorStop(1, 'rgba(168, 124, 255, 0)')
         ctx.fillStyle = radGrad
         ctx.fillRect(0, 0, width, height)
 
-        // 2. 卡片阴影（先画一层偏移半透明，模拟 box-shadow）
+        // ── 2. 装饰边框（双线 + 四角 L 括号 + 品牌文字） ──────
+        const fO   = 14    // 外线距画布边缘
+        const fI   = 32    // 内线距画布边缘
+        const cLen = 80    // L 臂长
+        const cW   = 6     // L 线宽
+
+        // 外细线（渐变紫）
+        const outerGrad = ctx.createLinearGradient(fO, fO, width - fO, height - fO)
+        outerGrad.addColorStop(0,   'rgba(143, 67, 246, 0.35)')
+        outerGrad.addColorStop(0.5, 'rgba(192, 132, 252, 0.60)')
+        outerGrad.addColorStop(1,   'rgba(143, 67, 246, 0.35)')
+        ctx.strokeStyle = outerGrad
+        ctx.lineWidth = 1.5
+        ctx.strokeRect(fO, fO, width - fO * 2, height - fO * 2)
+
+        // 内细线（渐变紫，稍深）
+        const innerGrad = ctx.createLinearGradient(fI, fI, width - fI, height - fI)
+        innerGrad.addColorStop(0,   'rgba(143, 67, 246, 0.30)')
+        innerGrad.addColorStop(0.5, 'rgba(192, 132, 252, 0.50)')
+        innerGrad.addColorStop(1,   'rgba(143, 67, 246, 0.30)')
+        ctx.strokeStyle = innerGrad
+        ctx.lineWidth = 1
+        ctx.strokeRect(fI, fI, width - fI * 2, height - fI * 2)
+
+        // 四角 L 标记（压在内线四角上，颜色更深）
+        ctx.fillStyle = 'rgba(143, 67, 246, 0.85)'
+        const drawCorner = (x, y, hx, hy) => {
+          ctx.fillRect(hx > 0 ? x : x - cLen + cW, y, cLen, cW)
+          ctx.fillRect(x, hy > 0 ? y : y - cLen + cW, cW, cLen)
+        }
+        drawCorner(fI,              fI,               1,  1)  // 左上
+        drawCorner(width - fI - cW, fI,              -1,  1)  // 右上
+        drawCorner(fI,              height - fI - cW, 1, -1)  // 左下
+        drawCorner(width - fI - cW, height - fI - cW,-1, -1)  // 右下
+
+        // 品牌文字（卡片底与内线之间居中，不被边框遮挡）
+        // 卡片底距画布底 = margin + 28 = 80，内线距画布底 = fI = 32，中点 = 56
+        ctx.fillStyle = 'rgba(143, 67, 246, 0.52)'
+        ctx.font = '500 26px sans-serif'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.fillText('✦  INSPIRED WARDROBE  ✦', width / 2, height - 56)
+        ctx.textAlign = 'left'
+        ctx.textBaseline = 'alphabetic'
+
+        // ── 3. 卡片（白色，带阴影） ───────────────────────
         ctx.save()
-        ctx.shadowColor = 'rgba(90, 70, 140, 0.14)'
-        ctx.shadowBlur = 44
+        ctx.shadowColor  = 'rgba(90, 70, 140, 0.14)'
+        ctx.shadowBlur   = 44
         ctx.shadowOffsetY = 20
-        this.drawRoundedRect(ctx, margin, margin, cardW, cardH, cardRadius)
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.88)'
+        this.drawRoundedRect(ctx, margin, margin, cardW, cardH, cardR)
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.92)'
         ctx.fill()
         ctx.restore()
 
-        // 3. 图片区域（top 两角圆、bottom 两角直，贴合预览）
+        // ── 4. 图片（上两角圆、下两角直） ───────────────────
         ctx.save()
         ctx.beginPath()
-        ctx.moveTo(previewX + imgRadius, previewY)
-        ctx.lineTo(previewX + previewW - imgRadius, previewY)
-        ctx.arcTo(previewX + previewW, previewY, previewX + previewW, previewY + imgRadius, imgRadius)
+        ctx.moveTo(previewX + imgR, previewY)
+        ctx.lineTo(previewX + previewW - imgR, previewY)
+        ctx.arcTo(previewX + previewW, previewY,   previewX + previewW, previewY + imgR, imgR)
         ctx.lineTo(previewX + previewW, previewY + previewH)
-        ctx.lineTo(previewX, previewY + previewH)
-        ctx.lineTo(previewX, previewY + imgRadius)
-        ctx.arcTo(previewX, previewY, previewX + imgRadius, previewY, imgRadius)
+        ctx.lineTo(previewX,            previewY + previewH)
+        ctx.lineTo(previewX,            previewY + imgR)
+        ctx.arcTo(previewX, previewY, previewX + imgR, previewY, imgR)
         ctx.closePath()
         ctx.clip()
 
@@ -271,75 +313,74 @@ Page({
             const previewImg = canvas.createImage()
             await this.loadCanvasImage(previewImg, previewInfo.path)
             ctx.drawImage(previewImg, previewX, previewY, previewW, previewH)
-          } catch (err) {
+          } catch (e) {
             this.fillPosterPlaceholder(ctx, previewX, previewY, previewW, previewH)
           }
         } else {
           this.fillPosterPlaceholder(ctx, previewX, previewY, previewW, previewH)
         }
-
         ctx.restore()
 
-        // 4. 图片底部渐变遮罩 + 文字
-        const overlayTop = previewY + previewH * 0.45
-        const overlayBottom = previewY + previewH
-        const overlay = ctx.createLinearGradient(0, overlayTop, 0, overlayBottom)
-        overlay.addColorStop(0, 'rgba(0, 0, 0, 0)')
-        overlay.addColorStop(1, 'rgba(0, 0, 0, 0.44)')
-        ctx.fillStyle = overlay
+        // ── 5. 图片底部渐变遮罩 + 文字 ───────────────────
+        const oTop    = previewY + previewH * 0.45
+        const oBottom = previewY + previewH
+        const ovGrad  = ctx.createLinearGradient(0, oTop, 0, oBottom)
+        ovGrad.addColorStop(0, 'rgba(0,0,0,0)')
+        ovGrad.addColorStop(1, 'rgba(0,0,0,0.44)')
+        ctx.fillStyle = ovGrad
         ctx.beginPath()
-        ctx.moveTo(previewX + imgRadius, previewY)
-        ctx.lineTo(previewX + previewW - imgRadius, previewY)
-        ctx.arcTo(previewX + previewW, previewY, previewX + previewW, previewY + imgRadius, imgRadius)
-        ctx.lineTo(previewX + previewW, previewY + previewH)
-        ctx.lineTo(previewX, previewY + previewH)
-        ctx.lineTo(previewX, previewY + imgRadius)
-        ctx.arcTo(previewX, previewY, previewX + imgRadius, previewY, imgRadius)
+        ctx.moveTo(previewX + imgR, previewY)
+        ctx.lineTo(previewX + previewW - imgR, previewY)
+        ctx.arcTo(previewX + previewW, previewY,   previewX + previewW, previewY + imgR, imgR)
+        ctx.lineTo(previewX + previewW, oBottom)
+        ctx.lineTo(previewX,            oBottom)
+        ctx.lineTo(previewX,            previewY + imgR)
+        ctx.arcTo(previewX, previewY, previewX + imgR, previewY, imgR)
         ctx.closePath()
         ctx.fill()
 
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.68)'
+        const tx = previewX + 52
+        ctx.fillStyle = 'rgba(255,255,255,0.68)'
         ctx.font = '500 26px sans-serif'
-        ctx.fillText(this.data.serialText, previewX + 56, overlayBottom - 160)
+        ctx.fillText(this.data.serialText, tx, oBottom - 158)
 
-        ctx.fillStyle = '#FFFFFF'
-        ctx.font = 'bold 60px sans-serif'
-        ctx.fillText(this.data.displayTitle || 'Inspired Look', previewX + 56, overlayBottom - 90)
+        ctx.fillStyle = '#ffffff'
+        ctx.font = 'bold 58px sans-serif'
+        ctx.fillText(this.data.displayTitle || 'Inspired Look', tx, oBottom - 90)
 
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.82)'
-        ctx.font = 'italic 28px sans-serif'
-        ctx.fillText(this.data.subtitleText, previewX + 56, overlayBottom - 38)
+        ctx.fillStyle = 'rgba(255,255,255,0.82)'
+        ctx.font = 'italic 27px sans-serif'
+        ctx.fillText(this.data.subtitleText, tx, oBottom - 40)
 
-        // 5. Footer（与预览页 poster-footer 结构一致，紧贴图片）
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.98)'
+        // ── 6. Footer ────────────────────────────────────
+        ctx.fillStyle = 'rgba(255,255,255,0.98)'
         ctx.fillRect(previewX, footerY, previewW, footerH)
 
         ctx.fillStyle = '#2C223D'
         ctx.font = 'bold 38px sans-serif'
-        ctx.fillText(this.data.appName, previewX + 50, footerY + 82)
+        ctx.fillText(this.data.appName, previewX + 48, footerY + 82)
 
         ctx.fillStyle = '#8C86A3'
         ctx.font = '26px sans-serif'
-        ctx.fillText(this.data.appDesc, previewX + 50, footerY + 128)
+        ctx.fillText(this.data.appDesc, previewX + 48, footerY + 128)
 
         try {
           const qrImg = canvas.createImage()
           await this.loadCanvasImage(qrImg, '/pages/images/qrX.jpg')
-          const qrSize = 116
+          const qrSize = 112
           ctx.drawImage(qrImg, previewX + previewW - qrSize - 44, footerY + (footerH - qrSize) / 2, qrSize, qrSize)
-        } catch (err) {
-          console.error('load qr image failed', err)
+        } catch (e) {
+          console.error('load qr failed', e)
         }
 
         wx.canvasToTempFilePath({
           canvas,
-          x: 0,
-          y: 0,
-          width: canvas.width,
+          x: 0, y: 0,
+          width:  canvas.width,
           height: canvas.height,
-          destWidth: canvas.width,
+          destWidth:  canvas.width,
           destHeight: canvas.height,
-          success: (result) => resolve(result.tempFilePath),
+          success: (r) => resolve(r.tempFilePath),
           fail: reject
         })
       })
