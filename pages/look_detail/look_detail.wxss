@@ -7,8 +7,8 @@
 .nav-title { font-size: 16px; font-weight: bold; }
 
 .content { padding: 20px; flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 20px; overflow: hidden; }
-.canvas-display { width: 100%; aspect-ratio: 3/4; border-radius: 24px; position: relative; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.05); background-color: #f8fafc; }
-.full-preview { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; object-fit: contain; }
+.canvas-display { width: 100%; border-radius: 24px; position: relative; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.05); background-color: #f8fafc; min-height: 200px; }
+.full-preview { width: 100%; display: block; position: relative; z-index: 1; }
 .emoji-huge { font-size: 120px; text-shadow: 0 10px 20px rgba(0,0,0,0.15); z-index: 2; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 .watermark { position: absolute; bottom: 20px; right: 20px; font-size: 24px; font-family: serif; color: rgba(0,0,0,0.05); font-weight: bold; letter-spacing: 4px; pointer-events: none; z-index: 3; }
 
