@@ -225,5 +225,18 @@ Page({
     wx.redirectTo({
       url: path
     })
+  },
+
+  onShareAppMessage() {
+    return {
+      title: '灵感衣橱 · 发现穿搭灵感，让美触手可及',
+      path: '/pages/wardrobe/wardrobe'
+    }
+  },
+
+  onShareTimeline() {
+    return {
+      title: '灵感衣橱 · 数字化你的衣橱，找回选衣服的乐趣'
+    }
   }
 })
