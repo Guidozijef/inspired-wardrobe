@@ -914,25 +914,29 @@ Page({
     }
 
     if (bg.type === 'image') {
-      const bgInfo = await new Promise((resolve) => {
-        wx.getImageInfo({
-          src: bg.value,
-          success: resolve,
-          fail: () => resolve(null)
-        })
+      const tryLoadImg = (src) => new Promise((resolve) => {
+        const img = canvas.createImage()
+        img.onload = () => resolve(img)
+        img.onerror = () => resolve(null)
+        img.src = src
       })
 
-      if (bgInfo && bgInfo.path) {
-        const img = canvas.createImage()
-        await new Promise((resolve) => {
-          img.onload = resolve
-          img.onerror = resolve
-          img.src = bgInfo.path
+      // 先直接加载（本地包文件路径）
+      let img = await tryLoadImg(bg.value)
+
+      // 失败则通过 getImageInfo 解析（cloud:// 或 https 链接）
+      if (!img) {
+        const bgInfo = await new Promise((resolve) => {
+          wx.getImageInfo({ src: bg.value, success: resolve, fail: () => resolve(null) })
         })
-        if (img.width) {
-          ctx.drawImage(img, 0, 0, width, height)
-          return
+        if (bgInfo && bgInfo.path && bgInfo.path !== bg.value) {
+          img = await tryLoadImg(bgInfo.path)
         }
+      }
+
+      if (img) {
+        ctx.drawImage(img, 0, 0, width, height)
+        return
       }
     }
 
