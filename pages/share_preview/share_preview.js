@@ -182,14 +182,25 @@ Page({
         const ctx = canvas.getContext('2d')
         const dpr = wx.getSystemInfoSync().pixelRatio
         const width = 1080
-        const height = 1600
         const previewX = 60
         const previewY = 60
         const previewW = 960
-        const previewH = 1220
-        const footerY = 1310
         const footerH = 220
         const radius = 58
+
+        // 先获取图片尺寸，按原始比例计算 previewH
+        const previewSrc = this.data.exportImage || this.data.displayImage || this.data.look.preview_url || this.data.look.preview
+        let previewInfo = null
+        if (previewSrc) {
+          previewInfo = await this.getImageInfo(previewSrc)
+        }
+
+        const previewH = (previewInfo && previewInfo.width && previewInfo.height)
+          ? Math.round(previewW * previewInfo.height / previewInfo.width)
+          : 1220
+
+        const footerY = previewY + previewH + 30
+        const height = footerY + footerH + 60
 
         canvas.width = width * dpr
         canvas.height = height * dpr
@@ -206,17 +217,11 @@ Page({
         ctx.save()
         ctx.clip()
 
-        const previewSrc = this.data.exportImage || this.data.displayImage || this.data.look.preview_url || this.data.look.preview
-        if (previewSrc) {
+        if (previewInfo && previewInfo.path) {
           try {
-            const previewInfo = await this.getImageInfo(previewSrc)
-            if (previewInfo && previewInfo.path) {
-              const previewImg = canvas.createImage()
-              await this.loadCanvasImage(previewImg, previewInfo.path)
-              this.drawImageContain(ctx, previewImg, previewInfo.width, previewInfo.height, previewX, previewY, previewW, previewH)
-            } else {
-              this.fillPosterPlaceholder(ctx, previewX, previewY, previewW, previewH)
-            }
+            const previewImg = canvas.createImage()
+            await this.loadCanvasImage(previewImg, previewInfo.path)
+            ctx.drawImage(previewImg, previewX, previewY, previewW, previewH)
           } catch (err) {
             this.fillPosterPlaceholder(ctx, previewX, previewY, previewW, previewH)
           }
@@ -226,7 +231,9 @@ Page({
 
         ctx.restore()
 
-        const overlay = ctx.createLinearGradient(0, previewY + previewH * 0.45, 0, previewY + previewH)
+        const overlayTop = previewY + previewH * 0.45
+        const overlayBottom = previewY + previewH
+        const overlay = ctx.createLinearGradient(0, overlayTop, 0, overlayBottom)
         overlay.addColorStop(0, 'rgba(0, 0, 0, 0)')
         overlay.addColorStop(1, 'rgba(0, 0, 0, 0.38)')
         ctx.fillStyle = overlay
@@ -235,15 +242,15 @@ Page({
 
         ctx.fillStyle = 'rgba(255, 255, 255, 0.68)'
         ctx.font = '500 26px sans-serif'
-        ctx.fillText(this.data.serialText, 116, 1120)
+        ctx.fillText(this.data.serialText, 116, overlayBottom - 160)
 
         ctx.fillStyle = '#FFFFFF'
         ctx.font = 'bold 60px sans-serif'
-        ctx.fillText(this.data.displayTitle || 'Inspired Look', 116, 1190)
+        ctx.fillText(this.data.displayTitle || 'Inspired Look', 116, overlayBottom - 90)
 
         ctx.fillStyle = 'rgba(255, 255, 255, 0.82)'
         ctx.font = 'italic 28px sans-serif'
-        ctx.fillText(this.data.subtitleText, 116, 1242)
+        ctx.fillText(this.data.subtitleText, 116, overlayBottom - 38)
 
         this.drawRoundedRect(ctx, 60, footerY, 960, footerH, 46)
         ctx.fillStyle = 'rgba(255, 255, 255, 0.96)'
@@ -380,26 +387,7 @@ Page({
     ctx.closePath()
   },
 
-  drawImageContain(ctx, img, imgW, imgH, x, y, width, height) {
-    const imgRatio = imgW / imgH
-    const boxRatio = width / height
-    let drawWidth = width
-    let drawHeight = height
-    let drawX = x
-    let drawY = y
-
-    if (imgRatio > boxRatio) {
-      drawHeight = width / imgRatio
-      drawY = y + (height - drawHeight) / 2
-    } else {
-      drawWidth = height * imgRatio
-      drawX = x + (width - drawWidth) / 2
-    }
-
-    ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight)
-  },
-
-  fillPosterPlaceholder(ctx, x, y, width, height) {
+fillPosterPlaceholder(ctx, x, y, width, height) {
     const gradient = ctx.createLinearGradient(x, y, x + width, y + height)
     gradient.addColorStop(0, '#F3EEE8')
     gradient.addColorStop(1, '#E8E1D8')
