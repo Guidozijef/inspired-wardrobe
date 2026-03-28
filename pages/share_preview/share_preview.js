@@ -193,7 +193,8 @@ Page({
 
         const canvas = res[0].node
         const ctx = canvas.getContext('2d')
-        const dpr = wx.getSystemInfoSync().pixelRatio
+        const hdEnabled = wx.getStorageSync('setting_hd_export')
+        const dpr = hdEnabled === false ? 1 : wx.getSystemInfoSync().pixelRatio
 
         // ── 布局常量 ──────────────────────────────────────
         const width    = 1080

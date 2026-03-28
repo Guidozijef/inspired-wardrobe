@@ -1,0 +1,132 @@
+.container {
+  min-height: 100vh;
+  position: relative;
+  background:
+    radial-gradient(circle at top right, rgba(138, 43, 226, 0.18), transparent 28%),
+    linear-gradient(180deg, #f5f0ff 0%, #f8f7fc 30%, #f2f0f8 100%);
+}
+
+.glow {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(48px);
+  pointer-events: none;
+  z-index: 0;
+}
+.glow-a {
+  width: 220px; height: 220px;
+  top: -60px; right: -60px;
+  background: rgba(145, 92, 255, 0.18);
+}
+
+/* ── Nav Bar ─────────────────────────────────────── */
+.nav-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: transparent;
+}
+.nav-back {
+  width: 32px; height: 100%;
+  display: flex; align-items: center;
+}
+.nav-back-icon {
+  font-size: 30px;
+  color: #7C3AED;
+  font-weight: 300;
+  line-height: 1;
+}
+.nav-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #3D1F8C;
+  letter-spacing: 0.3px;
+}
+
+/* ── Scroll ──────────────────────────────────────── */
+.scroll-body {
+  height: 100vh;
+  background: transparent;
+}
+
+/* ── Section Label ───────────────────────────────── */
+.section-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #9580c0;
+  letter-spacing: 0.8px;
+  padding: 20px 20px 8px;
+}
+
+/* ── Panel ───────────────────────────────────────── */
+.panel {
+  margin: 0 16px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 24px rgba(100, 60, 200, 0.07), inset 0 1px 0 rgba(255,255,255,0.9);
+  border: 1px solid rgba(124, 58, 237, 0.07);
+  overflow: hidden;
+}
+
+/* ── Row ─────────────────────────────────────────── */
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+}
+.row-left {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+.row-icon-wrap {
+  width: 38px; height: 38px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+.row-icon-wrap.purple {
+  background: linear-gradient(135deg, #7C3AED, #9F5FF0);
+}
+.row-icon-wrap.soft {
+  background: linear-gradient(145deg, #f0e8ff, #e8deff);
+}
+.row-icon { width: 18px; height: 18px; }
+
+.row-copy {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.row-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #241538;
+}
+.row-desc {
+  font-size: 12px;
+  color: #9580c0;
+}
+.row-arrow {
+  font-size: 20px;
+  color: #c0b4d8;
+  margin-left: 8px;
+  line-height: 1;
+}
+.version-tag {
+  font-size: 13px;
+  font-weight: 600;
+  color: #9580c0;
+}
+
+.divider {
+  height: 1px;
+  background: rgba(124, 58, 237, 0.07);
+  margin: 0 16px;
+}

@@ -1,0 +1,115 @@
+<view class="container">
+  <view class="glow glow-a"></view>
+
+  <!-- 导航栏 -->
+  <view class="nav-bar" style="height: {{statusBarHeight + navBarHeight}}px;">
+    <view class="nav-inner" style="position: absolute; left: 16px; right: 16px; top: {{menuTop}}px; height: {{menuHeight}}px; display: flex; align-items: center; justify-content: space-between;">
+      <view class="nav-back" bindtap="goBack">
+        <text class="nav-back-icon">‹</text>
+      </view>
+      <text class="nav-title">系统设置</text>
+      <view style="width: 32px;"></view>
+    </view>
+  </view>
+
+  <scroll-view scroll-y class="scroll-body">
+    <view style="height: {{statusBarHeight + navBarHeight}}px;"></view>
+
+    <!-- 功��偏好 -->
+    <view class="section-label">功能偏好</view>
+    <view class="panel">
+      <view class="row">
+        <view class="row-left">
+          <view class="row-icon-wrap purple">
+            <image class="row-icon" src="https://img.icons8.com/ios-glyphs/50/ffffff/scissors.png"></image>
+          </view>
+          <view class="row-copy">
+            <text class="row-title">AI 自动去背景</text>
+            <text class="row-desc">添加单品时自动识别并去除背景</text>
+          </view>
+        </view>
+        <switch color="#7C3AED" checked="{{aiCutoutEnabled}}" bindchange="toggleAiCutout" />
+      </view>
+
+      <view class="divider"></view>
+
+      <view class="row">
+        <view class="row-left">
+          <view class="row-icon-wrap soft">
+            <image class="row-icon" src="https://img.icons8.com/ios-glyphs/50/7C3AED/picture.png"></image>
+          </view>
+          <view class="row-copy">
+            <text class="row-title">保存高清图片</text>
+            <text class="row-desc">分享海报保存为原始分辨率</text>
+          </view>
+        </view>
+        <switch color="#7C3AED" checked="{{hdExportEnabled}}" bindchange="toggleHdExport" />
+      </view>
+    </view>
+
+    <!-- 存储与缓存 -->
+    <view class="section-label">存储与缓存</view>
+    <view class="panel">
+      <view class="row" bindtap="clearCache">
+        <view class="row-left">
+          <view class="row-icon-wrap soft">
+            <image class="row-icon" src="https://img.icons8.com/ios-glyphs/50/7C3AED/trash.png"></image>
+          </view>
+          <view class="row-copy">
+            <text class="row-title">清除本地缓存</text>
+            <text class="row-desc">{{cacheSize}}</text>
+          </view>
+        </view>
+        <text class="row-arrow">›</text>
+      </view>
+    </view>
+
+    <!-- 法律与协议 -->
+    <view class="section-label">法律与协议</view>
+    <view class="panel">
+      <view class="row" bindtap="openPrivacy">
+        <view class="row-left">
+          <view class="row-icon-wrap soft">
+            <image class="row-icon" src="https://img.icons8.com/ios-glyphs/50/7C3AED/agreement.png"></image>
+          </view>
+          <view class="row-copy">
+            <text class="row-title">隐私政策</text>
+          </view>
+        </view>
+        <text class="row-arrow">›</text>
+      </view>
+
+      <view class="divider"></view>
+
+      <view class="row" bindtap="openTerms">
+        <view class="row-left">
+          <view class="row-icon-wrap soft">
+            <image class="row-icon" src="https://img.icons8.com/ios-glyphs/50/7C3AED/document.png"></image>
+          </view>
+          <view class="row-copy">
+            <text class="row-title">用户协议</text>
+          </view>
+        </view>
+        <text class="row-arrow">›</text>
+      </view>
+    </view>
+
+    <!-- 版本信息 -->
+    <view class="section-label">关于</view>
+    <view class="panel">
+      <view class="row">
+        <view class="row-left">
+          <view class="row-icon-wrap soft">
+            <image class="row-icon" src="https://img.icons8.com/ios-glyphs/50/7C3AED/info.png"></image>
+          </view>
+          <view class="row-copy">
+            <text class="row-title">当前版本</text>
+          </view>
+        </view>
+        <text class="version-tag">v{{version}}</text>
+      </view>
+    </view>
+
+    <view style="height: 48px;"></view>
+  </scroll-view>
+</view>

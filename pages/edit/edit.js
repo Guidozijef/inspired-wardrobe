@@ -209,6 +209,11 @@ Page({
   },
 
   async autoCutoutForNew(localPath) {
+    const aiEnabled = wx.getStorageSync('setting_ai_cutout')
+    if (aiEnabled === false) {
+      this.setData({ currImage: localPath, hasCutout: false })
+      return
+    }
     await this.processImageWithCutout(localPath)
   },
 

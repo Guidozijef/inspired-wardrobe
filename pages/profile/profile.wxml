@@ -58,7 +58,7 @@
           <text class="menu-arrow">›</text>
         </view>
 
-        <view class="menu-item">
+        <view class="menu-item" bindtap="goSettings">
           <view class="menu-left">
             <view class="menu-icon-wrap">
               <image class="menu-icon" src="https://img.icons8.com/ios-glyphs/50/8A2BE2/settings.png"></image>
