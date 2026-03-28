@@ -99,7 +99,7 @@
           <button class="feedback-overlay" open-type="contact" hover-class="none"></button>
         </view>
 
-        <view class="menu-item">
+        <view class="menu-item" bindtap="goAbout">
           <view class="menu-left">
             <view class="menu-icon-wrap">
               <image class="menu-icon" src="https://img.icons8.com/ios-glyphs/50/8A2BE2/info.png"></image>

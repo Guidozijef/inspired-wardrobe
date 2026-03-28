@@ -1,0 +1,118 @@
+<view class="container">
+
+  <!-- 光晕装饰 -->
+  <view class="glow glow-a"></view>
+  <view class="glow glow-b"></view>
+
+  <!-- 导航栏 -->
+  <view class="nav-bar" style="height: {{statusBarHeight + navBarHeight}}px;">
+    <view class="nav-inner" style="position: absolute; left: 16px; right: 16px; top: {{menuTop}}px; height: {{menuHeight}}px; display: flex; align-items: center; justify-content: space-between;">
+      <view class="nav-back" bindtap="goBack">
+        <text class="nav-back-icon">‹</text>
+      </view>
+      <text class="nav-title">关于我们</text>
+      <view style="width: 40px;"></view>
+    </view>
+  </view>
+
+  <scroll-view scroll-y class="scroll-body">
+    <view style="height: {{statusBarHeight + navBarHeight}}px; flex-shrink: 0;"></view>
+
+    <!-- ── Hero ── -->
+    <view class="hero">
+      <view class="hero-badge">INSPIRED WARDROBE</view>
+      <text class="hero-title">让穿搭，成为\n一种愉悦</text>
+      <text class="hero-sub">数字化你的衣橱，找回选衣服的乐趣</text>
+    </view>
+
+    <!-- ── 问题导入 ── -->
+    <view class="problem-block">
+      <text class="problem-stat">21 min</text>
+      <text class="problem-desc">是普通人每天早上为"穿什么"纠结的平均时长</text>
+      <text class="problem-note">衣橱里衣服不少，却总觉得"没衣服穿"——这不是你的问题，是管理方式的问题。</text>
+    </view>
+
+    <!-- ── 功能亮点 ── -->
+    <view class="section-head">
+      <text class="section-kicker">FEATURES</text>
+      <text class="section-title">为什么选择灵感衣橱</text>
+    </view>
+
+    <view class="feature-list">
+
+      <view class="feature-card card-purple">
+        <view class="feature-icon-wrap">
+          <text class="feature-icon">👗</text>
+        </view>
+        <view class="feature-body">
+          <text class="feature-title">数字衣橱，一目了然</text>
+          <text class="feature-desc">将所有单品拍照存档，AI 自动去除背景，让每件衣服都清晰呈现。再也不会在买新衣时忘记自己已有什么。</text>
+        </view>
+      </view>
+
+      <view class="feature-card card-light">
+        <view class="feature-icon-wrap">
+          <text class="feature-icon">✏️</text>
+        </view>
+        <view class="feature-body">
+          <text class="feature-title">穿搭画布，自由创作</text>
+          <text class="feature-desc">拖拽单品到画布，像设计师一样自由组合搭配。直观看到上下装的实际搭配效果，不再脑补失败。</text>
+        </view>
+      </view>
+
+      <view class="feature-card card-light">
+        <view class="feature-icon-wrap">
+          <text class="feature-icon">📅</text>
+        </view>
+        <view class="feature-body">
+          <text class="feature-title">穿搭日历，告别重复</text>
+          <text class="feature-desc">记录每日穿搭，查看历史搭配，避免在同一场合反复穿同一套。让衣橱里的每件单品都被充分利用。</text>
+        </view>
+      </view>
+
+      <view class="feature-card card-light">
+        <view class="feature-icon-wrap">
+          <text class="feature-icon">✨</text>
+        </view>
+        <view class="feature-body">
+          <text class="feature-title">一键分享，记录美学</text>
+          <text class="feature-desc">自动生成精美穿搭海报，留存每一套令你满意的搭配。发现灵感，记录风格，分享给志同道合的朋友。</text>
+        </view>
+      </view>
+
+    </view>
+
+    <!-- ── 数据亮点 ── -->
+    <view class="stats-row">
+      <view class="stats-item">
+        <text class="stats-num">AI</text>
+        <text class="stats-label">自动去背景</text>
+      </view>
+      <view class="stats-divider"></view>
+      <view class="stats-item">
+        <text class="stats-num">0</text>
+        <text class="stats-label">门槛，即刻上手</text>
+      </view>
+      <view class="stats-divider"></view>
+      <view class="stats-item">
+        <text class="stats-num">∞</text>
+        <text class="stats-label">搭配可能性</text>
+      </view>
+    </view>
+
+    <!-- ── 理念 ── -->
+    <view class="manifesto">
+      <text class="manifesto-quote">"时尚不是关于拥有更多，\n而是更好地驾驭你所拥有的。"</text>
+      <text class="manifesto-brand">— INSPIRED WARDROBE</text>
+    </view>
+
+    <!-- ── 底部品牌 ── -->
+    <view class="footer">
+      <text class="footer-logo">灵感衣橱</text>
+      <text class="footer-tagline">发现穿搭灵感，让美触手可及</text>
+      <view class="footer-divider"></view>
+      <text class="footer-copy">© 2025 Inspired Wardrobe · All rights reserved</text>
+    </view>
+
+  </scroll-view>
+</view>

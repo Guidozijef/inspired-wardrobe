@@ -11,7 +11,8 @@
     "pages/search/search",
     "pages/capsule/capsule",
     "pages/share/share",
-    "pages/share_preview/share_preview"
+    "pages/share_preview/share_preview",
+    "pages/about/about"
   ],
   "window": {
     "backgroundTextStyle": "light",
