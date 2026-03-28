@@ -220,7 +220,7 @@ Page({
         const footerY = previewY + previewH
         const cardW   = width - 2 * margin
         const cardH   = cardPad + previewH + footerH + cardPad
-        const height  = 2 * margin + cardH + 28   // 底部多 28px 放品牌文字
+        const height  = 2 * margin + cardH         // 上下对称留边
 
         canvas.width  = width  * dpr
         canvas.height = height * dpr
@@ -265,25 +265,15 @@ Page({
         ctx.strokeRect(fI, fI, width - fI * 2, height - fI * 2)
 
         // 四角 L 标记（压在内线四角上，颜色更深）
-        ctx.fillStyle = 'rgba(143, 67, 246, 0.85)'
         const drawCorner = (x, y, hx, hy) => {
           ctx.fillRect(hx > 0 ? x : x - cLen + cW, y, cLen, cW)
           ctx.fillRect(x, hy > 0 ? y : y - cLen + cW, cW, cLen)
         }
+        ctx.fillStyle = 'rgba(143, 67, 246, 0.85)'
         drawCorner(fI,              fI,               1,  1)  // 左上
         drawCorner(width - fI - cW, fI,              -1,  1)  // 右上
         drawCorner(fI,              height - fI - cW, 1, -1)  // 左下
         drawCorner(width - fI - cW, height - fI - cW,-1, -1)  // 右下
-
-        // 品牌文字（卡片底与内线之间居中，不被边框遮挡）
-        // 卡片底距画布底 = margin + 28 = 80，内线距画布底 = fI = 32，中点 = 56
-        ctx.fillStyle = 'rgba(143, 67, 246, 0.52)'
-        ctx.font = '500 26px sans-serif'
-        ctx.textAlign = 'center'
-        ctx.textBaseline = 'middle'
-        ctx.fillText('✦  INSPIRED WARDROBE  ✦', width / 2, height - 56)
-        ctx.textAlign = 'left'
-        ctx.textBaseline = 'alphabetic'
 
         // ── 3. 卡片（白色，带阴影） ───────────────────────
         ctx.save()
@@ -372,6 +362,15 @@ Page({
         } catch (e) {
           console.error('load qr failed', e)
         }
+
+        // ── 7. 品牌文字（footer 之后绘制，不被卡片遮挡） ─────
+        ctx.fillStyle = 'rgba(143, 67, 246, 0.52)'
+        ctx.font = '500 26px sans-serif'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.fillText('✦  INSPIRED WARDROBE  ✦', width / 2, height - margin - 36)
+        ctx.textAlign = 'left'
+        ctx.textBaseline = 'alphabetic'
 
         wx.canvasToTempFilePath({
           canvas,
