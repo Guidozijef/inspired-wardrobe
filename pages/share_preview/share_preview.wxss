@@ -16,7 +16,7 @@
 }
 
 .poster-shell {
-  flex: 1;
+  flex: 0.96;
   min-height: 0;
   display: flex;
   align-items: flex-start;
@@ -51,6 +51,12 @@
   display: block;
   position: relative;
   z-index: 1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.poster-image.image-visible {
+  opacity: 1;
 }
 
 .poster-loading {
@@ -128,10 +134,12 @@
 }
 
 .actions {
-  flex: 0.25;
+  margin-top: -12px;
+  flex-shrink: 0;
+  padding: 16px 0 28px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .action-row {

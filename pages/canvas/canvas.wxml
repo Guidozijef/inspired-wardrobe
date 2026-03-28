@@ -5,6 +5,7 @@
       <view class="nav-btn primary" bindtap="saveCanvas">保存</view>
     </view>
     <view class="nav-title" style="top: {{statusBarHeight}}px; height: {{navBarHeight}}px; line-height: {{navBarHeight}}px;">搭配画布</view>
+    <view class="nav-size-tag">1080×1440</view>
   </view>
 
   <movable-area
@@ -18,9 +19,7 @@
       class="canvas-bg-image"
       src="{{selectedBg.value}}"
       mode="aspectFill"
-    ></image>
-
-    <movable-view
+    ></image>    <movable-view
       id="item-{{item.id}}"
       wx:for="{{canvasItems}}"
       wx:key="id"

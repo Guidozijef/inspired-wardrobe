@@ -1024,8 +1024,9 @@ Page({
 
         const areaWidth = areaRect.width
         const areaHeight = areaRect.height
-        const exportWidth = areaWidth
-        const exportHeight = Math.round(exportWidth * 4 / 3)
+        // 固定导出尺寸，所有设备保持一致
+        const exportWidth = 1080
+        const exportHeight = 1440
         const contentScale = Math.min(exportWidth / areaWidth, exportHeight / areaHeight)
         const contentOffsetX = (exportWidth - areaWidth * contentScale) / 2
         const contentOffsetY = (exportHeight - areaHeight * contentScale) / 2
@@ -1121,10 +1122,10 @@ Page({
                 canvas,
                 x: 0,
                 y: 0,
-                width: exportWidth,
-                height: exportHeight,
-                destWidth: exportWidth * dpr,
-                destHeight: exportHeight * dpr,
+                width: canvas.width,
+                height: canvas.height,
+                destWidth: canvas.width,
+                destHeight: canvas.height,
                 success: (tempRes) => resolve(tempRes.tempFilePath),
                 fail: reject
               })

@@ -6,15 +6,17 @@ Page({
     posterPath: '',
     displayImage: '',
     exportImage: '',
+    previewImageHeight: 0,
+    imageLoaded: false,
     displayTitle: '',
     serialText: '',
     subtitleText: '',
-    appName: '\u7075\u611f\u8863\u6a71',
-    appDesc: '\u53d1\u73b0\u7a7f\u642d\u7075\u611f\uff0c\u8ba9\u7f8e\u89e6\u624b\u53ef\u53ca',
-    saveLabel: '\u4fdd\u5b58\u5230\u624b\u673a\u76f8\u518c',
-    friendLabel: '\u53d1\u9001\u7ed9\u597d\u53cb',
-    timelineLabel: '\u5206\u4eab\u5230\u670b\u53cb\u5708',
-    emptyText: '\u6b63\u5728\u52a0\u8f7d\u56fe\u7247...'
+    appName: '灵感衣橱',
+    appDesc: '发现穿搭灵感，让美触手可及',
+    saveLabel: '保存到手机相册',
+    friendLabel: '发送给好友',
+    timelineLabel: '分享到朋友圈',
+    emptyText: '正在加载图片...'
   },
 
   onLoad(options) {
@@ -53,16 +55,23 @@ Page({
       const look = res.result.data
       const rawImage = look.preview_url || look.preview || ''
       const resolvedImage = await this.resolvePreviewImage(look)
-      console.log('share preview image source', {
-        preview_url: look.preview_url,
-        preview: look.preview,
-        rawImage,
-        resolvedImage
-      })
+      const imgSrc = resolvedImage || rawImage
+
+      // 提前获取图片尺寸，预设容器高度，防止加载时布局跳闪
+      const imgInfo = await this.getImageInfo(imgSrc)
+      let previewImageHeight = 0
+      if (imgInfo && imgInfo.width && imgInfo.height) {
+        const sysInfo = wx.getSystemInfoSync()
+        const containerW = sysInfo.windowWidth - 68 // content padding 18×2 + card padding 16×2
+        previewImageHeight = Math.round(containerW * imgInfo.height / imgInfo.width)
+      }
+
       this.setData({
         look,
-        displayImage: resolvedImage || rawImage,
-        exportImage: resolvedImage || rawImage,
+        displayImage: imgSrc,
+        exportImage: imgSrc,
+        previewImageHeight,
+        imageLoaded: false,
         displayTitle: look.title || 'Inspired Look',
         serialText: this.buildSerial(look._id || id),
         subtitleText: this.buildSubtitle(look.create_time)
@@ -78,6 +87,10 @@ Page({
       console.error('fetch look detail failed', err)
       wx.showToast({ title: '\u52a0\u8f7d\u5931\u8d25', icon: 'none' })
     })
+  },
+
+  onImageLoad() {
+    this.setData({ imageLoaded: true })
   },
 
   async buildPoster() {
