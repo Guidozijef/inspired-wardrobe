@@ -41,7 +41,7 @@
 .title {
   font-size: 30px;
   font-weight: 800;
-  color: #1C1033;
+  color: #3D1F8C;
   letter-spacing: 0.4px;
   line-height: 1.1;
 }
