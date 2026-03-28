@@ -1,7 +1,6 @@
 Page({
   data: {
     statusBarHeight: 20,
-    navBarHeight: 44,
     year: 2026,
     month: 2,
     days: [],
@@ -22,13 +21,11 @@ Page({
       menuButton = wx.getMenuButtonBoundingClientRect()
     } catch (e) {}
 
-    const navBarHeight = menuButton ? (menuButton.top - sysInfo.statusBarHeight) * 2 + menuButton.height : 44
     const today = new Date()
     const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
 
     this.setData({
       statusBarHeight: sysInfo.statusBarHeight,
-      navBarHeight,
       year: today.getFullYear(),
       month: today.getMonth() + 1,
       activeFullDate: todayStr

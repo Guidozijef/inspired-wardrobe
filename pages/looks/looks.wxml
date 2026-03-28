@@ -1,8 +1,16 @@
 <view class="container">
-  <!-- <view class="nav-header glass" style="padding-top: {{statusBarHeight}}px; height: {{statusBarHeight + navBarHeight}}px;">
-    <view class="nav-title" style="height: {{navBarHeight}}px; line-height: {{navBarHeight}}px;">我的穿搭</view>
-  </view> -->
 
+  <!-- 光晕 -->
+  <view class="glow glow-a"></view>
+  <view class="glow glow-b"></view>
+
+  <!-- 顶部头部 -->
+  <view class="page-header" style="padding-top: {{statusBarHeight + 12}}px;">
+    <text class="page-brand">MY WARDROBE</text>
+    <text class="page-title">我的穿搭</text>
+  </view>
+
+  <scroll-view scroll-y class="content-scroll">
   <view class="content">
     <view class="looks-grid">
       <view class="look-card" wx:for="{{looks}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
@@ -22,6 +30,7 @@
       <text>还没有穿搭记录哦</text>
     </view>
   </view>
+</scroll-view>
 
   <!-- Custom Tab Bar -->
   <view class="tab-bar glass">
