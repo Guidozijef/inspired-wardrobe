@@ -3,9 +3,12 @@
   <view class="sticky-area">
     <!-- Header -->
     <view class="header" style="padding-top: {{statusBarHeight + 40}}px; padding-bottom: 10px;">
-      <text class="title">我的衣橱</text>
+      <view class="header-left">
+        <text class="header-brand">INSPIRED WARDROBE</text>
+        <text class="title">我的衣橱</text>
+      </view>
       <view class="search-btn" bindtap="goToSearch">
-        <image class="icon" src="https://img.icons8.com/ios-glyphs/30/666666/search--v1.png"></image>
+        <image class="icon" src="https://img.icons8.com/ios-glyphs/30/7C3AED/search--v1.png"></image>
       </view>
     </view>
 
@@ -63,11 +66,11 @@
       <view class="action-menu">
         <view class="action-header">添加新单品，AI 将自动去除背景</view>
         <view class="action-item border-b" bindtap="goPhotograph">
-          <image class="action-icon" src="https://img.icons8.com/ios-glyphs/30/007AFF/camera.png"></image>
+          <image class="action-icon" src="https://img.icons8.com/ios-glyphs/30/7C3AED/camera.png"></image>
           <text>拍照</text>
         </view>
         <view class="action-item" bindtap="goPhotoalbum">
-          <image class="action-icon" src="https://img.icons8.com/ios-glyphs/30/007AFF/image.png"></image>
+          <image class="action-icon" src="https://img.icons8.com/ios-glyphs/30/7C3AED/image.png"></image>
           <text>从相册选择</text>
         </view>
       </view>
