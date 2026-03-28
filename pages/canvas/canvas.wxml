@@ -1,14 +1,21 @@
 <view class="container">
-  <view class="nav-header glass" style="padding-top: {{statusBarHeight}}px; height: {{statusBarHeight + navBarHeight}}px;">
-    <view class="nav-left-actions">
-      <view class="nav-btn" bindtap="clearCanvas">清空</view>
-      <view class="nav-btn primary" bindtap="saveCanvas">保存</view>
-    </view>
-    <view class="nav-title" style="top: {{statusBarHeight}}px; height: {{navBarHeight}}px; line-height: {{navBarHeight}}px;">搭配画布</view>
-    <view class="nav-size-tag">1080×1440</view>
-  </view>
+  <!-- 光晕 -->
+  <view class="glow glow-a"></view>
+  <view class="glow glow-b"></view>
 
-  <view style="height: {{statusBarHeight + navBarHeight}}px; flex-shrink: 0;"></view>
+  <view class="nav-header glass" style="padding-top: {{statusBarHeight + 16}}px;">
+    <view class="nav-brand-area">
+      <text class="page-brand">MY WARDROBE</text>
+      <view class="nav-title-row">
+        <text class="page-title">搭配画布</text>
+        <text class="nav-size-badge">1080×1440</text>
+      </view>
+    </view>
+    <view class="nav-actions">
+      <view class="action-chip" bindtap="clearCanvas">清空</view>
+      <view class="action-chip primary" bindtap="saveCanvas">保存</view>
+    </view>
+  </view>
 
   <movable-area
     id="canvasArea"

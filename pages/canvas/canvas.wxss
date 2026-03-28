@@ -2,69 +2,108 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  /* background: #f5f1ff; */
+  background: linear-gradient(180deg, #faf8ff 0%, #f3f0fc 100%);
   position: relative;
   overflow: hidden;
 }
 
 .glass {
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
+}
+
+.glow {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(52px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glow-a {
+  width: 280px; height: 280px;
+  top: -80px; right: -80px;
+  background: rgba(145, 92, 255, 0.18);
+}
+.glow-b {
+  width: 180px; height: 180px;
+  top: 380px; left: -80px;
+  background: rgba(196, 160, 255, 0.12);
 }
 
 .nav-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
+  align-items: flex-end;
+  padding: 0 20px 20px;
   box-sizing: border-box;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  position: relative;
   z-index: 30;
+  border-bottom: 1px solid rgba(138, 43, 226, 0.08);
 }
 
-.nav-left-actions {
+.nav-brand-area {
   display: flex;
-  gap: 16px;
-  align-items: center;
-  position: relative;
-  z-index: 12;
+  flex-direction: column;
 }
 
-.nav-btn {
-  color: #333333;
-  font-size: 15px;
-  font-weight: 500;
-  position: relative;
-  z-index: 12;
-  padding: 4px 0;
+.page-brand {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  color: #7C3AED;
+  opacity: 0.68;
+  margin-bottom: 3px;
 }
 
-.nav-btn.primary {
+.nav-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.page-title {
+  display: block;
+  font-size: 28px;
+  font-weight: 800;
+  color: #3D1F8C;
+  letter-spacing: 0.4px;
+}
+
+.nav-size-badge {
+  font-size: 10px;
   color: #8A2BE2;
-  font-weight: 700;
-}
-
-.nav-title {
-  font-size: 16px;
-  font-weight: 700;
-  position: absolute;
-  left: 0;
-  right: 0;
-  text-align: center;
-  z-index: 11;
-  pointer-events: none;
-}
-
-.nav-size-tag {
-  font-size: 11px;
-  color: rgba(138, 43, 226, 0.6);
-  font-weight: 500;
+  background: rgba(138, 43, 226, 0.08);
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-weight: 600;
   letter-spacing: 0.5px;
-  position: relative;
-  z-index: 12;
+}
+
+.nav-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 6px;
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+}
+
+.action-chip {
+  padding: 6px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #5e5576;
+  background: #f3f0fc;
+  transition: all 0.2s;
+}
+
+.action-chip.primary {
+  background: #8A2BE2;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(138, 43, 226, 0.2);
 }
 
 .canvas-area {
@@ -120,37 +159,38 @@
 .text-delete-btn,
 .text-rotate-handle {
   position: absolute;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #ffffff;
   z-index: 100;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.18);
-  font-size: 16px;
-  line-height: 28px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-size: 14px;
+  line-height: 24px;
   font-weight: 600;
+  backdrop-filter: blur(4px);
 }
 
 .item-delete-btn,
 .text-delete-btn {
-  top: -14px;
-  right: -14px;
-  background-color: #FF4D4F;
+  top: -12px;
+  right: -12px;
+  background-color: rgba(255, 77, 79, 0.95);
 }
 
 .rotate-handle {
-  bottom: -14px;
-  right: -14px;
-  background-color: #8A2BE2;
+  bottom: -12px;
+  right: -12px;
+  background-color: rgba(138, 43, 226, 0.95);
 }
 
 .text-rotate-handle {
-  bottom: -14px;
-  right: -14px;
-  background-color: #8A2BE2;
+  bottom: -12px;
+  right: -12px;
+  background-color: rgba(138, 43, 226, 0.95);
 }
 
 .text-delete-btn,
@@ -265,24 +305,26 @@
 
 .bottom-drawer {
   height: 320px;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 28px 28px 0 0;
-  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(15px);
+  border-radius: 32px 32px 0 0;
+  box-shadow: 0 -12px 40px rgba(138, 43, 226, 0.08);
   display: flex;
   flex-direction: column;
   position: relative;
   z-index: 20;
-  padding: 10px 16px 80px;
+  padding: 12px 16px 80px;
   box-sizing: border-box;
   overflow: hidden;
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .drawer-handle {
-  width: 42px;
-  height: 5px;
-  background: #d7cfeb;
+  width: 36px;
+  height: 4px;
+  background: #E2E8F0;
   border-radius: 999px;
-  margin: 0 auto 12px;
+  margin: 0 auto 16px;
 }
 
 .drawer-tabs {
