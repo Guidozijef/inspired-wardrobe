@@ -8,6 +8,8 @@
     <view class="nav-size-tag">1080×1440</view>
   </view>
 
+  <view style="height: {{statusBarHeight + navBarHeight}}px; flex-shrink: 0;"></view>
+
   <movable-area
     id="canvasArea"
     class="canvas-area {{activeTab === 2 ? 'text-mode' : ''}}"
