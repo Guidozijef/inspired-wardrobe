@@ -276,10 +276,10 @@ Page({
           canvas,
           x: 0,
           y: 0,
-          width,
-          height,
-          destWidth: width,
-          destHeight: height,
+          width: canvas.width,
+          height: canvas.height,
+          destWidth: canvas.width,
+          destHeight: canvas.height,
           success: (result) => resolve(result.tempFilePath),
           fail: reject
         })
