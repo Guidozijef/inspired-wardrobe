@@ -194,14 +194,21 @@ Page({
         const canvas = res[0].node
         const ctx = canvas.getContext('2d')
         const dpr = wx.getSystemInfoSync().pixelRatio
-        const width = 1080
-        const previewX = 60
-        const previewY = 60
-        const previewW = 960
-        const footerH = 220
-        const radius = 58
 
-        // 先获取图片尺寸，按原始比例计算 previewH
+        // 布局常量，与预览页结构对齐
+        const width = 1080
+        const margin = 28       // 对应 content padding 18px * 1.55
+        const cardPad = 32      // 对应 poster-card padding 16px * 2
+        const cardRadius = 86   // 对应 border-radius 32px * 2.7
+        const imgRadius = 64    // 对应 poster-preview border-radius 24px * 2.7
+        const footerH = 200     // 对应 poster-footer 高度
+
+        // previewX/W 与之前保持一致：60/960
+        const previewX = margin + cardPad   // = 60
+        const previewY = margin + cardPad   // = 60
+        const previewW = width - 2 * (margin + cardPad)  // = 960
+
+        // 先获取图片尺寸
         const previewSrc = this.data.exportImage || this.data.displayImage || this.data.look.preview_url || this.data.look.preview
         let previewInfo = null
         if (previewSrc) {
@@ -212,22 +219,51 @@ Page({
           ? Math.round(previewW * previewInfo.height / previewInfo.width)
           : 1220
 
-        const footerY = previewY + previewH + 30
-        const height = footerY + footerH + 60
+        // footer 紧贴图片底部（与预览页一致，无间隙）
+        const footerY = previewY + previewH
+        const cardW = width - 2 * margin         // = 1024
+        const cardH = cardPad + previewH + footerH + cardPad
+        const height = 2 * margin + cardH
 
         canvas.width = width * dpr
         canvas.height = height * dpr
         ctx.scale(dpr, dpr)
 
-        const background = this.resolveBackground()
-        const gradient = ctx.createLinearGradient(0, 0, 0, height)
-        gradient.addColorStop(0, background.top)
-        gradient.addColorStop(1, background.bottom)
-        ctx.fillStyle = gradient
+        // 1. 页面背景渐变（与预览页 .container 背景一致）
+        const bgGrad = ctx.createLinearGradient(0, 0, 0, height)
+        bgGrad.addColorStop(0, '#fbfaff')
+        bgGrad.addColorStop(1, '#f4f6fb')
+        ctx.fillStyle = bgGrad
         ctx.fillRect(0, 0, width, height)
 
-        this.drawRoundedRect(ctx, previewX, previewY, previewW, previewH, radius)
+        // 顶部紫色光晕
+        const radGrad = ctx.createRadialGradient(540, 0, 0, 540, 0, height * 0.42)
+        radGrad.addColorStop(0, 'rgba(168, 124, 255, 0.14)')
+        radGrad.addColorStop(1, 'rgba(168, 124, 255, 0)')
+        ctx.fillStyle = radGrad
+        ctx.fillRect(0, 0, width, height)
+
+        // 2. 卡片阴影（先画一层偏移半透明，模拟 box-shadow）
         ctx.save()
+        ctx.shadowColor = 'rgba(90, 70, 140, 0.14)'
+        ctx.shadowBlur = 44
+        ctx.shadowOffsetY = 20
+        this.drawRoundedRect(ctx, margin, margin, cardW, cardH, cardRadius)
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.88)'
+        ctx.fill()
+        ctx.restore()
+
+        // 3. 图片区域（top 两角圆、bottom 两角直，贴合预览）
+        ctx.save()
+        ctx.beginPath()
+        ctx.moveTo(previewX + imgRadius, previewY)
+        ctx.lineTo(previewX + previewW - imgRadius, previewY)
+        ctx.arcTo(previewX + previewW, previewY, previewX + previewW, previewY + imgRadius, imgRadius)
+        ctx.lineTo(previewX + previewW, previewY + previewH)
+        ctx.lineTo(previewX, previewY + previewH)
+        ctx.lineTo(previewX, previewY + imgRadius)
+        ctx.arcTo(previewX, previewY, previewX + imgRadius, previewY, imgRadius)
+        ctx.closePath()
         ctx.clip()
 
         if (previewInfo && previewInfo.path) {
@@ -244,43 +280,53 @@ Page({
 
         ctx.restore()
 
+        // 4. 图片底部渐变遮罩 + 文字
         const overlayTop = previewY + previewH * 0.45
         const overlayBottom = previewY + previewH
         const overlay = ctx.createLinearGradient(0, overlayTop, 0, overlayBottom)
         overlay.addColorStop(0, 'rgba(0, 0, 0, 0)')
-        overlay.addColorStop(1, 'rgba(0, 0, 0, 0.38)')
+        overlay.addColorStop(1, 'rgba(0, 0, 0, 0.44)')
         ctx.fillStyle = overlay
-        this.drawRoundedRect(ctx, previewX, previewY, previewW, previewH, radius)
+        ctx.beginPath()
+        ctx.moveTo(previewX + imgRadius, previewY)
+        ctx.lineTo(previewX + previewW - imgRadius, previewY)
+        ctx.arcTo(previewX + previewW, previewY, previewX + previewW, previewY + imgRadius, imgRadius)
+        ctx.lineTo(previewX + previewW, previewY + previewH)
+        ctx.lineTo(previewX, previewY + previewH)
+        ctx.lineTo(previewX, previewY + imgRadius)
+        ctx.arcTo(previewX, previewY, previewX + imgRadius, previewY, imgRadius)
+        ctx.closePath()
         ctx.fill()
 
         ctx.fillStyle = 'rgba(255, 255, 255, 0.68)'
         ctx.font = '500 26px sans-serif'
-        ctx.fillText(this.data.serialText, 116, overlayBottom - 160)
+        ctx.fillText(this.data.serialText, previewX + 56, overlayBottom - 160)
 
         ctx.fillStyle = '#FFFFFF'
         ctx.font = 'bold 60px sans-serif'
-        ctx.fillText(this.data.displayTitle || 'Inspired Look', 116, overlayBottom - 90)
+        ctx.fillText(this.data.displayTitle || 'Inspired Look', previewX + 56, overlayBottom - 90)
 
         ctx.fillStyle = 'rgba(255, 255, 255, 0.82)'
         ctx.font = 'italic 28px sans-serif'
-        ctx.fillText(this.data.subtitleText, 116, overlayBottom - 38)
+        ctx.fillText(this.data.subtitleText, previewX + 56, overlayBottom - 38)
 
-        this.drawRoundedRect(ctx, 60, footerY, 960, footerH, 46)
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.96)'
-        ctx.fill()
+        // 5. Footer（与预览页 poster-footer 结构一致，紧贴图片）
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.98)'
+        ctx.fillRect(previewX, footerY, previewW, footerH)
 
         ctx.fillStyle = '#2C223D'
         ctx.font = 'bold 38px sans-serif'
-        ctx.fillText(this.data.appName, 110, footerY + 86)
+        ctx.fillText(this.data.appName, previewX + 50, footerY + 82)
 
         ctx.fillStyle = '#8C86A3'
         ctx.font = '26px sans-serif'
-        ctx.fillText(this.data.appDesc, 110, footerY + 132)
+        ctx.fillText(this.data.appDesc, previewX + 50, footerY + 128)
 
         try {
           const qrImg = canvas.createImage()
           await this.loadCanvasImage(qrImg, '/pages/images/qrX.jpg')
-          ctx.drawImage(qrImg, 860, footerY + 40, 110, 110)
+          const qrSize = 116
+          ctx.drawImage(qrImg, previewX + previewW - qrSize - 44, footerY + (footerH - qrSize) / 2, qrSize, qrSize)
         } catch (err) {
           console.error('load qr image failed', err)
         }
@@ -298,15 +344,6 @@ Page({
         })
       })
     })
-  },
-
-  resolveBackground() {
-    const bgValue = this.data.look.canvas_data && this.data.look.canvas_data.background_color
-    if (!bgValue) {
-      return { top: '#F8F6FF', bottom: '#EEF2F9' }
-    }
-
-    return { top: bgValue, bottom: '#F5F5F7' }
   },
 
   buildSerial(id) {
