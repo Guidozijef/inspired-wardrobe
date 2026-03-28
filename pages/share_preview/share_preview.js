@@ -357,7 +357,7 @@ Page({
         try {
           const qrImg = canvas.createImage()
           await this.loadCanvasImage(qrImg, '/pages/images/qrX.jpg')
-          const qrSize = 112
+          const qrSize = 148
           ctx.drawImage(qrImg, previewX + previewW - qrSize - 44, footerY + (footerH - qrSize) / 2, qrSize, qrSize)
         } catch (e) {
           console.error('load qr failed', e)
