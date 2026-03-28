@@ -1,55 +1,384 @@
-.container { min-height: 100vh; background-color: #F8FAFC; padding-bottom: 100px; display: flex; flex-direction: column; }
-.header { background-color: #ffffff; padding: 0 20px; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
-.section-title { font-size: 18px; font-weight: bold; color: #1E293B; }
+/* ── Container ─────────────────────────────────────── */
+.container {
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #faf8ff 0%, #f3f0fc 100%);
+}
 
-.content-scroll { padding: 0 20px; }
-.section-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px; margin-top: 24px; }
-.section-desc { font-size: 12px; color: #94A3B8; margin-left: 8px; }
+.glow {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(52px);
+  pointer-events: none;
+  z-index: 0;
+}
+.glow-a {
+  width: 280px; height: 280px;
+  top: -80px; right: -80px;
+  background: rgba(145, 92, 255, 0.18);
+}
+.glow-b {
+  width: 180px; height: 180px;
+  top: 380px; left: -80px;
+  background: rgba(196, 160, 255, 0.12);
+}
 
-.calendar-card { background-color: #ffffff; border-radius: 24px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); margin-bottom: 24px; }
-.calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.month-title { font-size: 18px; font-weight: bold; color: #1E293B; }
-.nav-arrows { display: flex; gap: 16px; }
-.arrow { font-size: 20px; color: #94A3B8; font-weight: bold; padding: 0 8px; }
-.week-days { display: flex; justify-content: space-between; margin-bottom: 16px; color: #94A3B8; font-size: 12px; font-weight: 500; }
-.week-days text { width: 14.28%; text-align: center; }
-.days-grid { display: flex; flex-wrap: wrap; }
-.day { width: 14.28%; height: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 14px; color: #334155; font-weight: 500; margin-bottom: 8px; position: relative; }
-.day.prev-month { color: #CBD5E1; }
-.active-bg { width: 32px; height: 32px; background-color: #8A2BE2; color: #ffffff; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(138,43,226,0.3); }
-.dot { width: 4px; height: 4px; background-color: #8A2BE2; border-radius: 2px; position: absolute; bottom: 4px; z-index: 10; }
+/* ── Page Header ─────────────────────────────────── */
+.page-header {
+  position: relative;
+  z-index: 1;
+  padding: 0 20px 16px;
+  flex-shrink: 0;
+}
+.page-brand {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  color: #7C3AED;
+  opacity: 0.68;
+  margin-bottom: 3px;
+}
+.page-title {
+  display: block;
+  font-size: 30px;
+  font-weight: 800;
+  color: #3D1F8C;
+  letter-spacing: 0.4px;
+}
 
-.daily-look { display: flex; align-items: center; padding-top: 20px; margin-top: 20px; border-top: 1px solid #F1F5F9; }
-.daily-look-img { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 16px; }
-.daily-emoji { font-size: 32px; }
-.daily-look-info { flex: 1; display: flex; flex-direction: column; }
-.daily-look-title { font-size: 16px; font-weight: bold; color: #1E293B; margin-bottom: 4px; }
-.daily-look-desc { font-size: 12px; color: #94A3B8; }
-.daily-look-arrow { color: #CBD5E1; font-size: 20px; }
-.daily-look-empty { display: flex; justify-content: space-between; align-items: center; padding-top: 20px; margin-top: 20px; border-top: 1px solid #F1F5F9; color: #94A3B8; font-size: 14px; }
-.add-record-btn { width: 200px; margin: 0; padding: 6px 20px; font-size: 12px; font-weight: bold; background-color: #8A2BE2; color: white; border-radius: 16px; display: flex; align-items: center; justify-content: center; }
+/* ── Scroll ──────────────────────────────────────── */
+.content-scroll {
+  position: relative;
+  z-index: 1;
+  padding: 0 16px;
+  flex: 1;
+  min-height: 0;
+  margin-bottom: 70px;
+}
 
-/* Slot Machine Styles */
-.random-card { background-color: #ffffff; border-radius: 24px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); margin-bottom: 24px; display: flex; flex-direction: column; align-items: center; }
-.slot-machine { display: flex; justify-content: center; gap: 16px; margin-bottom: 20px; background-color: #F8FAFC; padding: 20px; border-radius: 16px; width: 100%; box-sizing: border-box; box-shadow: inset 0 4px 8px rgba(0,0,0,0.02); }
-.outfit-window { width: 160px; height: 200px; background-color: #ffffff; border-radius: 12px; overflow: hidden; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+/* ── Calendar Card ───────────────────────────────── */
+.calendar-card {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(16px);
+  border-radius: 28px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(100, 60, 200, 0.10), inset 0 1px 0 rgba(255,255,255,0.9);
+  border: 1px solid rgba(124, 58, 237, 0.07);
+  margin-bottom: 20px;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.month-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.month-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #3D1F8C;
+  letter-spacing: 0.5px;
+}
+.month-sub {
+  font-size: 11px;
+  color: #9580c0;
+  letter-spacing: 0.3px;
+}
+.nav-arrows {
+  display: flex;
+  gap: 8px;
+}
+.arrow-btn {
+  width: 34px; height: 34px;
+  border-radius: 12px;
+  background: rgba(124, 58, 237, 0.08);
+  display: flex; align-items: center; justify-content: center;
+}
+.arrow {
+  font-size: 20px;
+  color: #7C3AED;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* ── Week Days ───────────────────────────────────── */
+.week-days {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.week-days text {
+  width: 14.28%;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #9580c0;
+  letter-spacing: 0.3px;
+}
+
+/* ── Days Grid ───────────────────────────────────── */
+.days-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+.day {
+  width: 14.28%;
+  height: 42px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #3D1F8C;
+  font-weight: 500;
+  margin-bottom: 4px;
+  position: relative;
+}
+.day.prev-month { color: #c8bfdf; }
+.day-inner {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px;
+}
+.active-bg {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, #7C3AED, #9F5FF0);
+  color: #ffffff;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
+  font-weight: 700;
+}
+.dot {
+  width: 5px; height: 5px;
+  background: linear-gradient(135deg, #7C3AED, #9F5FF0);
+  border-radius: 3px;
+  position: absolute;
+  bottom: 2px;
+}
+
+/* ── Daily Section ───────────────────────────────── */
+.daily-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(124, 58, 237, 0.08);
+}
+.daily-look {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.06), rgba(159, 95, 240, 0.04));
+  border-radius: 18px;
+  border: 1px solid rgba(124, 58, 237, 0.08);
+}
+.daily-img {
+  width: 64px; height: 64px;
+  border-radius: 14px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.daily-img-empty {
+  background: linear-gradient(145deg, #f0e8ff, #e8deff);
+  display: flex; align-items: center; justify-content: center;
+}
+.daily-emoji { font-size: 30px; }
+.daily-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.daily-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #9580c0;
+}
+.daily-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #3D1F8C;
+}
+.daily-hint {
+  font-size: 12px;
+  color: #7C3AED;
+}
+
+.daily-empty {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(248, 246, 255, 0.7);
+  border-radius: 18px;
+  border: 1px dashed rgba(124, 58, 237, 0.2);
+}
+.daily-empty-icon { font-size: 28px; flex-shrink: 0; }
+.daily-empty-copy { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.daily-empty-title { font-size: 13px; font-weight: 600; color: #3D1F8C; }
+.daily-empty-desc { font-size: 11px; color: #9580c0; }
+.add-record-btn {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #7C3AED, #9F5FF0) !important;
+  color: #ffffff !important;
+  border-radius: 14px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  padding: 0 14px !important;
+  height: 32px !important;
+  line-height: 32px !important;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.28) !important;
+  margin: 0 !important;
+}
+.add-record-btn::after { border: none !important; }
+
+/* ── Gacha Header ────────────────────────────────── */
+.gacha-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 14px;
+  padding: 0 4px;
+}
+.gacha-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.gacha-kicker {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #7C3AED;
+  opacity: 0.65;
+}
+.gacha-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #3D1F8C;
+}
+.gacha-desc {
+  font-size: 12px;
+  color: #9580c0;
+}
+
+/* ── Gacha Card ──────────────────────────────────── */
+.gacha-card {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(16px);
+  border-radius: 28px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(100, 60, 200, 0.10), inset 0 1px 0 rgba(255,255,255,0.9);
+  border: 1px solid rgba(124, 58, 237, 0.07);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Slot Machine ────────────────────────────────── */
+.slot-machine {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+  padding: 16px;
+  background: linear-gradient(145deg, #f5f0ff, #ede8ff);
+  border-radius: 20px;
+  box-sizing: border-box;
+}
+.slot-window {
+  width: 160px; height: 200px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(100, 60, 200, 0.12);
+}
+.slot-empty {
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.6);
+  border: 2px dashed rgba(124, 58, 237, 0.2);
+}
+.slot-empty-icon { font-size: 56px; opacity: 0.4; }
 .slot-reel { display: flex; flex-direction: column; }
 .slot-reel.transitioning { transition: transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1); }
-.outfit-item { width: 160px; height: 200px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.outfit-item-img { width: 140px; height: 180px; border-radius: 12px; }
+.slot-item { width: 160px; height: 200px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.slot-img { width: 140px; height: 180px; border-radius: 12px; }
 .spinning-outfit { animation: spin-outfit-reel 0.4s linear infinite; }
 @keyframes spin-outfit-reel { 0% { transform: translateY(0); } 100% { transform: translateY(-800px); } }
-.random-info { text-align: center; margin-bottom: 16px; }
-.random-title { font-size: 18px; font-weight: bold; color: #1E293B; }
-.random-actions { display: flex; gap: 12px; width: 100%; }
-.random-btn { flex: 1; padding: 12px 0; font-size: 16px; font-weight: bold; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0; }
-.primary-btn { background-color: #8A2BE2; color: white; box-shadow: 0 4px 12px rgba(138,43,226,0.3); }
-.share-btn { background-color: #07c160; color: white; box-shadow: 0 4px 12px rgba(7,193,96,0.3); }
 
-/* Tab Bar */
-.tab-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 80px; display: flex; justify-content: space-around; padding-top: 12px; border-top: 1px solid rgba(200,200,200,0.5); z-index: 50; }
-.glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); }
+.gacha-name {
+  margin-bottom: 16px;
+  text-align: center;
+}
+.gacha-name-text {
+  font-size: 17px;
+  font-weight: 700;
+  color: #3D1F8C;
+}
+.gacha-tip {
+  font-size: 13px;
+  color: #9580c0;
+}
+
+/* ── Gacha Buttons ───────────────────────────────── */
+.gacha-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  margin-top: 4px;
+}
+.gacha-btn {
+  flex: 1;
+  padding: 8px;
+  height: 48px;
+  border-radius: 16px;
+  font-size: 15px;
+  font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0;
+}
+.gacha-btn::after { border: none; }
+.primary-btn {
+  background: linear-gradient(135deg, #7C3AED, #9F5FF0);
+  color: #ffffff;
+  box-shadow: 0 6px 18px rgba(124, 58, 237, 0.32);
+}
+.share-btn {
+  background: linear-gradient(135deg, #09a34e, #07c160);
+  color: #ffffff;
+  box-shadow: 0 6px 18px rgba(7, 193, 96, 0.28);
+}
+.share-icon {
+  width: 18px; height: 18px;
+  margin-right: 6px;
+}
+
+/* ── Tab Bar ─────────────────────────────────────── */
+.tab-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 80px;
+  display: flex;
+  justify-content: space-around;
+  padding-top: 12px;
+  border-top: 1px solid rgba(124, 58, 237, 0.08);
+  z-index: 50;
+}
+.glass {
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(24px);
+}
 .tab-item { display: flex; flex-direction: column; align-items: center; }
 .tab-icon { width: 24px; height: 24px; margin-bottom: 4px; }
-.tab-text { font-size: 10px; color: #999999; font-weight: 500; }
-.tab-item.active .tab-text { color: #8A2BE2; }
+.tab-text { font-size: 10px; color: #9CA3AF; font-weight: 500; }
+.tab-item.active .tab-text { color: #7C3AED; }

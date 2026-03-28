@@ -1,6 +1,4 @@
 <view class="container">
-  <view class="page-glow glow-top"></view>
-  <view class="page-glow glow-middle"></view>
 
   <view class="hero-shell" style="padding-top: {{heroTopPadding}}px;">
     <view class="hero-card">

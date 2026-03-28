@@ -9,28 +9,6 @@
     linear-gradient(180deg, #f5f0ff 0%, #f8f7fc 34%, #f4f7fb 100%);
 }
 
-.page-glow {
-  position: absolute;
-  border-radius: 999px;
-  filter: blur(10px);
-  pointer-events: none;
-}
-
-.glow-top {
-  width: 220px;
-  height: 220px;
-  top: -80px;
-  right: -60px;
-  background: rgba(145, 92, 255, 0.22);
-}
-
-.glow-middle {
-  width: 160px;
-  height: 160px;
-  top: 200px;
-  left: -70px;
-  background: rgba(196, 160, 255, 0.16);
-}
 
 .hero-shell {
   padding-left: 16px;
