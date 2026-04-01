@@ -1,0 +1,68 @@
+<view class="container">
+  <view class="hero-section glass">
+    <view class="overview-title">数据驱动衣橱</view>
+    <view class="stats-cards">
+      <view class="stat-card">
+        <text class="stat-num">{{userStats.clothesCount}}</text>
+        <text class="stat-label">单品总数</text>
+      </view>
+      <view class="stat-card">
+        <text class="stat-num">{{userStats.outfitCount}}</text>
+        <text class="stat-label">搭配总数</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{isLoading}}" class="loading-state">
+    <text>数据努力加载中...</text>
+  </view>
+
+  <block wx:else>
+    <view class="section category-section" wx:if="{{categoryStats.length > 0}}">
+      <view class="section-title">分类构成</view>
+      <text class="section-subtitle">各类单品储备情况</text>
+      <view class="category-list">
+        <view class="category-row" wx:for="{{categoryStats}}" wx:key="_id">
+          <text class="cat-label">{{item._id}}</text>
+          <view class="progress-track">
+            <view class="progress-bar" style="width: {{(item.count / userStats.clothesCount) * 100}}%"></view>
+          </view>
+          <text class="cat-count">{{item.count}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="section color-section" wx:if="{{colorStats.length > 0}}">
+      <view class="section-title">色彩倾向</view>
+      <text class="section-subtitle">探索你的衣物调色板</text>
+      <view class="color-list">
+        <view class="color-row" wx:for="{{colorStats}}" wx:key="_id">
+          <view class="color-swatch-wrap">
+            <view class="color-swatch" style="background-color: {{item._id}}"></view>
+          </view>
+          <view class="progress-track color-track">
+            <view class="progress-bar color-bar" style="width: {{item.percent}}%; background-color: {{item._id}}; opacity: 0.9;"></view>
+          </view>
+          <text class="cat-count">{{item.count}}件</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="section top-picks-section" wx:if="{{topPicks.length > 0}}">
+      <view class="section-title">搭配利用率排行 Top 5</view>
+      <text class="section-subtitle">最常被放进记录画板中的优质单品</text>
+      <scroll-view class="picks-scroll" scroll-x show-scrollbar="false" enhanced="true">
+        <view class="pick-card" wx:for="{{topPicks}}" wx:key="_id">
+          <view class="pick-img-wrap">
+            <image class="pick-img" mode="aspectFit" src="{{item.clothInfo[0].image_url}}"></image>
+            <view class="wear-badge">搭配过 {{item.wearCount}} 次</view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <view wx:if="{{categoryStats.length === 0}}" class="empty-state">
+      <text>你的衣橱数据档案还是空的\n快去添加衣服或记录搭配吧~</text>
+    </view>
+  </block>
+</view>

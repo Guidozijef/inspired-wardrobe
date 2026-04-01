@@ -199,6 +199,10 @@ Page({
     wx.redirectTo({ url: path });
   },
 
+  goStats() {
+    wx.navigateTo({ url: '/pages/stats/stats' })
+  },
+
   goAbout() {
     wx.navigateTo({ url: '/pages/about/about' })
   },

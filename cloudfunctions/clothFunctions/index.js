@@ -443,6 +443,60 @@ const updateUserProfile = async (data) => {
   }
 }
 
+// 获取衣橱统计分析信息
+const getWardrobeStats = async () => {
+  const { OPENID } = cloud.getWXContext();
+  const $ = db.command.aggregate;
+  try {
+    const userRes = await db.collection('users').where({ _openid: OPENID }).get();
+    let userStats = { clothesCount: 0, outfitCount: 0 };
+    if (userRes.data.length > 0) {
+      userStats.clothesCount = userRes.data[0].clothesCount || 0;
+      userStats.outfitCount = userRes.data[0].outfitCount || 0;
+    }
+
+    const categoryStatsRes = await db.collection('clothes')
+      .aggregate()
+      .match({ _openid: OPENID })
+      .group({ _id: '$category', count: $.sum(1) })
+      .sort({ count: -1 })
+      .end();
+
+    const colorStatsRes = await db.collection('clothes')
+      .aggregate()
+      .match({ _openid: OPENID })
+      .group({ _id: '$color', count: $.sum(1) })
+      .sort({ count: -1 })
+      .end();
+
+    const topPicksRes = await db.collection('outfits')
+      .aggregate()
+      .match({ _openid: OPENID })
+      .unwind('$clothes_ids')
+      .group({ _id: '$clothes_ids', wearCount: $.sum(1) })
+      .sort({ wearCount: -1 })
+      .limit(5)
+      .lookup({
+        from: 'clothes',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'clothInfo'
+      })
+      .end();
+
+    return {
+      success: true,
+      data: {
+        userStats,
+        categoryStats: categoryStatsRes.list,
+        colorStats: colorStatsRes.list,
+        topPicks: topPicksRes.list
+      }
+    };
+  } catch (err) {
+    return { success: false, errMsg: err.message || err };
+  }
+};
 
 // 云函数入口函数
 exports.main = async (event, context) => {
@@ -547,6 +601,8 @@ exports.main = async (event, context) => {
       return await getUserProfile();
     case "updateUserProfile":
       return await updateUserProfile(event.data);
+    case "getWardrobeStats":
+      return await getWardrobeStats();
     default:
       return {
         success: false,

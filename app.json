@@ -12,6 +12,7 @@
     "pages/capsule/capsule",
     "pages/share/share",
     "pages/share_preview/share_preview",
+    "pages/stats/stats",
     "pages/about/about",
     "pages/settings/settings"
   ],
