@@ -475,7 +475,7 @@ const getWardrobeStats = async () => {
       .unwind('$clothes_ids')
       .group({ _id: '$clothes_ids', wearCount: $.sum(1) })
       .sort({ wearCount: -1 })
-      .limit(5)
+      .limit(20)
       .lookup({
         from: 'clothes',
         localField: '_id',

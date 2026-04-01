@@ -30,11 +30,15 @@ Page({
           percent: Math.floor((item.count / maxColorCount) * 100)
         }));
 
+        const validTopPicks = (data.topPicks || [])
+          .filter(item => item.clothInfo && item.clothInfo.length > 0)
+          .slice(0, 5);
+
         this.setData({
           userStats: data.userStats || { clothesCount: 0, outfitCount: 0 },
           categoryStats: data.categoryStats || [],
           colorStats: colorStats,
-          topPicks: data.topPicks || [],
+          topPicks: validTopPicks,
           isLoading: false
         });
       } else {
