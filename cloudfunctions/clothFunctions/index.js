@@ -484,13 +484,37 @@ const getWardrobeStats = async () => {
       })
       .end();
 
+    const dustyPicksRes = await db.collection('clothes')
+      .aggregate()
+      .match({ _openid: OPENID })
+      .lookup({
+        from: 'outfits',
+        localField: '_id',
+        foreignField: 'clothes_ids',
+        as: 'worn_outfits'
+      })
+      .project({
+        name: 1,
+        image_url: 1,
+        price: 1,
+        create_time: 1,
+        wear_count: $.size('$worn_outfits')
+      })
+      .match({
+        wear_count: 0
+      })
+      .sort({ create_time: 1 })
+      .limit(10)
+      .end();
+
     return {
       success: true,
       data: {
         userStats,
         categoryStats: categoryStatsRes.list,
         colorStats: colorStatsRes.list,
-        topPicks: topPicksRes.list
+        topPicks: topPicksRes.list,
+        dustyPicks: dustyPicksRes.list
       }
     };
   } catch (err) {

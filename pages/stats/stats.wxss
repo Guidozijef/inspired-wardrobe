@@ -122,39 +122,47 @@ page {
   color: #1E293B;
 }
 
-/* Color Row */
-.color-row {
+/* Pie Chart */
+.pie-container {
   display: flex;
   align-items: center;
-  margin-bottom: 16px;
-  gap: 14px;
-}
-.color-row:last-child {
-  margin-bottom: 0;
+  margin-top: 24px;
 }
 
-.color-swatch-wrap {
-  width: 54px;
+.pie-chart {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  margin-right: 32px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border: 4px solid #FFFFFF;
+}
+
+.pie-legend {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.legend-item {
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
-.color-swatch {
-  width: 28px;
-  height: 28px;
+.legend-swatch {
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   border: 1px solid #E2E8F0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
-.color-track {
-  height: 14px;
-  border-radius: 7px;
-  background: #F8FAFC;
-}
-
-.color-bar {
-  border-radius: 7px;
+.legend-count {
+  font-size: 14px;
+  color: #475569;
+  font-weight: 600;
 }
 
 /* Top Picks */
@@ -193,6 +201,44 @@ page {
   left: 0;
   right: 0;
   background: rgba(138, 43, 226, 0.9);
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  padding: 6px 0;
+  backdrop-filter: blur(8px);
+}
+
+.cpw-badge {
+  margin-top: 8px;
+  font-size: 11px;
+  color: #8A2BE2;
+  font-weight: 700;
+  text-align: center;
+  background: #F3E8FF;
+  border-radius: 8px;
+  padding: 4px 0;
+}
+.cpw-badge.empty {
+  color: #94A3B8;
+  background: #F1F5F9;
+}
+
+.dusty-card {
+  opacity: 0.85;
+}
+
+.dusty-wrap {
+  border: 1px solid #FFE4E6;
+  background: #FFF1F2;
+}
+
+.dusty-badge {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(225, 29, 72, 0.9);
   color: #FFFFFF;
   font-size: 11px;
   font-weight: 600;
