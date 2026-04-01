@@ -7,7 +7,8 @@ Page({
     page: 0,
     pageSize: 10, // 调整为每次加载 10 条
     isLoading: false,
-    isNoMore: false
+    isNoMore: false,
+    loadedImages: {}
   },
   onLoad() {
     const sysInfo = wx.getSystemInfoSync();
@@ -92,6 +93,12 @@ Page({
   switchTab(e) {
     const path = e.currentTarget.dataset.path;
     wx.redirectTo({ url: path });
+  },
+  onImageLoad(e) {
+    const id = e.currentTarget.dataset.id;
+    if (id) {
+      this.setData({ [`loadedImages.${id}`]: true });
+    }
   },
   goToDetail(e) {
     const id = e.currentTarget.dataset.id;

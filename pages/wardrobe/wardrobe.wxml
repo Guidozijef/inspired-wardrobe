@@ -28,7 +28,7 @@
   <view class="grid" wx:if="{{items.length > 0}}">
     <view class="grid-item" wx:for="{{items}}" wx:key="index" bindtap="goToEdit" data-item="{{item}}">
       <view class="item-img-bg">
-        <image class="main-img" src="{{item.emoji}}" mode="aspectFit" />
+        <image class="main-img {{loadedImages[item.id] ? 'fade-in' : 'pre-load'}}" src="{{item.emoji}}" mode="aspectFit" lazy-load="true" show-menu-by-longpress="true" bindload="onImageLoad" data-id="{{item.id}}" />
       </view>
       <view class="item-info">
         <view class="item-header">

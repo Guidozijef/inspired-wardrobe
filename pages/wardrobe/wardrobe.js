@@ -61,7 +61,8 @@ Page({
     page: 0,
     pageSize: 10,
     isLoading: false,
-    isNoMore: false
+    isNoMore: false,
+    loadedImages: {}
   },
 
   onLoad() {
@@ -225,6 +226,13 @@ Page({
     wx.redirectTo({
       url: path
     })
+  },
+  
+  onImageLoad(e) {
+    const id = e.currentTarget.dataset.id;
+    if (id) {
+      this.setData({ [`loadedImages.${id}`]: true });
+    }
   },
 
   onShareAppMessage() {

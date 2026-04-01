@@ -15,7 +15,7 @@
     <view class="looks-grid">
       <view class="look-card" wx:for="{{looks}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
         <view class="look-img-wrapper" style="background-color: {{item.bg}};">
-          <image wx:if="{{item.preview}}" class="look-preview" src="{{item.preview}}" mode="aspectFill" />
+          <image wx:if="{{item.preview}}" class="look-preview {{loadedImages[item.id] ? 'fade-in' : 'pre-load'}}" src="{{item.preview}}" mode="aspectFill" lazy-load="true" show-menu-by-longpress="true" bindload="onImageLoad" data-id="{{item.id}}" />
           <text wx:else class="emoji-huge">{{item.emoji}}</text>
         </view>
         <view class="look-info">
