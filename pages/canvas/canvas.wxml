@@ -20,7 +20,7 @@
   <movable-area
     id="canvasArea"
     class="canvas-area {{activeTab === 2 ? 'text-mode' : ''}}"
-    style="background: {{selectedBg.type === 'image' ? 'transparent' : selectedBg.css}}; background-size: {{selectedBg.grid || selectedBg.dots ? '20px 20px' : 'cover'}};"
+    style="background: {{selectedBg.type === 'image' ? 'transparent' : selectedBg.css}}; background-size: {{selectedBg.bgSize || (selectedBg.grid || selectedBg.dots ? '20px 20px' : 'cover')}};"
     catchtap="onCanvasTap"
   >
     <image
@@ -111,7 +111,7 @@
 
   <view
     class="drawer-bg-bleed"
-    style="background: {{selectedBg.type === 'image' ? 'transparent' : selectedBg.css}}; background-size: {{selectedBg.grid || selectedBg.dots ? '20px 20px' : 'cover'}};"
+    style="background: {{selectedBg.type === 'image' ? 'transparent' : selectedBg.css}}; background-size: {{selectedBg.bgSize || (selectedBg.grid || selectedBg.dots ? '20px 20px' : 'cover')}};"
   >
     <image
       wx:if="{{selectedBg.type === 'image'}}"
@@ -160,7 +160,7 @@
         >
           <view
             class="bg-swatch"
-            style="background: {{item.type === 'image' ? 'transparent' : item.css}}; background-size: {{item.grid || item.dots ? '20px 20px' : 'cover'}};"
+            style="background: {{item.type === 'image' ? 'transparent' : item.css}}; background-size: {{item.bgSize || (item.grid || item.dots ? '20px 20px' : 'cover')}};"
           >
             <image
               wx:if="{{item.type === 'image'}}"

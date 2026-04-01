@@ -1,31 +1,48 @@
 import { WARDROBE_CATEGORIES } from '../constants'
 
 const BACKGROUNDS = [
-  { id: 'mini1', type: 'solid', value: '#FFFDF5', css: '#FFFDF5', label: '奶油白' },
-  { id: 'mini2', type: 'solid', value: '#F5F5F7', css: '#F5F5F7', label: '极简灰' },
-  { id: 'mini3', type: 'solid', value: '#E8EBE4', css: '#E8EBE4', label: '雾感绿' },
-  { id: 'mini4', type: 'solid', value: '#F2E6E6', css: '#F2E6E6', label: '莫兰粉' },
-  { id: 'mini5', type: 'gradient', colors: ['#F9F9F9', '#F1F1F1'], css: 'linear-gradient(180deg, #F9F9F9 0%, #F1F1F1 100%)', label: '极简渐变' },
-  { id: 'mini6', type: 'gradient', colors: ['#FFFDF5', '#F5F0E6'], css: 'linear-gradient(135deg, #FFFDF5 0%, #F5F0E6 100%)', label: '柔和奶油' },
-  { id: 'mini7', type: 'solid', value: '#EBDED5', css: '#EBDED5', label: '陶土色' },
-  { id: 'mini9', type: 'solid', value: '#E5E5F2', css: '#E5E5F2', label: '淡雾紫' },
-  { id: 'bg1', type: 'solid', value: '#F2F2F7', css: '#F2F2F7', label: '浅灰白' },
-  { id: 'bg2', type: 'solid', value: '#FFFFFF', css: '#FFFFFF', label: '纯白' },
-  { id: 'bg3', type: 'solid', value: '#FFE5E5', css: '#FFE5E5', label: '蜜桃粉' },
-  { id: 'bg4', type: 'solid', value: '#E5F3FF', css: '#E5F3FF', label: '天青蓝' },
-  { id: 'bg5', type: 'solid', value: '#E8FFE5', css: '#E8FFE5', label: '薄荷绿' },
-  { id: 'bg6', type: 'solid', value: '#FFF5E5', css: '#FFF5E5', label: '奶杏色' },
-  { id: 'bg7', type: 'solid', value: '#F3E5FF', css: '#F3E5FF', label: '浅紫雾' },
-  { id: 'grad1', type: 'gradient', colors: ['#a18cd1', '#fbc2eb'], css: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)', label: '紫粉流光' },
-  { id: 'grad2', type: 'gradient', colors: ['#ff9a9e', '#fecfef'], css: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)', label: '莓果雾粉' },
-  { id: 'grad3', type: 'gradient', colors: ['#84fab0', '#8fd3f4'], css: 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)', label: '薄荷海盐' },
-  { id: 'grad4', type: 'gradient', colors: ['#fccb90', '#d57eeb'], css: 'linear-gradient(135deg, #fccb90 0%, #d57eeb 100%)', label: '日落紫霞' },
-  { id: 'grad5', type: 'gradient', colors: ['#e0c3fc', '#8ec5fc'], css: 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)', label: '云雾蓝紫' },
-  { id: 'grid1', type: 'solid', value: '#FFFFFF', css: 'linear-gradient(#F0F0F0 1px, transparent 1px), linear-gradient(90deg, #F0F0F0 1px, transparent 1px)', grid: true, label: '网格纸' },
-  { id: 'grid2', type: 'solid', value: '#FFFFFF', css: 'radial-gradient(#D1D1D1 1.5px, transparent 1.5px)', dots: true, label: '点阵纸' },
-  { id: 'img1', type: 'image', value: '/assets/backgrounds/bg_light_wood.png', css: 'url(/assets/backgrounds/bg_light_wood.png)', label: '浅木纹' },
-  { id: 'img2', type: 'image', value: '/assets/backgrounds/bg_beige_linen.png', css: 'url(/assets/backgrounds/bg_beige_linen.png)', label: '亚麻布' },
-  { id: 'img3', type: 'image', value: '/assets/backgrounds/bg_soft_marble.png', css: 'url(/assets/backgrounds/bg_soft_marble.png)', label: '柔和大理石' }
+  // 【网格第1行】明亮纯色
+  { id: 'solid1', type: 'solid', value: '#FFFFFF', css: '#FFFFFF', label: '纯白' },
+  { id: 'solid2', type: 'solid', value: '#F7F8FA', css: '#F7F8FA', label: '极简灰' },
+  { id: 'solid5', type: 'solid', value: '#F8F4EC', css: '#F8F4EC', label: '奶油燕麦' },
+  { id: 'solid6', type: 'solid', value: '#EAE5DF', css: '#EAE5DF', label: '拿铁咖啡' },
+
+  // 【网格第2行】莫兰迪纯色
+  { id: 'solid8', type: 'solid', value: '#E3E5D7', css: '#E3E5D7', label: '日系抹茶' },
+  { id: 'solid9', type: 'solid', value: '#D8E2E8', css: '#D8E2E8', label: '雾霾海蓝' },
+  { id: 'solid10', type: 'solid', value: '#E8D8D8', css: '#E8D8D8', label: '干枯玫瑰' },
+  { id: 'solid12', type: 'solid', value: '#BAAFAF', css: '#BAAFAF', label: '紫雾灰' },
+
+  // 【网格第3行】高级纸本（横线与网格点阵）
+  { id: 'note1', type: 'solid', value: '#FFFFFF', css: 'linear-gradient(transparent 95%, #F0F0F0 95%) #FFFFFF', bgSize: '100% 30px', label: '极简横线' },
+  { id: 'note2', type: 'solid', value: '#FCFBF6', css: 'linear-gradient(transparent 95%, #EBE8DA 95%) #FCFBF6', bgSize: '100% 30px', label: '护眼横格' },
+  { id: 'grid_xiaomi', type: 'solid', value: '#FDFCF8', css: 'linear-gradient(#EFECE1 1px, transparent 1px), linear-gradient(90deg, #EFECE1 1px, transparent 1px) #FDFCF8', bgSize: '24px 24px', label: '复古方格' },
+  { id: 'dots_warm', type: 'solid', value: '#FCFBF9', css: 'radial-gradient(#D6D4CA 1.5px, transparent 1.5px) #FCFBF9', bgSize: '20px 20px', label: '手帐点阵' },
+
+  // 【网格第4行】实景材质
+  { id: 'img3', type: 'image', value: '/assets/backgrounds/bg_plaster_shadow.png', css: 'url(/assets/backgrounds/bg_plaster_shadow.png)', label: '白墙光影' },
+  { id: 'img2', type: 'image', value: '/assets/backgrounds/bg_beige_linen.png', css: 'url(/assets/backgrounds/bg_beige_linen.png)', label: '粗纺亚麻' },
+  { id: 'img5', type: 'image', value: '/assets/backgrounds/bg_terrazzo.png', css: 'url(/assets/backgrounds/bg_terrazzo.png)', label: '纯净水磨石' },
+  { id: 'img1', type: 'image', value: '/assets/backgrounds/bg_light_wood.png', css: 'url(/assets/backgrounds/bg_light_wood.png)', label: '原木底纹' },
+
+  // 【网格第5行】丝滑光晕与辅助预设
+  { id: 'img4', type: 'image', value: '/assets/backgrounds/bg_beige_silk.png', css: 'url(/assets/backgrounds/bg_beige_silk.png)', label: '柔滑丝绸' },
+  { id: 'img6', type: 'image', value: '/assets/backgrounds/bg_aura_grain.png', css: 'url(/assets/backgrounds/bg_aura_grain.png)', label: '胶片柔光斑' },
+  { id: 'grid1', type: 'solid', value: '#FFFFFF', css: 'linear-gradient(#F0F0F0 1px, transparent 1px), linear-gradient(90deg, #F0F0F0 1px, transparent 1px) #FFFFFF', bgSize: '20px 20px', grid: true, label: '基础网格' },
+  { id: 'grid2', type: 'solid', value: '#FFFFFF', css: 'radial-gradient(#D1D1D1 1.5px, transparent 1.5px) #FFFFFF', bgSize: '16px 16px', dots: true, label: '细密点阵' },
+
+  // 【网格第6行】纯净光晕渐变
+  { id: 'grad1', type: 'gradient', colors: ['#FDFBFB', '#EBEDEE'], css: 'linear-gradient(135deg, #FDFBFB 0%, #EBEDEE 100%)', label: '银河光晕' },
+  { id: 'grad2', type: 'gradient', colors: ['#FEF9F2', '#EAE0D5'], css: 'linear-gradient(135deg, #FEF9F2 0%, #EAE0D5 100%)', label: '晨曦奶油' },
+  { id: 'grad3', type: 'gradient', colors: ['#F5E6E6', '#E4D5CE'], css: 'linear-gradient(135deg, #F5E6E6 0%, #E4D5CE 100%)', label: '玫瑰薄雾' },
+  { id: 'grad4', type: 'gradient', colors: ['#E0EAFC', '#CFDEF3'], css: 'linear-gradient(135deg, #E0EAFC 0%, #CFDEF3 100%)', label: '清晨海岛' },
+
+  // 【网格第7行】冷调与暗境
+  { id: 'solid3', type: 'solid', value: '#E5E5EA', css: '#E5E5EA', label: '银河灰' },
+  { id: 'note3', type: 'solid', value: '#F2F2F7', css: 'linear-gradient(transparent 95%, #E2E2E8 95%) #F2F2F7', bgSize: '100% 30px', label: '冷灰横格' },
+  { id: 'solid4', type: 'solid', value: '#1C1C1E', css: '#1C1C1E', label: '深邃黑' },
+  { id: 'note4', type: 'solid', value: '#1C1C1E', css: 'linear-gradient(transparent 95%, #2C2C2E 95%) #1C1C1E', bgSize: '100% 30px', label: '暗夜横格' },
+  { id: 'grid_dark', type: 'solid', value: '#1C1C1E', css: 'linear-gradient(#2C2C2E 1px, transparent 1px), linear-gradient(90deg, #2C2C2E 1px, transparent 1px) #1C1C1E', bgSize: '20px 20px', grid: true, label: '暗境方格' }
 ]
 
 const TEXT_ALIGN_OPTIONS = ['left', 'center', 'right']
@@ -50,9 +67,20 @@ Page({
     helperCanvasHeight: 500,
     recordDate: '',
     backgrounds: BACKGROUNDS,
-    selectedBg: BACKGROUNDS.find((item) => item.id === 'bg1'),
+    selectedBg: BACKGROUNDS.find((item) => item.id === 'solid2'),
     textAlignOptions: TEXT_ALIGN_OPTIONS,
-    textColors: ['#000000', '#333333', '#8E8E93', '#FFFFFF', '#FF3B30', '#FF2D55', '#FF9500', '#FFCC00', '#34C759', '#4CD964', '#5AC8FA', '#007AFF', '#5856D6', '#AF52DE', '#A2845E'],
+    textColors: [
+      // 基础黑白灰
+      '#000000','#FFFFFF','#808080',
+      // 高饱和亮色（剪映经典必备色）
+      '#FF3B30', '#FF9500', '#FFCC00', '#34C759', '#00C7BE', '#007AFF', '#5856D6', '#AF52DE', '#FF2D55',
+      // 流行马卡龙色/低饱和粉彩
+      '#FFD4D4', '#FFE8D4', '#FFF5D4', '#E1FFD4', '#D4FDFF', '#D4E8FF', '#E8D4FF', '#FFD4ED',
+      // 浓郁深高贵色
+      '#8A1C1C', '#A85B2A', '#9B7400', '#1C6B2C', '#0A6E6A', '#134075', '#3A2073', '#731742',
+      // 复古大地色/莫兰迪
+      '#F5E6D3', '#D6B89E', '#A38068', '#869679', '#788A99', '#897A8C'
+    ],
     textItems: [],
     nextTextId: 1,
     activeTextId: null,
