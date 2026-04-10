@@ -46,7 +46,7 @@
         <view class="menu-item" bindtap="editProfile">
           <view class="menu-left">
             <view class="menu-icon-wrap">
-              <image class="menu-icon" src="https://img.icons8.com/ios-glyphs/50/8A2BE2/user-male-circle.png"></image>
+              <image class="menu-icon" src="../images/self/user-male-circle.png"></image>
             </view>
             <view class="menu-copy">
               <text class="menu-text">修改个人信息</text>
@@ -60,7 +60,7 @@
         <view class="menu-item" bindtap="goStats">
           <view class="menu-left">
             <view class="menu-icon-wrap">
-              <image class="menu-icon" src="https://img.icons8.com/ios-glyphs/50/8A2BE2/combo-chart.png"></image>
+              <image class="menu-icon" src="../images/self/combo-chart.png"></image>
             </view>
             <view class="menu-copy">
               <text class="menu-text">衣橱数据与分析</text>
@@ -73,7 +73,7 @@
         <view class="menu-item feedback-item">
           <view class="menu-left">
             <view class="menu-icon-wrap">
-              <image class="menu-icon" src="https://img.icons8.com/ios-glyphs/50/8A2BE2/topic.png"></image>
+              <image class="menu-icon" src="../images/self/topic.png"></image>
             </view>
             <view class="menu-copy">
               <text class="menu-text">意见反馈</text>
@@ -87,7 +87,7 @@
         <view class="menu-item feedback-item">
           <view class="menu-left">
             <view class="menu-icon-wrap">
-              <image class="menu-icon" src="https://img.icons8.com/ios-glyphs/50/8A2BE2/customer-support.png"></image>
+              <image class="menu-icon" src="../images/self/customer-support.png"></image>
             </view>
             <view class="menu-copy">
               <text class="menu-text">联系客服</text>
@@ -101,7 +101,7 @@
         <view class="menu-item" bindtap="goSettings">
           <view class="menu-left">
             <view class="menu-icon-wrap">
-              <image class="menu-icon" src="https://img.icons8.com/ios-glyphs/50/8A2BE2/settings.png"></image>
+              <image class="menu-icon" src="../images/self/settings.png"></image>
             </view>
             <view class="menu-copy">
               <text class="menu-text">系统设置</text>
@@ -114,7 +114,7 @@
         <view class="menu-item" bindtap="goAbout">
           <view class="menu-left">
             <view class="menu-icon-wrap">
-              <image class="menu-icon" src="https://img.icons8.com/ios-glyphs/50/8A2BE2/info.png"></image>
+              <image class="menu-icon" src="../images/self/info.png"></image>
             </view>
             <view class="menu-copy">
               <text class="menu-text">关于我们</text>
