@@ -1,34 +1,71 @@
 <view class="container">
-  <view class="search-header glass" style="padding-top: 10px">
+  <view class="search-header glass" style="padding-top: 12px; padding-bottom: 12px;">
     <view class="search-bar">
       <image class="search-icon" src="https://img.icons8.com/ios-glyphs/30/999999/search--v1.png"></image>
-      <input class="search-input" placeholder="搜索单品、颜色、场景" auto-focus="true" />
+      <input class="search-input" placeholder="搜索单品、颜色、场景" auto-focus="true" value="{{keyword}}" bindinput="onInput" bindconfirm="onConfirm" />
     </view>
+    <view class="cancel-btn" bindtap="goBack">取消</view>
   </view>
 
-  <view class="search-content">
-    <view class="section">
-      <view class="section-title">
-        <text>历史搜索</text>
-        <image class="delete-icon" src="https://img.icons8.com/ios-glyphs/30/999999/trash.png" bindtap="clearHistory"></image>
+  <scroll-view class="search-content" scroll-y="true" bindscrolltolower="onReachBottom" enhanced="true" show-scrollbar="false">
+    
+    <!-- 未在搜索时显示：历史与热门 -->
+    <block wx:if="{{!isSearching}}">
+      <view class="section" wx:if="{{historyList.length > 0}}">
+        <view class="section-title">
+          <text>历史搜索</text>
+          <image class="delete-icon" src="https://img.icons8.com/ios-glyphs/30/999999/trash.png" bindtap="clearHistory"></image>
+        </view>
+        <view class="tags">
+          <view class="tag" wx:for="{{historyList}}" wx:key="*this" bindtap="searchTag" data-tag="{{item}}">{{item}}</view>
+        </view>
       </view>
-      <view class="tags">
-        <view class="tag">白衬衫</view>
-        <view class="tag">牛仔裤</view>
-        <view class="tag">职场</view>
-      </view>
-    </view>
 
-    <view class="section">
-      <view class="section-title">
-        <text>热门标签</text>
+      <view class="section">
+        <view class="section-title">
+          <text>热门标签</text>
+        </view>
+        <view class="tags">
+          <view class="tag hot" bindtap="searchTag" data-tag="春季">🌸 春季</view>
+          <view class="tag hot" bindtap="searchTag" data-tag="旅行度假">✈️ 旅行度假</view>
+          <view class="tag hot" bindtap="searchTag" data-tag="连衣裙">连衣裙</view>
+          <view class="tag hot" bindtap="searchTag" data-tag="黑色">黑色</view>
+        </view>
       </view>
-      <view class="tags">
-        <view class="tag hot">🌸 春季</view>
-        <view class="tag hot">✈️ 旅行度假</view>
-        <view class="tag hot">连衣裙</view>
-        <view class="tag hot">黑色</view>
+    </block>
+
+    <!-- 正在搜索时显示：结果网格 -->
+    <block wx:else>
+      <view class="grid" wx:if="{{results.length > 0}}">
+        <view class="grid-item" wx:for="{{results}}" wx:key="id" bindtap="goToEdit" data-item="{{item}}">
+          <view class="item-img-bg">
+            <image class="main-img {{loadedImages[item.id] ? 'fade-in' : 'pre-load'}}" src="{{item.emoji}}" mode="aspectFit" lazy-load="true" bindload="onImageLoad" data-id="{{item.id}}" />
+          </view>
+          <view class="item-info">
+            <view class="item-header">
+              <view class="item-title">{{item.title}}</view>
+              <view class="season-list">
+                <text wx:for="{{item.seasons}}" wx:for-item="icon" wx:key="*this" class="season-icon">{{icon}}</text>
+              </view>
+            </view>
+            <view class="item-bottom">
+              <view class="item-desc">{{item.desc}}</view>
+              <view class="custom-tag" wx:if="{{item.tag}}">{{item.tag}}</view>
+            </view>
+          </view>
+        </view>
       </view>
-    </view>
-  </view>
+
+      <!-- 搜索状态 -->
+      <view class="loading-status" wx:if="{{isLoading}}">加载中...</view>
+      <view class="loading-status" wx:if="{{isNoMore && results.length > 0}}">到底啦~</view>
+      
+      <!-- 无结果空状态 -->
+      <view class="empty-state" wx:if="{{!isLoading && results.length === 0}}">
+        <image class="empty-icon" src="https://img.icons8.com/ios-glyphs/90/C8B5E8/box-important--v1.png"></image>
+        <text class="empty-title">找不到相关单品</text>
+        <text class="empty-tips">换个关键词试试看吧</text>
+      </view>
+    </block>
+  </scroll-view>
 </view>

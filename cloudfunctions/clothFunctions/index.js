@@ -270,15 +270,31 @@ const updateCloth = async (data) => {
 // 获取衣物列表 (支持分类 & 分页)
 const getClothes = async (data = {}) => {
   const { OPENID } = cloud.getWXContext();
-  const { category } = data;
+  const { category, keyword } = data;
   const page = Number(data.page || 0);
   const pageSize = Number(data.pageSize || 10);
 
   try {
+    const _ = db.command;
     let condition = { _openid: OPENID };
 
     if (category && category !== '全部') {
       condition.category = category;
+    }
+
+    if (keyword) {
+      const regex = db.RegExp({ regexp: keyword, options: 'i' });
+      condition = _.and([
+        condition,
+        _.or([
+          { name: regex },
+          { category: regex },
+          { color: regex },
+          { seasons: regex },
+          { occasions: regex },
+          { brand: regex }
+        ])
+      ]);
     }
 
     const res = await db.collection('clothes')
