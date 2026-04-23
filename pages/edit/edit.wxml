@@ -17,7 +17,7 @@
     </view>
 
     <view class="reupload-btn" bindtap="reupload">
-      <image class="reupload-icon" src="https://img.icons8.com/ios-glyphs/30/007AFF/refresh.png"></image>
+      <image class="reupload-icon" src="https://img.icons8.com/ios-glyphs/30/8A2BE2/refresh.png"></image>
       <text>重新上传</text>
     </view>
 

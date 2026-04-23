@@ -28,7 +28,15 @@
       class="canvas-bg-image"
       src="{{selectedBg.value}}"
       mode="aspectFill"
-    ></image>    <movable-view
+    ></image>
+
+    <view class="canvas-empty-state" wx:if="{{canvasItems.length === 0 && textItems.length === 0}}">
+      <image class="canvas-empty-icon" src="https://img.icons8.com/ios-glyphs/90/C8B5E8/magic-wand.png" />
+      <text class="canvas-empty-text">从下方单品库选择衣物</text>
+      <text class="canvas-empty-subtext">拖拽排版，释放你的穿搭灵感</text>
+    </view>
+
+    <movable-view
       id="item-{{item.id}}"
       wx:for="{{canvasItems}}"
       wx:key="id"
