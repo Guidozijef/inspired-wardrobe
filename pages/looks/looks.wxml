@@ -26,12 +26,20 @@
     </view>
     <view class="loading-status" wx:if="{{isLoading}}">加载中...</view>
     <view class="loading-status" wx:if="{{isNoMore && looks.length > 0}}">已经到底啦~</view>
+    <!-- Empty State -->
     <view class="empty-state" wx:if="{{isNoMore && looks.length === 0}}">
-      <text>还没有穿搭记录哦</text>
+      <image class="empty-img" src="./empty-state.png" mode="aspectFit"></image>
+      <text class="empty-title">灵感尚未着色</text>
+      <text class="empty-tips">这个分类下还没有穿搭，快去画板创作吧</text>
+      <view class="empty-btn" bindtap="switchTab" data-path="/pages/canvas/canvas">立即创建</view>
     </view>
   </view>
 </scroll-view>
 
+  <!-- Floating Add Button -->
+  <view class="add-btn" bindtap="switchTab" data-path="/pages/canvas/canvas">
+    <text class="add-icon">+</text>
+  </view>
   <!-- Custom Tab Bar -->
   <view class="tab-bar glass">
     <view class="tab-item" bindtap="switchTab" data-path="/pages/wardrobe/wardrobe">
