@@ -35,11 +35,26 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  padding: 0 20px 20px;
+  padding: 0 20px 20px 10px;
   box-sizing: border-box;
   position: relative;
   z-index: 30;
   border-bottom: 1px solid rgba(138, 43, 226, 0.08);
+}
+
+.nav-header-left {
+  display: flex;
+  align-items: center;
+}
+
+.nav-back-btn {
+  padding: 8px 12px 8px 0;
+}
+
+.back-icon {
+  width: 24px;
+  height: 24px;
+  opacity: 0.8;
 }
 
 .nav-brand-area {

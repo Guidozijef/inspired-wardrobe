@@ -1,0 +1,101 @@
+<view class="container">
+
+  <view class="main-content" style="padding-top: {{statusBarHeight + 10}}px;">
+    <!-- Header: Greeting & Date -->
+    <view class="header">
+      <view class="greeting">{{greeting}}, The Curator</view>
+      <view class="date">{{dateText}}</view>
+    </view>
+
+    <!-- Weather Widget -->
+    <view class="weather-card glass">
+      <view class="weather-top">
+        <view class="weather-info">
+          <text class="weather-icon">{{weather.icon}}</text>
+          <text class="weather-temp">{{weather.temp}}</text>
+          <text class="weather-desc">{{weather.desc}}</text>
+        </view>
+        <view class="weather-location">
+          <image class="location-icon" src="https://img.icons8.com/ios-glyphs/30/7C3AED/marker--v1.png"></image>
+          <text>我的位置</text>
+        </view>
+      </view>
+      <view class="weather-advice">
+        <text>💡 {{weather.advice}}</text>
+      </view>
+    </view>
+
+    <!-- Quick Actions -->
+    <view class="actions-section">
+      <view class="action-btn primary glass" bindtap="goToCanvas">
+        <view class="action-icon-bg">
+          <image class="action-icon" src="../images/tabbar/fantasy_active.png"></image>
+        </view>
+        <view class="action-texts">
+          <text class="action-title">去画布排版</text>
+          <text class="action-desc">灵感穿搭 自由搭配</text>
+        </view>
+        <view class="action-arrow">→</view>
+      </view>
+
+      <view class="action-row">
+        <view class="action-btn secondary glass" bindtap="goPhotograph">
+          <image class="action-icon-small" src="https://img.icons8.com/ios-glyphs/60/7C3AED/camera.png"></image>
+          <text class="action-title-small">拍照入库</text>
+        </view>
+        <view class="action-btn secondary glass" bindtap="goPhotoalbum">
+          <image class="action-icon-small" src="https://img.icons8.com/ios-glyphs/60/7C3AED/picture.png"></image>
+          <text class="action-title-small">相册导入</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Today's Pick -->
+    <view class="recommend-section">
+      <view class="section-title">
+        <text>今日推荐</text>
+        <text class="section-subtitle">Today's Pick</text>
+      </view>
+
+      <view class="picks-container" wx:if="{{todayPicks.length > 0}}">
+        <view class="pick-item glass" wx:for="{{todayPicks}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
+          <view class="pick-img-wrapper">
+            <image class="pick-img" src="{{item.image}}" mode="aspectFit"></image>
+          </view>
+          <view class="pick-title">{{item.title}}</view>
+        </view>
+      </view>
+      
+      <!-- Empty state for recommendations -->
+      <view class="empty-picks glass" wx:if="{{todayPicks.length === 0}}">
+        <image class="empty-picks-icon" src="https://img.icons8.com/ios-glyphs/60/C8B5E8/hanger.png"></image>
+        <text>衣橱里还没有单品</text>
+        <view class="empty-add-btn" bindtap="goToAdd">立即添加</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Tab Bar -->
+  <view class="tab-bar glass">
+    <view class="tab-item active" data-path="/pages/home/home" bindtap="switchTab">
+      <image class="tab-icon" src="../images/tabbar/home-page_active.png"></image>
+      <text class="tab-text">首页</text>
+    </view>
+    <view class="tab-item" data-path="/pages/wardrobe/wardrobe" bindtap="switchTab">
+      <image class="tab-icon" src="../images/tabbar/shirt.png"></image>
+      <text class="tab-text">衣橱</text>
+    </view>
+    <view class="tab-item" data-path="/pages/looks/looks" bindtap="switchTab">
+      <image class="tab-icon" src="../images/tabbar/hanger.png"></image>
+      <text class="tab-text">穿搭</text>
+    </view>
+    <view class="tab-item" data-path="/pages/calendar/calendar" bindtap="switchTab">
+      <image class="tab-icon" src="../images/tabbar/calendar.png"></image>
+      <text class="tab-text">日历</text>
+    </view>
+    <view class="tab-item" data-path="/pages/profile/profile" bindtap="switchTab">
+      <image class="tab-icon" src="../images/tabbar/user.png"></image>
+      <text class="tab-text">我的</text>
+    </view>
+  </view>
+</view>

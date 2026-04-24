@@ -98,6 +98,10 @@ Page({
     }
   },
 
+  goBack() {
+    wx.navigateBack();
+  },
+
   onLoad(options) {
     const sysInfo = wx.getSystemInfoSync()
     const menuButton = wx.getMenuButtonBoundingClientRect()

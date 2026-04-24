@@ -4,11 +4,16 @@
   <view class="glow glow-b"></view>
 
   <view class="nav-header glass" style="padding-top: {{statusBarHeight + 16}}px;">
-    <view class="nav-brand-area">
-      <text class="page-brand">MY WARDROBE</text>
-      <view class="nav-title-row">
-        <text class="page-title">搭配画布</text>
-        <text class="nav-size-badge">1080×1440</text>
+    <view class="nav-header-left">
+      <view class="nav-back-btn" bindtap="goBack">
+        <image class="back-icon" src="https://img.icons8.com/ios-glyphs/30/1C1033/back.png"></image>
+      </view>
+      <view class="nav-brand-area">
+        <text class="page-brand">MY WARDROBE</text>
+        <view class="nav-title-row">
+          <text class="page-title">搭配画布</text>
+          <text class="nav-size-badge">1080×1440</text>
+        </view>
       </view>
     </view>
     <view class="nav-actions">
@@ -253,28 +258,6 @@
     </view>
   </view>
 
-  <view class="tab-bar glass">
-    <view class="tab-item" bindtap="switchTab" data-path="/pages/wardrobe/wardrobe">
-      <image class="tab-icon" src="../images/tabbar/shirt.png"></image>
-      <text class="tab-text">衣橱</text>
-    </view>
-    <view class="tab-item active">
-      <image class="tab-icon" src="../images/tabbar/fantasy_active.png"></image>
-      <text class="tab-text">画布</text>
-    </view>
-    <view class="tab-item" bindtap="switchTab" data-path="/pages/looks/looks">
-      <image class="tab-icon" src="../images/tabbar/hanger.png"></image>
-      <text class="tab-text">穿搭</text>
-    </view>
-    <view class="tab-item" bindtap="switchTab" data-path="/pages/calendar/calendar">
-      <image class="tab-icon" src="../images/tabbar/calendar.png"></image>
-      <text class="tab-text">日历</text>
-    </view>
-    <view class="tab-item" bindtap="switchTab" data-path="/pages/profile/profile">
-      <image class="tab-icon" src="../images/tabbar/user.png"></image>
-      <text class="tab-text">我的</text>
-    </view>
-  </view>
 
   <view class="modal-mask {{showSaveModal ? 'show' : ''}}" bindtap="closeSaveModal">
     <view class="modal-content glass" catchtap="stopBubble">

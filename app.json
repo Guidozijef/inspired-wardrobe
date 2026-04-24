@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/home/home",
     "pages/wardrobe/wardrobe",
     "pages/edit/edit",
     "pages/canvas/canvas",
