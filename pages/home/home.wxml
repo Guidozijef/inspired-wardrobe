@@ -1,14 +1,18 @@
 <view class="container">
+  <!-- Rich Animated Background Mesh -->
+  <view class="bg-glow glow-1"></view>
+  <view class="bg-glow glow-2"></view>
+  <view class="bg-glow glow-3"></view>
 
   <view class="main-content" style="padding-top: {{statusBarHeight + 10}}px;">
     <!-- Header: Greeting & Date -->
-    <view class="header">
+    <view class="header animate-fade-in-up delay-1">
       <view class="greeting">{{greeting}}, The Curator</view>
       <view class="date">{{dateText}}</view>
     </view>
 
     <!-- Weather Widget -->
-    <view class="weather-card glass">
+    <view class="weather-card glass animate-fade-in-up delay-2">
       <view class="weather-top">
         <view class="weather-info">
           <text class="weather-icon">{{weather.icon}}</text>
@@ -26,7 +30,7 @@
     </view>
 
     <!-- Quick Actions -->
-    <view class="actions-section">
+    <view class="actions-section animate-fade-in-up delay-3">
       <view class="action-btn primary glass" bindtap="goToCanvas">
         <view class="action-icon-bg">
           <image class="action-icon" src="../images/tabbar/fantasy_active.png"></image>
@@ -51,7 +55,7 @@
     </view>
 
     <!-- Today's Pick -->
-    <view class="recommend-section">
+    <view class="recommend-section animate-fade-in-up delay-4">
       <view class="section-title">
         <text>今日推荐</text>
         <text class="section-subtitle">Today's Pick</text>
