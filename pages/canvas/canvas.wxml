@@ -156,9 +156,11 @@
       >{{item}}</view>
     </scroll-view>
 
-    <scroll-view class="item-scroll" scroll-x="true" show-scrollbar="false" wx:if="{{activeTab === 0}}">
-      <view class="scroll-item" wx:for="{{libraryItems}}" wx:key="_id" bindtap="addToCanvas" data-item="{{item}}">
-        <image class="library-img" src="{{item.image_url}}" mode="aspectFit" />
+    <scroll-view class="item-scroll" scroll-y="true" show-scrollbar="false" wx:if="{{activeTab === 0}}">
+      <view class="item-grid">
+        <view class="scroll-item" wx:for="{{libraryItems}}" wx:key="_id" bindtap="addToCanvas" data-item="{{item}}">
+          <image class="library-img" src="{{item.image_url}}" mode="aspectFit" />
+        </view>
       </view>
     </scroll-view>
 
