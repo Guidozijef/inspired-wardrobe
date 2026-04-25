@@ -5,10 +5,11 @@ Page({
     greeting: '早上好',
     dateText: '',
     weather: {
-      temp: '24°C',
-      desc: '晴朗',
-      icon: '☀️',
-      advice: '微凉，建议搭配薄外套'
+      temp: '--°C',
+      desc: '加载中...',
+      icon: '☁️',
+      advice: '正在获取天气信息...',
+      location: '定位中...'
     },
     todayPicks: []
   },
@@ -21,6 +22,7 @@ Page({
     });
     this.initDateAndGreeting();
     this.fetchTodayPicks();
+    this.fetchWeather();
   },
   initDateAndGreeting() {
     const now = new Date();
@@ -57,6 +59,48 @@ Page({
         this.setData({ todayPicks: picks });
       }
     }).catch(err => console.error(err));
+  },
+  
+  fetchWeather() {
+    wx.cloud.callFunction({
+      name: 'clothFunctions',
+      data: { type: 'getWeather' }
+    }).then(res => {
+      if (res.result && res.result.success && res.result.weather) {
+        const live = res.result.weather;
+        const city = res.result.location;
+        
+        const weatherDesc = live.weather;
+        let icon = '☁️';
+        let advice = '舒适，可自由穿搭';
+        
+        if (weatherDesc.includes('晴')) { icon = '☀️'; advice = '阳光明媚，注意防晒'; }
+        else if (weatherDesc.includes('雨')) { icon = '🌧️'; advice = '有雨，出门记得带伞'; }
+        else if (weatherDesc.includes('阴')) { icon = '☁️'; advice = '多云转阴，温度适宜'; }
+        else if (weatherDesc.includes('雪')) { icon = '❄️'; advice = '下雪啦，注意保暖'; }
+        
+        const temp = parseInt(live.temperature);
+        if (temp < 10) advice = '天气寒冷，建议穿厚外套/羽绒服';
+        else if (temp >= 10 && temp < 20) advice = '微凉，建议搭配薄外套/卫衣';
+        else if (temp >= 20 && temp < 28) advice = '温度适宜，适合穿衬衫/T恤';
+        else if (temp >= 28) advice = '天气炎热，建议穿轻薄透气的夏装';
+
+        this.setData({
+          weather: {
+            temp: `${live.temperature}°C`,
+            desc: live.weather,
+            icon: icon,
+            advice: advice,
+            location: city
+          }
+        });
+      } else {
+        this.setData({ 'weather.location': '定位失败' });
+      }
+    }).catch(err => {
+      console.error('获取天气云函数调用失败:', err);
+      this.setData({ 'weather.location': '网络错误' });
+    });
   },
   goToCanvas() {
     wx.navigateTo({ url: '/pages/canvas/canvas' });

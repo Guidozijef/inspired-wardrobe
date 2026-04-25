@@ -538,6 +538,43 @@ const getWardrobeStats = async () => {
   }
 };
 
+// 获取天气信息 (通过云端请求，免配合法域名)
+const getWeather = async () => {
+  const wxContext = cloud.getWXContext();
+  const clientIP = wxContext.CLIENTIP;
+  const key = '297eda70c46dcf772765e8e343d7e1ba';
+
+  try {
+    // 1. 通过高德 IP 定位接口获取当前城市
+    // 注意：传入真实客户端 IP，否则会定位到云函数的服务器
+    const ipRes = await axios.get(`https://restapi.amap.com/v3/ip?ip=${clientIP}&key=${key}`);
+    
+    if (ipRes.data && ipRes.data.status === '1') {
+      let city = ipRes.data.city || ipRes.data.province;
+      if (typeof city !== 'string' || !city) city = '未知城市';
+      
+      const cityOrAdcode = ipRes.data.adcode || city;
+      
+      // 2. 根据城市获取天气
+      const weatherRes = await axios.get(`https://restapi.amap.com/v3/weather/weatherInfo?key=${key}&city=${encodeURIComponent(cityOrAdcode)}`);
+      
+      if (weatherRes.data && weatherRes.data.status === '1' && weatherRes.data.lives && weatherRes.data.lives.length > 0) {
+        return {
+          success: true,
+          location: city,
+          weather: weatherRes.data.lives[0]
+        };
+      } else {
+        return { success: false, errMsg: '获取天气信息失败', location: city };
+      }
+    } else {
+      return { success: false, errMsg: 'IP定位失败' };
+    }
+  } catch (err) {
+    return { success: false, errMsg: err.message };
+  }
+};
+
 // 云函数入口函数
 exports.main = async (event, context) => {
   console.log('脚本加载成功')
@@ -643,6 +680,8 @@ exports.main = async (event, context) => {
       return await updateUserProfile(event.data);
     case "getWardrobeStats":
       return await getWardrobeStats();
+    case "getWeather":
+      return await getWeather();
     default:
       return {
         success: false,

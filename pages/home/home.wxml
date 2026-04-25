@@ -21,7 +21,7 @@
         </view>
         <view class="weather-location">
           <image class="location-icon" src="https://img.icons8.com/ios-glyphs/30/7C3AED/marker--v1.png"></image>
-          <text>我的位置</text>
+          <text>{{weather.location || '定位中...'}}</text>
         </view>
       </view>
       <view class="weather-advice">

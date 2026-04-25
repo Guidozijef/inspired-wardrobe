@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<script>
+    function getLocation() {
+        axios
+            .get("https://restapi.amap.com/v3/ip", {
+                params: {
+                    key: "e8e0bb95c623fd363f68ca5e3045b5b2",
+                },
+            })
+            .then((data) => {
+                console.log(data.data);
+                const span = document.getElementById("city");
+                span.innerText = data.data.city;
+            });
+    }
+</script>
+
+<body>
+    <button onclick="getLocation()">定位</button><span id="city">未知</span>
+</body>
+
+</html>
