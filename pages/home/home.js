@@ -62,10 +62,30 @@ Page({
   },
   
   fetchWeather() {
+    // 优先尝试获取手机 GPS 定位 (使用模糊定位，更容易通过审核)
+    wx.getFuzzyLocation({
+      type: 'wgs84',
+      success: (res) => {
+        this.callWeatherCloudFunction(res.latitude, res.longitude);
+      },
+      fail: (err) => {
+        console.warn('获取 GPS 定位失败，降级使用 IP 定位', err);
+        // 如果用户拒绝授权或获取失败，降级使用原有的 IP 定位
+        this.callWeatherCloudFunction();
+      }
+    });
+  },
+  
+  callWeatherCloudFunction(lat, lon) {
     wx.cloud.callFunction({
       name: 'clothFunctions',
-      data: { type: 'getWeather' }
+      data: { 
+        type: 'getWeather',
+        lat: lat,
+        lon: lon
+      }
     }).then(res => {
+      console.log(res)
       if (res.result && res.result.success && res.result.weather) {
         const live = res.result.weather;
         const city = res.result.location;
@@ -145,5 +165,19 @@ Page({
   switchTab(e) {
     const path = e.currentTarget.dataset.path;
     wx.redirectTo({ url: path });
+  },
+
+  onShareAppMessage() {
+    return {
+      title: 'AI灵感衣橱 - 你的私人穿搭管家',
+      path: '/pages/home/home',
+      imageUrl: '/assets/logo.png' // 可选，如果项目里有合适的海报可以换成相应的图片
+    };
+  },
+
+  onShareTimeline() {
+    return {
+      title: 'AI灵感衣橱 - 你的私人穿搭管家'
+    };
   }
 });

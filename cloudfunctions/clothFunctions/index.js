@@ -539,23 +539,41 @@ const getWardrobeStats = async () => {
 };
 
 // 获取天气信息 (通过云端请求，免配合法域名)
-const getWeather = async () => {
+const getWeather = async (data = {}) => {
+  const { lat, lon } = data;
   const wxContext = cloud.getWXContext();
   const clientIP = wxContext.CLIENTIP;
   const key = '297eda70c46dcf772765e8e343d7e1ba';
 
   try {
-    // 1. 通过高德 IP 定位接口获取当前城市
-    // 注意：传入真实客户端 IP，否则会定位到云函数的服务器
-    const ipRes = await axios.get(`https://restapi.amap.com/v3/ip?ip=${clientIP}&key=${key}`);
-    
-    if (ipRes.data && ipRes.data.status === '1') {
-      let city = ipRes.data.city || ipRes.data.province;
-      if (typeof city !== 'string' || !city) city = '未知城市';
-      
-      const cityOrAdcode = ipRes.data.adcode || city;
-      
-      // 2. 根据城市获取天气
+    let cityOrAdcode = '';
+    let city = '';
+
+    // 1. 如果客户端传来了 GPS 经纬度，优先使用逆地理编码获取准确城市
+    if (lat && lon) {
+      // 高德逆地理编码接口要求格式为：经度,纬度 (lon,lat)
+      const regeoRes = await axios.get(`https://restapi.amap.com/v3/geocode/regeo?location=${lon},${lat}&key=${key}`);
+      if (regeoRes.data && regeoRes.data.status === '1') {
+        const addressComponent = regeoRes.data.regeocode.addressComponent;
+        cityOrAdcode = addressComponent.adcode;
+        city = addressComponent.city && addressComponent.city.length > 0 ? addressComponent.city : addressComponent.province;
+      }
+    }
+
+    // 2. 如果没有经纬度（用户未授权或获取失败），降级使用 IP 定位
+    if (!cityOrAdcode) {
+      const ipRes = await axios.get(`https://restapi.amap.com/v3/ip?ip=${clientIP}&key=${key}`);
+      if (ipRes.data && ipRes.data.status === '1') {
+        city = ipRes.data.city || ipRes.data.province;
+        if (typeof city !== 'string' || !city) city = '未知城市';
+        cityOrAdcode = ipRes.data.adcode || city;
+      } else {
+        return { success: false, errMsg: 'IP定位失败 (可能处于 IPv6 网络环境)', location: city || '未知城市' };
+      }
+    }
+
+    // 3. 根据城市 adcode 获取天气
+    if (cityOrAdcode) {
       const weatherRes = await axios.get(`https://restapi.amap.com/v3/weather/weatherInfo?key=${key}&city=${encodeURIComponent(cityOrAdcode)}`);
       
       if (weatherRes.data && weatherRes.data.status === '1' && weatherRes.data.lives && weatherRes.data.lives.length > 0) {
@@ -568,7 +586,7 @@ const getWeather = async () => {
         return { success: false, errMsg: '获取天气信息失败', location: city };
       }
     } else {
-      return { success: false, errMsg: 'IP定位失败' };
+      return { success: false, errMsg: '无法解析城市信息' };
     }
   } catch (err) {
     return { success: false, errMsg: err.message };
@@ -681,7 +699,7 @@ exports.main = async (event, context) => {
     case "getWardrobeStats":
       return await getWardrobeStats();
     case "getWeather":
-      return await getWeather();
+      return await getWeather(event.data);
     default:
       return {
         success: false,
