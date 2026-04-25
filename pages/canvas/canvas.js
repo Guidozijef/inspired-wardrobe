@@ -13,6 +13,12 @@ const BACKGROUNDS = [
   { id: 'solid10', type: 'solid', value: '#E8D8D8', css: '#E8D8D8', label: '干枯玫瑰' },
   { id: 'solid12', type: 'solid', value: '#BAAFAF', css: '#BAAFAF', label: '紫雾灰' },
 
+    // 【网格第6行】纯净光晕渐变
+  { id: 'grad1', type: 'gradient', colors: ['#FDFBFB', '#EBEDEE'], css: 'linear-gradient(135deg, #FDFBFB 0%, #EBEDEE 100%)', label: '银河光晕' },
+  { id: 'grad2', type: 'gradient', colors: ['#FEF9F2', '#EAE0D5'], css: 'linear-gradient(135deg, #FEF9F2 0%, #EAE0D5 100%)', label: '晨曦奶油' },
+  { id: 'grad3', type: 'gradient', colors: ['#F5E6E6', '#E4D5CE'], css: 'linear-gradient(135deg, #F5E6E6 0%, #E4D5CE 100%)', label: '玫瑰薄雾' },
+  { id: 'grad4', type: 'gradient', colors: ['#E0EAFC', '#CFDEF3'], css: 'linear-gradient(135deg, #E0EAFC 0%, #CFDEF3 100%)', label: '清晨海岛' },
+
   // 【网格第3行】高级纸本（横线与网格点阵）
   { id: 'note1', type: 'solid', value: '#FFFFFF', css: 'linear-gradient(transparent 95%, #F0F0F0 95%) #FFFFFF', bgSize: '100% 30px', label: '极简横线' },
   { id: 'note2', type: 'solid', value: '#FCFBF6', css: 'linear-gradient(transparent 95%, #EBE8DA 95%) #FCFBF6', bgSize: '100% 30px', label: '护眼横格' },
@@ -21,28 +27,30 @@ const BACKGROUNDS = [
 
   // 【网格第4行】实景材质
   { id: 'img3', type: 'image', value: '/assets/backgrounds/bg_plaster_shadow.png', css: 'url(/assets/backgrounds/bg_plaster_shadow.png)', label: '白墙光影' },
-  { id: 'img2', type: 'image', value: '/assets/backgrounds/bg_beige_linen.png', css: 'url(/assets/backgrounds/bg_beige_linen.png)', label: '粗纺亚麻' },
+  // { id: 'img2', type: 'image', value: '/assets/backgrounds/bg_beige_linen.png', css: 'url(/assets/backgrounds/bg_beige_linen.png)', label: '粗纺亚麻' },
   { id: 'img5', type: 'image', value: '/assets/backgrounds/bg_terrazzo.png', css: 'url(/assets/backgrounds/bg_terrazzo.png)', label: '纯净水磨石' },
   { id: 'img1', type: 'image', value: '/assets/backgrounds/bg_light_wood.png', css: 'url(/assets/backgrounds/bg_light_wood.png)', label: '原木底纹' },
 
-  // 【网格第5行】丝滑光晕与辅助预设
+  // 【网格第5行】节庆与插画模板
+  { id: 'img_new_year', type: 'image', value: '/assets/backgrounds/bg_new_year_floral.png', css: 'url(/assets/backgrounds/bg_new_year_floral.png)', label: '新年可期' },
+  { id: 'img_botanical', type: 'image', value: '/assets/backgrounds/bg_cute_botanical.png', css: 'url(/assets/backgrounds/bg_cute_botanical.png)', label: '植物手帐' },
+  { id: 'img_vintage_frame', type: 'image', value: '/assets/backgrounds/bg_vintage_frame.png', css: 'url(/assets/backgrounds/bg_vintage_frame.png)', label: '复古相框' },
+  { id: 'img_christmas', type: 'image', value: '/assets/backgrounds/bg_christmas.png', css: 'url(/assets/backgrounds/bg_christmas.png)', label: '圣诞物语' },
+  { id: 'img_autumn', type: 'image', value: '/assets/backgrounds/bg_autumn.png', css: 'url(/assets/backgrounds/bg_autumn.png)', label: '秋日落叶' },
+  { id: 'img_memphis', type: 'image', value: '/assets/backgrounds/bg_memphis.png', css: 'url(/assets/backgrounds/bg_memphis.png)', label: '孟菲斯波点' },
+  { id: 'img_spring_cherry', type: 'image', value: '/assets/backgrounds/bg_spring_cherry.png', css: 'url(/assets/backgrounds/bg_spring_cherry.png)', label: '春日樱花' },
+  { id: 'img_scrapbook_tape', type: 'image', value: '/assets/backgrounds/bg_scrapbook_tape.png', css: 'url(/assets/backgrounds/bg_scrapbook_tape.png)', label: '手账胶带' },
+  { id: 'img_summer_beach', type: 'image', value: '/assets/backgrounds/bg_summer_beach.png', css: 'url(/assets/backgrounds/bg_summer_beach.png)', label: '夏日海滩' },
+  { id: 'img_neon_cyberpunk', type: 'image', value: '/assets/backgrounds/bg_neon_cyberpunk.png', css: 'url(/assets/backgrounds/bg_neon_cyberpunk.png)', label: '赛博霓虹' },
+  { id: 'img_clouds_stars', type: 'image', value: '/assets/backgrounds/bg_clouds_stars.png', css: 'url(/assets/backgrounds/bg_clouds_stars.png)', label: '云端星空' },
+  { id: 'img_gold_foliage', type: 'image', value: '/assets/backgrounds/bg_gold_foliage.png', css: 'url(/assets/backgrounds/bg_gold_foliage.png)', label: '烫金落叶' },
+
+  // 【网格第6行】丝滑光晕与辅助预设
   { id: 'img4', type: 'image', value: '/assets/backgrounds/bg_beige_silk.png', css: 'url(/assets/backgrounds/bg_beige_silk.png)', label: '柔滑丝绸' },
   { id: 'img6', type: 'image', value: '/assets/backgrounds/bg_aura_grain.png', css: 'url(/assets/backgrounds/bg_aura_grain.png)', label: '胶片柔光斑' },
   { id: 'grid1', type: 'solid', value: '#FFFFFF', css: 'linear-gradient(#F0F0F0 1px, transparent 1px), linear-gradient(90deg, #F0F0F0 1px, transparent 1px) #FFFFFF', bgSize: '20px 20px', grid: true, label: '基础网格' },
   { id: 'grid2', type: 'solid', value: '#FFFFFF', css: 'radial-gradient(#D1D1D1 1.5px, transparent 1.5px) #FFFFFF', bgSize: '16px 16px', dots: true, label: '细密点阵' },
 
-  // 【网格第6行】纯净光晕渐变
-  { id: 'grad1', type: 'gradient', colors: ['#FDFBFB', '#EBEDEE'], css: 'linear-gradient(135deg, #FDFBFB 0%, #EBEDEE 100%)', label: '银河光晕' },
-  { id: 'grad2', type: 'gradient', colors: ['#FEF9F2', '#EAE0D5'], css: 'linear-gradient(135deg, #FEF9F2 0%, #EAE0D5 100%)', label: '晨曦奶油' },
-  { id: 'grad3', type: 'gradient', colors: ['#F5E6E6', '#E4D5CE'], css: 'linear-gradient(135deg, #F5E6E6 0%, #E4D5CE 100%)', label: '玫瑰薄雾' },
-  { id: 'grad4', type: 'gradient', colors: ['#E0EAFC', '#CFDEF3'], css: 'linear-gradient(135deg, #E0EAFC 0%, #CFDEF3 100%)', label: '清晨海岛' },
-
-  // 【网格第7行】冷调与暗境
-  { id: 'solid3', type: 'solid', value: '#E5E5EA', css: '#E5E5EA', label: '银河灰' },
-  { id: 'note3', type: 'solid', value: '#F2F2F7', css: 'linear-gradient(transparent 95%, #E2E2E8 95%) #F2F2F7', bgSize: '100% 30px', label: '冷灰横格' },
-  { id: 'solid4', type: 'solid', value: '#1C1C1E', css: '#1C1C1E', label: '深邃黑' },
-  { id: 'note4', type: 'solid', value: '#1C1C1E', css: 'linear-gradient(transparent 95%, #2C2C2E 95%) #1C1C1E', bgSize: '100% 30px', label: '暗夜横格' },
-  { id: 'grid_dark', type: 'solid', value: '#1C1C1E', css: 'linear-gradient(#2C2C2E 1px, transparent 1px), linear-gradient(90deg, #2C2C2E 1px, transparent 1px) #1C1C1E', bgSize: '20px 20px', grid: true, label: '暗境方格' }
 ]
 
 const TEXT_ALIGN_OPTIONS = ['left', 'center', 'right']
