@@ -63,7 +63,7 @@ Page({
   
   fetchWeather() {
     // 优先尝试获取手机 GPS 定位 (使用模糊定位，更容易通过审核)
-    wx.getFuzzyLocation({
+    wx.getLocation({
       type: 'wgs84',
       success: (res) => {
         this.callWeatherCloudFunction(res.latitude, res.longitude);

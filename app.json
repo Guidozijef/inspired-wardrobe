@@ -31,6 +31,6 @@
     }
   },
   "requiredPrivateInfos": [
-    "getFuzzyLocation"
+    "getLocation"
   ]
 }
