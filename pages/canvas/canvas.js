@@ -57,7 +57,7 @@ const TEXT_ALIGN_OPTIONS = ['left', 'center', 'right']
 
 Page({
   data: {
-    tabs: ['单品库', '背景', '文字'],
+    tabs: ['单品库', '背景', '文字', '✨ AI魔法'],
     activeTab: 0,
     categories: WARDROBE_CATEGORIES,
     activeCategory: 0,
@@ -103,7 +103,9 @@ Page({
       startY: 0,
       initX: 0,
       initY: 0
-    }
+    },
+    aiPrompt: '',
+    aiTags: ['极简画室', '日落海滩', '巴黎街头', '复古老钱风', '赛博朋克霓虹', '莫兰迪色纯净空间']
   },
 
   goBack() {
@@ -1179,6 +1181,81 @@ Page({
           })
         })
       })
+    })
+  },
+
+  // --- AI 魔法相关方法 ---
+
+  onAIPromptInput(e) {
+    this.setData({ aiPrompt: e.detail.value })
+  },
+
+  selectAITag(e) {
+    const tag = e.currentTarget.dataset.tag
+    this.setData({ aiPrompt: tag })
+  },
+
+  generateAIPoster() {
+    let prompt = this.data.aiPrompt.trim()
+    if (!prompt) {
+      wx.showToast({ title: '请输入场景描述', icon: 'none' })
+      return
+    }
+
+    wx.showLoading({ title: 'AI创作中...', mask: true })
+    
+    // 增加后缀以确保生成的图像适合作为背景
+    const finalPrompt = prompt + "，适合作为高级海报背景，唯美光影，极简，高分辨率，无文字"
+
+    // 调用生图云函数
+    wx.cloud.callFunction({
+      name: "generateImage-4IUjJb",
+      data: {
+        prompt: finalPrompt
+      },
+      success: res => {
+        wx.hideLoading()
+        const result = res.result
+
+        if (result && result.success && result.imageUrl) {
+          wx.showToast({ title: '魔法生效！', icon: 'success' })
+          
+          // 设置背景并切回背景 tab 供用户预览
+          this.setData({
+            selectedBg: {
+              id: 'ai_generated_' + Date.now(),
+              type: 'image',
+              value: result.imageUrl,
+              css: `url(${result.imageUrl})`,
+              label: 'AI: ' + prompt.substring(0, 4)
+            },
+            activeTab: 1 
+          })
+          
+          // 预下载图片到本地临时路径，确保后续 canvas 绘图保存时不报跨域错或过期错误
+          wx.downloadFile({
+            url: result.imageUrl,
+            success: (downloadRes) => {
+              if (downloadRes.statusCode === 200) {
+                // 更新 value 为本地临时路径
+                const bg = this.data.selectedBg;
+                bg.value = downloadRes.tempFilePath;
+                bg.css = `url(${downloadRes.tempFilePath})`;
+                this.setData({ selectedBg: bg });
+              }
+            }
+          })
+          
+        } else {
+          console.error("生成失败:", result);
+          wx.showToast({ title: '生成失败请重试', icon: 'none' })
+        }
+      },
+      fail: err => {
+        wx.hideLoading()
+        console.error("调用失败:", err)
+        wx.showToast({ title: '网络错误', icon: 'none' })
+      }
     })
   }
 })

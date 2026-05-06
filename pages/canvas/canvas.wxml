@@ -254,6 +254,34 @@
       </view>
     </view>
 
+    <!-- AI 魔法面板 -->
+    <view class="ai-magic-panel" wx:if="{{activeTab === 3}}">
+      <view class="ai-input-container">
+        <input 
+          class="ai-prompt-input" 
+          placeholder="描述你想要的背景，如：巴黎复古街头" 
+          value="{{aiPrompt}}"
+          bindinput="onAIPromptInput"
+        />
+      </view>
+      
+      <scroll-view class="ai-tags-scroll" scroll-x="true" show-scrollbar="false">
+        <view 
+          wx:for="{{aiTags}}" 
+          wx:key="*this"
+          class="ai-tag-chip"
+          bindtap="selectAITag"
+          data-tag="{{item}}"
+        >
+          {{item}}
+        </view>
+      </scroll-view>
+
+      <view class="ai-generate-btn" bindtap="generateAIPoster">
+        ✨ 施展魔法生成背景
+      </view>
+    </view>
+
     <view class="drag-hint" wx:if="{{activeTab === 0}}">
       <text class="arrow-up">↑</text>
       点击单品放入画布
