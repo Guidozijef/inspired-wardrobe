@@ -1,22 +1,5 @@
 {
-  "pages": [
-    "pages/home/home",
-    "pages/wardrobe/wardrobe",
-    "pages/edit/edit",
-    "pages/canvas/canvas",
-    "pages/looks/looks",
-    "pages/calendar/calendar",
-    "pages/profile/profile",
-    "pages/look_detail/look_detail",
-    "pages/detail/detail",
-    "pages/search/search",
-    "pages/capsule/capsule",
-    "pages/share/share",
-    "pages/share_preview/share_preview",
-    "pages/stats/stats",
-    "pages/about/about",
-    "pages/settings/settings"
-  ],
+  "pages": ["pages/home/home", "pages/wardrobe/wardrobe", "pages/edit/edit", "pages/canvas/canvas", "pages/looks/looks", "pages/calendar/calendar", "pages/profile/profile", "pages/look_detail/look_detail", "pages/detail/detail", "pages/search/search", "pages/capsule/capsule", "pages/share/share", "pages/share_preview/share_preview", "pages/stats/stats", "pages/about/about", "pages/settings/settings"],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#F2F2F7",
@@ -31,6 +14,6 @@
     }
   },
   "requiredPrivateInfos": [
-    "getLocation"
+    // "getLocation"
   ]
 }
